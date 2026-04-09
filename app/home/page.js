@@ -11,17 +11,20 @@ import { Footer } from "@/components/Footer";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col relative">
-      <BackgroundEffects />
-      <Ticker />
-      <Navbar />
-      <Hero />
-      <AgentGrid />
-      <BettingTable />
-      <ArenaStats />
-      <CommunitySection />
-      <TwitterWall />
-      <Footer />
-    </main>
+    <>
+      <div className="scanlines" />
+      <main className="flex min-h-screen flex-col relative">
+        <BackgroundEffects />
+        <Ticker />
+        <Navbar />
+        <Hero />
+        <AgentGrid />
+        <BettingTable />
+        <ArenaStats />
+        <CommunitySection />
+        <TwitterWall />
+        <Footer />
+      </main>
+    </>
   );
 }

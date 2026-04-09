@@ -15,7 +15,7 @@ const logs = [
 export function Ticker() {
   return (
     <div className="w-full bg-emerald/5 border-b border-emerald/20 text-emerald py-1 overflow-hidden flex items-center text-xs font-mono relative">
-      <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.1)_50%)] bg-[length:100%_2px] pointer-events-none z-0" />
+      <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.1)_50%)] bg-size-[100%_2px] pointer-events-none z-0" />
 
       <div className="px-4 flex items-center gap-2 border-r border-emerald/20 bg-background z-10 relative shadow-[5px_0_10px_rgba(0,0,0,0.5)]">
         <motion.div

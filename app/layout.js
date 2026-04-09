@@ -27,7 +27,6 @@ export default function RootLayout({ children }) {
         suppressHydrationWarning
         className="bg-background text-white font-sans antialiased min-h-screen relative"
       >
-        <div className="scanlines" />
         {children}
       </body>
     </html>
