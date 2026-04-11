@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import Image from "next/image";
+import { Card } from "@/components/ui/card";
 
 const activeAgents = [
   {
@@ -27,7 +28,7 @@ const activeAgents = [
     maxHp: 100,
     status: "Defensive",
     avatar: "cyborg",
-    color: "bg-purple",
+    color: "bg-primary",
   },
   {
     id: "C3",
@@ -103,7 +104,8 @@ const moveHistory = [
 export function LeftSidebar() {
   return (
     <aside className="w-80 border-r border-white/10 bg-surface/30 flex flex-col h-full shrink-0">
-      <div className="p-4 border-b border-white/10 flex-1 overflow-y-auto no-scrollbar">
+      {/* Active Agents Section */}
+      <div className="p-4 border-b border-white/10 flex-1 overflow-y-auto">
         <div className="flex items-center gap-2 mb-4">
           <Activity className="w-4 h-4 text-emerald" />
           <h2 className="font-mono font-bold text-sm tracking-wider">
@@ -113,9 +115,9 @@ export function LeftSidebar() {
 
         <div className="space-y-3">
           {activeAgents.map((agent) => (
-            <div
+            <Card
               key={agent.id}
-              className="bg-black/40 border border-white/5 rounded p-3 hover:border-white/10 transition-colors"
+              className="bg-black/40 border border-white/5 rounded p-3 hover:border-white/10 transition-colors shadow-none"
             >
               <div className="flex items-center gap-3 mb-2">
                 <div className="relative w-8 h-8 rounded bg-surface overflow-hidden shrink-0">
@@ -127,7 +129,6 @@ export function LeftSidebar() {
                     referrerPolicy="no-referrer"
                   />
                 </div>
-
                 <div className="flex-1 min-w-0">
                   <div className="font-mono text-xs font-bold truncate">
                     {agent.name}
@@ -136,7 +137,6 @@ export function LeftSidebar() {
                     {agent.status}
                   </div>
                 </div>
-
                 <div className="font-mono text-xs text-right">
                   <span
                     className={agent.hp < 30 ? "text-red-400" : "text-white"}
@@ -147,6 +147,7 @@ export function LeftSidebar() {
                 </div>
               </div>
 
+              {/* HP Bar */}
               <div className="w-full h-1.5 bg-surface rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
@@ -154,27 +155,27 @@ export function LeftSidebar() {
                   className={`h-full ${agent.color}`}
                 />
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       </div>
 
-      <div className="p-4 flex-1 overflow-y-auto bg-black/20 no-scrollbar">
+      {/* Move History Section */}
+      <div className="p-4 flex-1 overflow-y-auto bg-black/20">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <ScrollText className="w-4 h-4 text-purple" />
+            <ScrollText className="w-4 h-4 text-primary" />
             <h2 className="font-mono font-bold text-sm tracking-wider">
               LIVE LOG
             </h2>
           </div>
-
           <span className="flex h-2 w-2 relative">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald"></span>
           </span>
         </div>
 
-        <div className="space-y-4 relative before:absolute before:inset-y-0 before:left-2.75 before:w-px before:bg-white/10">
+        <div className="space-y-4 relative before:absolute before:inset-y-0 before:left-[11px] before:w-[1px] before:bg-white/10">
           {moveHistory.map((move, i) => {
             const Icon = move.icon;
             return (

@@ -2,6 +2,8 @@
 
 import { Coins, TrendingUp, AlertCircle } from "lucide-react";
 import { motion } from "motion/react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 const availableBets = [
   {
@@ -10,7 +12,7 @@ const availableBets = [
     pool: "12,500 ABT",
     options: [
       { label: "VOID_WALKER", odds: "1.2x", color: "text-red-400" },
-      { label: "AGENT_BETA", odds: "3.5x", color: "text-purple" },
+      { label: "AGENT_BETA", odds: "3.5x", color: "text-primary" },
       { label: "QUANTUM-QUEEN", odds: "12.0x", color: "text-emerald" },
     ],
   },
@@ -29,7 +31,8 @@ const availableBets = [
 export function RightSidebar() {
   return (
     <aside className="w-80 md:w-96 border-l border-white/10 bg-surface/30 flex flex-col h-full shrink-0">
-      <div className="p-4 border-b border-white/10 flex-1 overflow-y-auto no-scrollbar">
+      {/* Sub-Betting Section */}
+      <div className="p-4 border-b border-white/10 flex-1 overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-emerald" />
@@ -37,7 +40,6 @@ export function RightSidebar() {
               LIVE SUB-BETS
             </h2>
           </div>
-
           <div className="text-[10px] font-mono bg-emerald/10 text-emerald px-2 py-1 rounded border border-emerald/20">
             PHASE: MID-GAME
           </div>
@@ -45,9 +47,9 @@ export function RightSidebar() {
 
         <div className="space-y-6">
           {availableBets.map((bet) => (
-            <div
+            <Card
               key={bet.id}
-              className="bg-black/40 border border-white/10 rounded-lg p-4"
+              className="bg-black/40 border border-white/10 rounded-lg p-4 shadow-none"
             >
               <div className="flex justify-between items-start mb-3">
                 <h3 className="font-sans text-sm font-medium text-white">
@@ -65,8 +67,10 @@ export function RightSidebar() {
 
               <div className="grid grid-cols-1 gap-2">
                 {bet.options.map((opt, i) => (
-                  <button
+                  <Button
                     key={i}
+                    type="button"
+                    variant="secondary"
                     className="flex items-center justify-between p-2 rounded bg-surface border border-white/5 hover:border-emerald/50 hover:bg-emerald/5 transition-all group"
                   >
                     <span className={`font-mono text-xs ${opt.color}`}>
@@ -75,17 +79,18 @@ export function RightSidebar() {
                     <span className="font-mono text-xs font-bold text-white group-hover:text-emerald">
                       {opt.odds}
                     </span>
-                  </button>
+                  </Button>
                 ))}
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       </div>
 
-      <div className="p-4 h-1/3 min-h-62.5 bg-black/20 flex flex-col">
+      {/* My Slips Section */}
+      <div className="p-4 h-1/3 min-h-[250px] bg-black/20 flex flex-col">
         <div className="flex items-center gap-2 mb-4">
-          <Coins className="w-4 h-4 text-purple" />
+          <Coins className="w-4 h-4 text-primary" />
           <h2 className="font-mono font-bold text-sm tracking-wider">
             MY SLIPS
           </h2>
@@ -96,9 +101,13 @@ export function RightSidebar() {
           <p className="text-sm font-sans text-gray-400 mb-4">
             No active bets for this match.
           </p>
-          <button className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded font-mono text-xs transition-colors">
+          <Button
+            type="button"
+            variant="ghost"
+            className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded font-mono text-xs transition-colors"
+          >
             VIEW PAST SLIPS
-          </button>
+          </Button>
         </div>
       </div>
     </aside>

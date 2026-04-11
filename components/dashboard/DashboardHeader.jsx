@@ -1,23 +1,24 @@
 "use client";
 
+import { Shield, Bell, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Shield, Bell, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function DashboardHeader() {
   const pathname = usePathname();
 
   const navLinks = [
-    { name: "Arena", href: "/" },
-    { name: "Leaderboard", href: "/leaderboard" },
-    { name: "History", href: "/history" },
+    { name: "Arena", href: "/dashboard" },
+    { name: "Leaderboard", href: "/dashboard/leaderboard" },
+    { name: "History", href: "/dashboard/history" },
   ];
 
   return (
     <header className="h-16 border-b border-white/10 bg-surface/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0 z-20 relative">
       <div className="flex items-center gap-8 h-full">
         <Link href="/" className="flex items-center gap-2 group">
-          <Shield className="w-6 h-6 text-purple group-hover:text-emerald transition-colors" />
+          <Shield className="w-6 h-6 text-primary group-hover:text-emerald transition-colors" />
           <span className="font-mono font-bold text-xl tracking-tighter">
             AUTO<span className="text-emerald">BATTLE</span>
           </span>
@@ -45,14 +46,18 @@ export function DashboardHeader() {
           <span className="text-emerald font-bold">12,450 ABT</span>
         </div>
 
-        <button className="p-2 text-gray-400 hover:text-white transition-colors relative">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative text-gray-400 hover:text-white"
+        >
           <Bell className="w-5 h-5" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald rounded-full"></span>
-        </button>
+        </Button>
 
         <Link
           href="/dashboard/profile"
-          className={`w-8 h-8 rounded-full border flex items-center justify-center transition-colors ${pathname === "/dashboard/profile" ? "bg-emerald/20 border-emerald text-emerald" : "bg-purple/20 border-purple/50 text-purple hover:border-emerald"}`}
+          className={`w-8 h-8 rounded-full border flex items-center justify-center transition-colors ${pathname === "/dashboard/profile" ? "bg-emerald/20 border-emerald text-emerald" : "bg-primary/20 border-primary/50 text-primary hover:border-emerald"}`}
         >
           <User className="w-4 h-4" />
         </Link>
