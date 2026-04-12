@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 export default function LivePage() {
   return (
@@ -21,7 +21,7 @@ export default function LivePage() {
 
       {/* Middle Column: Game Area */}
       <div className="flex-1 bg-element rounded-3xl p-5 flex flex-col items-center justify-center border border-border/50">
-        <h2 className="font-semibold text-lg text-text-muted mb-1">Game Area</h2>
+        <h2 className="font-bold text-xl text-text-muted mb-1">Game Area</h2>
         <p className="text-xs text-text-muted">Select a game to watch</p>
       </div>
 

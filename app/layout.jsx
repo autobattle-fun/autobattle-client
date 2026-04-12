@@ -3,15 +3,32 @@ import "./globals.css";
 import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
 import { ThemeProvider } from "@/components/providers";
+import localFont from "next/font/local";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
+const openRunde = localFont({
+  src: [
+    {
+      path: "./fonts/OpenRunde-Regular.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "./fonts/OpenRunde-Medium.woff2",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "./fonts/OpenRunde-Semibold.woff2",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "./fonts/OpenRunde-Bold.woff2",
+      weight: "700",
+      style: "italic",
+    },
+  ],
+  variable: "--font-open-runde",
 });
 
 export const metadata = {
@@ -23,7 +40,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable}`}
+      className={`${openRunde.variable}`}
       suppressHydrationWarning
     >
       <body className="bg-background text-text-main font-sans antialiased flex h-screen overflow-hidden">
