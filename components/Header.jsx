@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useLogout } from "@privy-io/react-auth";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:4000";
+  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
 
 export function Header({ isAuthenticated = false }) {
   const router = useRouter();

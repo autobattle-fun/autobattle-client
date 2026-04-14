@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Wallet, Globe, User, LogOut } from "lucide-react";
+import { Wallet, Globe, User, LogOut, AlertTriangle } from "lucide-react";
 import {
   useLogin,
   usePrivy,
@@ -19,7 +19,7 @@ import { LoginMethodCard } from "@/components/auth/login/LoginMethodCard";
 import { LoginUsernameCard } from "@/components/auth/login/LoginUsernameCard";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
+  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
 
 function normalizeAuthProvider(value) {
   if (!value) {

@@ -6,7 +6,7 @@ import { ProfilePerformanceCards } from "@/components/profile/ProfilePerformance
 import { ProfileRecentHistory } from "@/components/profile/ProfileRecentHistory";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
+  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
 
 async function getProfile() {
   const cookieStore = await cookies();
