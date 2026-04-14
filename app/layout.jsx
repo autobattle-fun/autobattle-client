@@ -1,9 +1,12 @@
-import { Inter, JetBrains_Mono } from "next/font/google";
-import "./globals.css";
-import { Sidebar } from "@/components/Sidebar";
-import { Header } from "@/components/Header";
-import { ThemeProvider } from "@/components/providers";
+import { cookies } from "next/headers";
 import localFont from "next/font/local";
+
+import "./globals.css";
+
+import { RootShell } from "@/components/layout/RootShell";
+
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { PrivyProviderClient } from "@/components/providers/PrivyProvider";
 
 const openRunde = localFont({
   src: [
@@ -36,26 +39,25 @@ export const metadata = {
   description: "High-performance, responsive landing page for AutoBattle.fun.",
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const cookieStore = await cookies();
+
+  const hasServerSession = Boolean(
+    cookieStore.get("autobattle_session")?.value,
+  );
+
   return (
     <html
       lang="en"
-      className={`${openRunde.variable}`}
       suppressHydrationWarning
+      className={`${openRunde.variable}`}
     >
-      <body className="bg-background text-text-main font-sans antialiased flex h-screen overflow-hidden">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Sidebar />
-          <div className="flex-1 flex flex-col h-full overflow-hidden relative">
-            <Header />
-            <main className="flex-1 overflow-y-auto px-8 pb-8">{children}</main>
-          </div>
-        </ThemeProvider>
+      <body className="bg-background text-text-main font-sans antialiased min-h-screen overflow-hidden">
+        <PrivyProviderClient>
+          <ThemeProvider>
+            <RootShell initialLoggedIn={hasServerSession}>{children}</RootShell>
+          </ThemeProvider>
+        </PrivyProviderClient>
       </body>
     </html>
   );

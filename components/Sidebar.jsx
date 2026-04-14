@@ -2,18 +2,25 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Box, Radio, Gamepad2, User, Clock, Settings } from "lucide-react";
+import { Radio, Gamepad2, User, Clock, Settings } from "lucide-react";
 import Image from "next/image";
 
-export function Sidebar() {
+export function Sidebar({ isAuthenticated = false }) {
   const pathname = usePathname();
 
-  const links = [
+  const publicLinks = [
     { href: "/", icon: Radio, label: "Live" },
-    { href: "/profile", icon: User, label: "Profile" },
     { href: "/games", icon: Gamepad2, label: "Games" },
+  ];
+
+  const privateLinks = [
+    { href: "/profile", icon: User, label: "Profile" },
     { href: "/history", icon: Clock, label: "History" },
   ];
+
+  const links = isAuthenticated
+    ? [...publicLinks, ...privateLinks]
+    : publicLinks;
 
   return (
     <aside className="w-20 h-screen bg-background flex flex-col border-r border-border items-center justify-center py-6 shrink-0 z-20">
@@ -52,24 +59,25 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Settings at bottom */}
-      <div className="mt-auto w-full">
-        <Link
-          href="/settings"
-          className={`flex flex-col items-center justify-center relative gap-1 p-2 px-0 w-full rounded-xl transition-colors ${
-            pathname === "/settings"
-              ? "text-primary"
-              : "text-text-muted hover:text-text-main"
-          }`}
-        >
-          <Settings className="w-5 h-5" />
-          <span className="text-[10px] font-medium">Settings</span>
+      {isAuthenticated ? (
+        <div className="mt-auto w-full">
+          <Link
+            href="/settings"
+            className={`flex flex-col items-center justify-center relative gap-1 p-2 px-0 w-full rounded-xl transition-colors ${
+              pathname === "/settings"
+                ? "text-primary"
+                : "text-text-muted hover:text-text-main"
+            }`}
+          >
+            <Settings className="w-5 h-5" />
+            <span className="text-[10px] font-medium">Settings</span>
 
-          <div
-            className={`absolute top-1 right-0 w-2 h-[80%] bg-primary rounded-full rounded-r-none ${pathname === "/settings" ? "block" : "hidden"}`}
-          ></div>
-        </Link>
-      </div>
+            <div
+              className={`absolute top-1 right-0 w-2 h-[80%] bg-primary rounded-full rounded-r-none ${pathname === "/settings" ? "block" : "hidden"}`}
+            ></div>
+          </Link>
+        </div>
+      ) : null}
     </aside>
   );
 }

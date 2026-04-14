@@ -6,9 +6,16 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "server:dev": "npm --prefix server run dev",
+    "server:start": "npm --prefix server run start"
   },
   "dependencies": {
+    "@privy-io/react-auth": "^3.21.2",
+    "@solana-program/memo": "^0.11.0",
+    "@solana-program/system": "^0.12.0",
+    "@solana-program/token": "^0.13.0",
+    "@solana/kit": "^6.8.0",
     "lucide-react": "^1.8.0",
     "motion": "^12.38.0",
     "next": "16.2.3",

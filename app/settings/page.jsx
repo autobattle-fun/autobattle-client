@@ -1,15 +1,5 @@
-"use client";
-
 import { Card } from "@/components/ui/card";
-import {
-  ChessPawn,
-  ChevronRight,
-  Dot,
-  Edit,
-  Laptop,
-  Power,
-  Sun,
-} from "lucide-react";
+import { ChevronRight, Power, Sun } from "lucide-react";
 
 export default function SettingsPage() {
   return (
