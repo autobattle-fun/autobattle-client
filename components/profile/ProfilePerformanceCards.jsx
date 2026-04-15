@@ -8,16 +8,16 @@ const PERFORMANCE_CARDS = [
 
 export function ProfilePerformanceCards() {
   return (
-    <div className="grid gap-3 sm:grid-cols-3">
+    <div className="mb-3 flex w-full gap-3">
       {PERFORMANCE_CARDS.map(([title, value]) => (
         <Card
           key={title}
-          className="rounded-2xl border-border bg-element p-4 text-center shadow-inner"
+          className="flex-1 rounded-2xl border border-border bg-element p-3 text-center shadow-inner"
         >
-          <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+          <div className="mb-0.5 text-[10px] font-semibold uppercase tracking-wider text-text-muted">
             {title}
           </div>
-          <div className="text-sm font-bold text-text-main">{value}</div>
+          <div className="text-sm font-bold">{value}</div>
         </Card>
       ))}
     </div>

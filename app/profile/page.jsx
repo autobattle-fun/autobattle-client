@@ -1,41 +1,46 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+
 import { ProfileHero } from "@/components/profile/ProfileHero";
 import { ProfileActions } from "@/components/profile/ProfileActions";
-import { ProfilePerformanceCards } from "@/components/profile/ProfilePerformanceCards";
 import { ProfileRecentHistory } from "@/components/profile/ProfileRecentHistory";
+import { ProfilePerformanceCards } from "@/components/profile/ProfilePerformanceCards";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
 
 async function getProfile() {
-  const cookieStore = await cookies();
-  const cookieHeader = cookieStore.toString();
+  try {
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore.toString();
 
-  const response = await fetch(`${API_BASE_URL}/me`, {
-    headers: {
-      cookie: cookieHeader,
-    },
-    cache: "no-store",
-  });
+    const response = await fetch(`${API_BASE_URL}/me`, {
+      headers: {
+        cookie: cookieHeader,
+      },
+      cache: "no-store",
+    });
 
-  if (response.status === 401 || response.status === 404) {
-    redirect("/login");
+    if (response.status === 401 || response.status === 404) {
+      redirect("/login");
+    }
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const payload = await response.json();
+    return payload?.user || null;
+  } catch {
+    return null;
   }
-
-  if (!response.ok) {
-    throw new Error("Could not load profile.");
-  }
-
-  const payload = await response.json();
-  return payload.user;
 }
 
 export default async function ProfilePage() {
   const profile = await getProfile();
 
   return (
-    <div className="mx-auto flex h-full max-w-5xl flex-col gap-4 pb-12 pt-8">
+    <div className="mx-auto flex h-full w-full max-w-xl flex-col items-center pb-12 pt-8">
       <ProfileHero profile={profile} />
       <ProfileActions />
       <ProfilePerformanceCards />

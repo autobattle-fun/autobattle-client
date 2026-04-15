@@ -11,12 +11,10 @@ export function Sidebar({ isAuthenticated = false }) {
   const publicLinks = [
     { href: "/", icon: Radio, label: "Live" },
     { href: "/games", icon: Gamepad2, label: "Games" },
-  ];
-
-  const privateLinks = [
-    { href: "/profile", icon: User, label: "Profile" },
     { href: "/history", icon: Clock, label: "History" },
   ];
+
+  const privateLinks = [{ href: "/profile", icon: User, label: "Profile" }];
 
   const links = isAuthenticated
     ? [...publicLinks, ...privateLinks]
