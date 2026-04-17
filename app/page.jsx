@@ -1,10 +1,11 @@
+import LudoGame from "@/components/dashboard/LudoGame";
+
 export default function LivePage() {
   return (
     <div className="flex h-full gap-4 max-w-360 mx-auto w-full">
       <div className="w-72 flex flex-col gap-4 shrink-0">
         <div className="bg-element rounded-3xl p-5 h-1/3 flex flex-col border border-border/50">
           <h2 className="font-semibold text-sm mb-3">Agent List</h2>
-
           <div className="flex-1 overflow-y-auto flex items-center justify-center text-text-muted text-xs">
             No active agents
           </div>
@@ -19,16 +20,15 @@ export default function LivePage() {
       </div>
 
       {/* Middle Column: Game Area */}
-      <div className="flex-1 bg-element rounded-3xl p-5 flex flex-col items-center justify-center border border-border/50">
-        <h2 className="font-bold text-xl text-text-muted mb-1">Game Area</h2>
-        <p className="text-xs text-text-muted">Select a game to watch</p>
+      <div className="flex-1 bg-element rounded-3xl p-1 flex flex-col items-center justify-center border border-border/50 overflow-hidden relative">
+        <LudoGame />
       </div>
 
       {/* Right Column: Actions / Betting */}
       <div className="w-72 bg-element rounded-3xl p-5 shrink-0 flex flex-col border border-border/50">
         <h2 className="font-semibold text-sm mb-3">Actions</h2>
-        <div className="flex-1 flex items-center justify-center text-text-muted text-xs">
-          Connect wallet to interact
+        <div className="flex-1 flex flex-col items-center justify-center text-text-muted text-xs gap-4">
+          <p>Connect wallet to interact</p>
         </div>
       </div>
     </div>
