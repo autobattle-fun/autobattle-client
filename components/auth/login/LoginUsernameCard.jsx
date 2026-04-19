@@ -16,14 +16,11 @@ export function LoginUsernameCard({
   walletAddress,
 }) {
   return (
-    <Card className="rounded-3xl border-border bg-surface p-6 shadow-sm">
-      <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.25em] text-text-muted">
-        Step 2 of 2
-      </div>
-      <div className="mb-1 text-lg font-semibold text-text-main">
+    <div className="border-t border-border border-dashed pt-5">
+      <div className="text-lg font-semibold text-text-main">
         Choose a username
       </div>
-      <p className="mb-4 text-sm text-text-muted">
+      <p className="mb-4 font-semibold text-sm text-text-muted">
         This username is used for your app account.
       </p>
 
@@ -33,21 +30,21 @@ export function LoginUsernameCard({
           onChange={(event) => onUsernameChange(event.target.value)}
           placeholder="your_handle"
           autoComplete="off"
-          className="h-11 bg-surface"
+          className="h-11 bg-surface font-semibold"
         />
 
         {usernameError ? (
           <p className="text-xs text-red-500">{usernameError}</p>
         ) : (
-          <p className="text-xs text-text-muted">
+          <p className="text-xs -mt-1 text-text-muted font-semibold opacity-70">
             3-20 characters: lowercase letters, numbers, and underscores.
           </p>
         )}
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 mt-2">
           <Button
             type="submit"
-            className="flex-1 rounded-2xl"
+            className="flex-1 h-12 rounded-2xl font-semibold"
             disabled={isSubmittingUsername}
           >
             {isSubmittingUsername ? (
@@ -62,22 +59,13 @@ export function LoginUsernameCard({
           <Button
             type="button"
             variant="secondary"
-            className="rounded-2xl"
+            className="rounded-2xl h-12"
             onClick={onSignOut}
           >
             <LogOut className="w-4 h-4" />
           </Button>
         </div>
-
-        {appUser ? (
-          <p className="text-xs text-text-muted">
-            Signed in as {appUser.privyUserId || "your account"}
-          </p>
-        ) : null}
-        {walletAddress ? (
-          <p className="text-xs text-text-muted">Wallet {walletAddress}</p>
-        ) : null}
       </form>
-    </Card>
+    </div>
   );
 }

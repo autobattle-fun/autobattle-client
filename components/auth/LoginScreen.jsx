@@ -369,11 +369,10 @@ export function LoginScreen() {
           title="Checking your app account"
           description="Syncing your login with the app session."
         />
-        <div className="flex flex-wrap gap-2 pt-1">
+        <div className="flex flex-wrap gap-2 pt-1 mt-2">
           <Button
             type="button"
-            variant="secondary"
-            className="rounded-2xl"
+            className="flex-1 h-12 rounded-2xl font-semibold"
             onClick={syncWithServer}
             disabled={isBootstrapping}
           >
@@ -381,12 +380,11 @@ export function LoginScreen() {
           </Button>
           <Button
             type="button"
-            variant="ghost"
-            className="rounded-2xl"
+            variant="secondary"
+            className="rounded-2xl h-12"
             onClick={handleSignOut}
           >
-            <LogOut className="mr-2 h-4 w-4" />
-            Sign out
+            <LogOut className="h-4 w-4" />
           </Button>
         </div>
       </LoginShell>
@@ -394,11 +392,7 @@ export function LoginScreen() {
   }
 
   return (
-    <LoginShell
-      eyebrow="AutoBattle access"
-      title="Login"
-      description="Sign in with social or wallet, then complete your username if this is your first time."
-    >
+    <LoginShell title="Login" description="Access your Autobattle.fun account">
       <div className="space-y-4">
         {isBusy ? (
           <LoginStatusCard title={statusText} description={statusDescription} />
@@ -426,10 +420,6 @@ export function LoginScreen() {
           />
         ) : (
           <div className="space-y-3">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-text-muted">
-              Step 1 of 2
-            </div>
-
             {methods.map((method) => (
               <LoginMethodCard
                 key={method.id}
@@ -438,17 +428,6 @@ export function LoginScreen() {
                 onSelect={method.action}
               />
             ))}
-
-            <Card className="rounded-3xl border border-border bg-element/70 p-4 shadow-none">
-              <div className="mb-1 flex items-center gap-2 text-sm font-semibold text-text-main">
-                <User className="h-4 w-4 text-primary" />
-                Account flow
-              </div>
-              <p className="text-xs leading-6 text-text-muted">
-                After authentication, the backend checks your app account. If no
-                account exists, you will be prompted for a username.
-              </p>
-            </Card>
           </div>
         )}
       </div>

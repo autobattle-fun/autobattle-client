@@ -21,10 +21,10 @@ export function LoginMethodCard({ method, busy = false, onSelect }) {
             {method.icon}
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-semibold text-text-main">
+            <span className="text-md font-semibold text-text-main">
               {method.label}
             </span>
-            <span className="text-xs leading-5 text-text-muted">
+            <span className="text-xs leading-5 font-semibold text-text-muted">
               {method.description}
             </span>
           </div>
