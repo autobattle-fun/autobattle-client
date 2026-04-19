@@ -7,6 +7,11 @@ import { RootShell } from "@/components/layout/RootShell";
 
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { PrivyProviderClient } from "@/components/providers/PrivyProvider";
+import { Toaster } from "sonner";
+import { Inter } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
 const openRunde = localFont({
   src: [
@@ -50,12 +55,28 @@ export default async function RootLayout({ children }) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${openRunde.variable}`}
+      className={cn(openRunde.variable, "font-sans", inter.variable)}
     >
       <body className="bg-background text-text-main font-sans antialiased min-h-screen overflow-hidden">
         <PrivyProviderClient>
           <ThemeProvider>
             <RootShell initialLoggedIn={hasServerSession}>{children}</RootShell>
+            <Toaster
+              position="bottom-right"
+              richColors
+              toastOptions={{
+                className: `flex items-center justify-center text-center border ${openRunde.className}`,
+                style: {
+                  backgroundColor: "var(--background)",
+                  color: "var(--text-main)",
+                  borderColor: "var(--foreground)",
+                  borderRadius: "6px",
+                  fontSize: "12px",
+                  padding: "15px",
+                  fontWeight: 700,
+                },
+              }}
+            />
           </ThemeProvider>
         </PrivyProviderClient>
       </body>

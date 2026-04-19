@@ -20,7 +20,7 @@ export default function LivePage() {
       </div>
 
       {/* Middle Column: Game Area */}
-      <div className="flex-1 bg-element rounded-3xl p-1 flex flex-col items-center justify-center border border-border/50 overflow-hidden relative">
+      <div className="flex-1 bg-element rounded-3xl flex flex-col items-center justify-center border border-border/50 overflow-hidden relative">
         <LudoGame />
       </div>
 

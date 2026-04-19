@@ -30,7 +30,7 @@ async function getProfile() {
     }
 
     const payload = await response.json();
-    return payload?.user || null;
+    return payload || null;
   } catch {
     return null;
   }
@@ -41,7 +41,7 @@ export default async function ProfilePage() {
 
   return (
     <div className="mx-auto flex h-full w-full max-w-xl flex-col items-center pb-12 pt-8">
-      <ProfileHero profile={profile} />
+      <ProfileHero profile={profile?.user} metadata={profile?.metadata} />
       <ProfileActions />
       <ProfilePerformanceCards />
       <ProfileRecentHistory />

@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useRouter } from "next/navigation";
 import { useLogout } from "@privy-io/react-auth";
+import Avatar from "boring-avatars";
+import ReadyToEarnDialog from "./dialog/ReadyToEarnDialog";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
@@ -15,8 +17,10 @@ export function Header({ isAuthenticated = false }) {
   const router = useRouter();
   const { logout } = useLogout();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [username, setUsername] = useState("");
   const menuRef = useRef(null);
+  const [splBalance, setSplBalance] = useState(0);
+  const [username, setUsername] = useState("");
+  const [solBalance, setSolBalance] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -42,10 +46,13 @@ export function Header({ isAuthenticated = false }) {
 
         if (!cancelled) {
           setUsername(payload?.user?.username || "");
+          setSplBalance(payload?.metadata?.splTokenBalance || 0);
+          setSolBalance(payload?.metadata?.solBalance || 0);
         }
       } catch {
         if (!cancelled) {
           setUsername("");
+          setSplBalance(0);
         }
       }
     }
@@ -95,8 +102,6 @@ export function Header({ isAuthenticated = false }) {
     }
   }
 
-  const avatarLetter = (username || "A").charAt(0).toUpperCase();
-
   return (
     <header className="h-20 flex items-center justify-between px-8 w-full shrink-0 relative">
       {/* Search Bar */}
@@ -115,23 +120,9 @@ export function Header({ isAuthenticated = false }) {
       <div />
 
       <div className="flex items-center gap-3">
+        <ReadyToEarnDialog solBalance={solBalance} autoBalance={splBalance} />
+
         <ThemeToggle className="bg-element hover:bg-element-hover border border-border shadow-inner" />
-        {/* <Button
-          variant="secondary"
-          size="icon"
-          className="bg-element hover:bg-element-hover"
-        >
-          <Mail className="w-4 h-4 text-text-main" />
-        </Button> */}
-        {/* <Button
-          variant="secondary"
-          className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full transition-colors"
-        >
-          <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden">
-            <div className="w-full h-full bg-gradient-to-br from-primary/40 to-primary/10" />
-          </div>
-          <span className="text-sm font-medium">$0.00</span>
-        </Button> */}
 
         {isAuthenticated ? (
           <div className="relative" ref={menuRef}>
@@ -141,11 +132,9 @@ export function Header({ isAuthenticated = false }) {
               onClick={() => setIsMenuOpen((value) => !value)}
               aria-label="Open profile menu"
             >
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
-                {avatarLetter}
-              </div>
+              <Avatar name={username} size={24} />
               <div className="max-w-28 truncate text-sm font-semibold text-text-main">
-                {username || "Profile"}
+                {splBalance} $AUTO
               </div>
             </button>
 
@@ -153,7 +142,7 @@ export function Header({ isAuthenticated = false }) {
               <div className="absolute right-0 top-12 z-50 min-w-44 rounded-2xl border border-border bg-surface p-1.5 shadow-lg">
                 <button
                   type="button"
-                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-text-main transition-colors hover:bg-element"
+                  className="flex w-full items-center font-semibold gap-2 rounded-xl px-3 py-2 text-sm text-text-main opacity-80 transition-colors hover:bg-element"
                   onClick={() => {
                     setIsMenuOpen(false);
                     router.push("/profile");
@@ -164,7 +153,7 @@ export function Header({ isAuthenticated = false }) {
                 </button>
                 <button
                   type="button"
-                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-red-500 transition-colors hover:bg-red-500/10"
+                  className="flex w-full items-center gap-2 font-semibold rounded-xl px-3 py-2 text-sm text-red-500 transition-colors hover:bg-red-500/10"
                   onClick={handleLogout}
                 >
                   <LogOut className="h-4 w-4" />
@@ -179,7 +168,7 @@ export function Header({ isAuthenticated = false }) {
             onClick={() => router.push("/login")}
           >
             <Plus className="w-4 h-4" />
-            Connect Wallet
+            Sign In
           </Button>
         )}
       </div>

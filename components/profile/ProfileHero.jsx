@@ -1,8 +1,12 @@
+"use client";
+
 import Image from "next/image";
 import { Copy } from "lucide-react";
 import { trimWalletAddress } from "@/lib/wallet";
+import Avatar from "boring-avatars";
+import { toast } from "sonner";
 
-export function ProfileHero({ profile }) {
+export function ProfileHero({ profile, metadata }) {
   const walletAddress = profile?.walletAddress || "";
   const username = profile?.username || "username";
   const shortWallet = walletAddress
@@ -14,20 +18,28 @@ export function ProfileHero({ profile }) {
       <div className="flex h-full flex-col justify-between">
         <div className="flex flex-col gap-1">
           <p className="text-xl font-semibold text-white opacity-50">Balance</p>
-          <p className="text-4xl font-semibold text-white">0 $AUTO</p>
+          <p className="text-4xl font-semibold text-white">
+            {metadata?.splTokenBalance || 0} $AUTO
+          </p>
           <div className="flex items-center gap-2">
             <p className="text-base font-semibold text-white opacity-50">
               {shortWallet}
             </p>
-            <Copy className="h-4 w-4 text-white opacity-50" />
+            <Copy
+              className="h-4 w-4 text-white opacity-50 cursor-pointer"
+              onClick={() => {
+                navigator.clipboard.writeText(walletAddress);
+                toast.success("Wallet address copied to clipboard");
+              }}
+            />
           </div>
         </div>
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 overflow-hidden rounded-full bg-white" />
+            <Avatar name={username} size={32} />
             <p className="text-base font-semibold text-white opacity-50">
-              autobattle.fun/${username}
+              autobattle.fun/${username.toUpperCase()}
             </p>
           </div>
 

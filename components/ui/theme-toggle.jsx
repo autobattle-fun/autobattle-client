@@ -25,9 +25,9 @@ export function ThemeToggle({ className }) {
       className={className}
     >
       {isDark ? (
-        <SunMedium className="h-4 w-4" />
-      ) : (
         <MoonStar className="h-4 w-4" />
+      ) : (
+        <SunMedium className="h-4 w-4" />
       )}
     </Button>
   );
