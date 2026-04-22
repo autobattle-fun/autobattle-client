@@ -1,8 +1,7 @@
 // Barrel exports for the blackjack module
 
-export { GameArena }      from "./GameArena";
-export { PredictionPanel } from "./PredictionPanel";
-export { PlayingCard }    from "./PlayingCard";
+export { GameArena } from "./GameArena";
+export { PlayingCard } from "./PlayingCard";
 export {
   gameReducer,
   makeInitialGameState,
