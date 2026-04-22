@@ -5,13 +5,13 @@ import "./globals.css";
 
 import { RootShell } from "@/components/layout/RootShell";
 
-import { ThemeProvider } from "@/components/providers/ThemeProvider";
-import { PrivyProviderClient } from "@/components/providers/PrivyProvider";
+import { ThemeProvider } from "@/providers/ThemeProvider";
+import { PrivyProviderClient } from "@/providers/PrivyProvider";
 import { Toaster } from "sonner";
 import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const openRunde = localFont({
   src: [
