@@ -7,14 +7,15 @@ export function MainBetSection({ markets, activeBets, onPlace, maxStake }) {
         <h4 className="text-xs font-semibold uppercase tracking-[0.14em] text-text-muted">
           Main Bet
         </h4>
+
         <span className="text-[11px] text-text-muted">Match winner</span>
       </div>
 
       <MainBetTradeCard
         markets={markets}
-        activeBets={activeBets}
         onPlace={onPlace}
         maxStake={maxStake}
+        activeBets={activeBets}
       />
     </div>
   );

@@ -3,12 +3,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
-  generateMarkets,
   makeBetState,
+  generateMarkets,
   resolveActiveBets,
 } from "@/components/dashboard/bettingLogic";
-import { MainBetSection } from "../bets/MainBetSection";
+
 import { SubBetSection } from "../bets/SubBetSection";
+import { MainBetSection } from "../bets/MainBetSection";
+
 import { SectionCard } from "./SectionCard";
 
 export function BetsSection({ gameState }) {
@@ -17,7 +19,6 @@ export function BetsSection({ gameState }) {
   useEffect(() => {
     if (!gameState) return;
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setBets((prev) => {
       if (prev.active.length === 0) return prev;
 
@@ -76,14 +77,15 @@ export function BetsSection({ gameState }) {
   );
 
   const subMarkets = useMemo(
-    () => markets.filter((market) => market.type !== "match_winner"),
+    () => markets.filter((market) => market.type === "round_winner"),
     [markets],
   );
 
   return (
     <SectionCard
-      title="Bets and Sub Bets"
-      subtitle="Main winner market first, then live sub markets"
+      title="Markets"
+      className="border-white/10 bg-slate-950/70"
+      subtitle="Main winner first, then round winner markets"
     >
       <div className="space-y-4">
         <MainBetSection

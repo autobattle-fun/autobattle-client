@@ -9,14 +9,12 @@ export function SubBetSection({ markets, activeBets, onPlace, maxStake }) {
         <h4 className="text-xs font-semibold uppercase tracking-[0.14em] text-text-muted">
           Sub Bets
         </h4>
-        <span className="text-[11px] text-text-muted">
-          Round and event outcomes
-        </span>
+        <span className="text-[11px] text-text-muted">Round winner only</span>
       </div>
 
       {markets.length === 0 ? (
         <p className="rounded-lg border border-border/60 bg-element/35 px-3 py-2 text-xs text-text-muted">
-          Sub markets appear as the game progresses.
+          Round winner market appears during live rounds.
         </p>
       ) : (
         groups.map((group) => (

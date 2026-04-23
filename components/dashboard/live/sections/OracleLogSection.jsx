@@ -13,6 +13,7 @@ export function OracleLogSection({ logs }) {
   return (
     <SectionCard
       title="Oracle Log"
+      className="border-white/10 bg-slate-950/70"
       subtitle="Live event feed from the round engine"
       right={
         <span className="text-xs text-text-muted">{logs.length} events</span>
@@ -20,7 +21,7 @@ export function OracleLogSection({ logs }) {
     >
       <div
         ref={containerRef}
-        className="space-y-1 rounded-lg border border-border/50 bg-background/30 p-2"
+        className="max-h-95 space-y-1 overflow-y-auto rounded-xl border border-white/10 bg-black/25 p-2"
       >
         {logs.length === 0 ? (
           <p className="px-1 py-2 text-xs text-text-muted">

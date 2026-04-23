@@ -13,18 +13,19 @@ function accentBySide(side) {
 }
 
 export function BetMarketCard({ market, onPlace, existingBet, maxStake }) {
-  const [expanded, setExpanded] = useState(false);
   const [amount, setAmount] = useState(10);
+  const [expanded, setExpanded] = useState(false);
 
-  const accent = accentBySide(market.side);
   const cents = oddsToCents(market.odds);
+  const accent = accentBySide(market.side);
 
   const disabled = amount < 1 || amount > maxStake;
+
   const locked = Boolean(existingBet);
 
   return (
     <article
-      className="overflow-hidden rounded-2xl border border-border/60 bg-surface/90 shadow-[0_6px_20px_rgba(0,0,0,0.04)]"
+      className="overflow-hidden rounded-2xl border border-white/10 bg-[#0e1628]/85 shadow-[0_8px_24px_rgba(0,0,0,0.26)]"
       style={{
         boxShadow: expanded && !locked ? `inset 0 0 0 1px ${accent}55` : "none",
       }}
@@ -62,7 +63,7 @@ export function BetMarketCard({ market, onPlace, existingBet, maxStake }) {
       </button>
 
       {expanded && !locked ? (
-        <div className="space-y-2.5 border-t border-border/50 px-3 pb-3 pt-2">
+        <div className="space-y-2.5 border-t border-white/10 px-3 pb-3 pt-2">
           <div className="grid grid-cols-6 gap-1.5">
             {QUICK_AMOUNTS.map((value) => (
               <button
@@ -72,9 +73,9 @@ export function BetMarketCard({ market, onPlace, existingBet, maxStake }) {
                 style={{
                   color: amount === value ? accent : "var(--muted)",
                   borderColor:
-                    amount === value ? `${accent}70` : "var(--border)",
+                    amount === value ? `${accent}70` : "rgba(255,255,255,0.18)",
                   background:
-                    amount === value ? `${accent}1c` : "var(--background)",
+                    amount === value ? `${accent}1c` : "rgba(255,255,255,0.03)",
                 }}
                 onClick={() => setAmount(value)}
               >
@@ -89,21 +90,24 @@ export function BetMarketCard({ market, onPlace, existingBet, maxStake }) {
                 $
               </span>
               <input
-                type="number"
                 min={1}
+                type="number"
                 max={maxStake}
                 value={amount}
                 onChange={(event) => {
                   const next = parseInt(event.target.value, 10);
+
                   if (Number.isNaN(next)) {
                     setAmount(1);
                     return;
                   }
+
                   setAmount(Math.max(1, Math.min(maxStake, next)));
                 }}
-                className="w-full rounded-lg border border-border/70 bg-background/30 py-2 pl-6 pr-2 text-sm font-semibold text-text-main outline-none"
+                className="w-full rounded-lg border border-white/20 bg-black/20 py-2 pl-6 pr-2 text-sm font-semibold text-text-main outline-none"
               />
             </label>
+
             <span className="text-xs text-text-muted">
               Price:{" "}
               <span style={{ color: accent }} className="font-semibold">
