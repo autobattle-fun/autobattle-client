@@ -32,7 +32,7 @@ export function CommentsSection() {
     <SectionCard
       title="Comments"
       subtitle="Community signal below the arena"
-      className="border-white/10 bg-slate-950/70"
+      className="border-white/10 bg-slate-950/70 mx-8"
       right={<span className="text-xs text-text-muted">{countLabel}</span>}
     >
       <div className="space-y-3">

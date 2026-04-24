@@ -35,9 +35,9 @@ export function BattleCenter({ phase, redScore, blueScore, lastDamage }) {
   const result = compareResult(redScore, blueScore);
 
   return (
-    <section className="flex h-full flex-col justify-between rounded-3xl border border-white/10 bg-linear-to-b from-black/35 via-black/25 to-black/40 p-4">
+    <section className="flex h-full flex-col justify-between rounded-3xl border border-border bg-linear-to-b from-background/35 via-background/25 to-background/40 p-4">
       <div className="space-y-2">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/50">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em]">
           Round State
         </p>
 
@@ -55,7 +55,7 @@ export function BattleCenter({ phase, redScore, blueScore, lastDamage }) {
       </div>
 
       <div className="space-y-3 text-center">
-        <p className="text-[11px] uppercase tracking-[0.18em] text-white/50">
+        <p className="text-[11px] uppercase tracking-[0.18em] text-foreground/50">
           Damage Delta
         </p>
 
@@ -63,11 +63,13 @@ export function BattleCenter({ phase, redScore, blueScore, lastDamage }) {
           -{lastDamage || 0}
         </p>
 
-        <p className="text-[11px] text-white/60">Applied to the round loser</p>
+        <p className="text-[11px] text-foreground/60">
+          Applied to the round loser
+        </p>
       </div>
 
-      <div className="rounded-2xl border border-white/10 bg-black/30 p-3 text-center">
-        <p className="text-[11px] uppercase tracking-[0.14em] text-white/45">
+      <div className="rounded-2xl border border-border bg-element/30 p-3 text-center">
+        <p className="text-[11px] uppercase tracking-[0.14em] text-foreground/45">
           Current Edge
         </p>
 
@@ -78,7 +80,7 @@ export function BattleCenter({ phase, redScore, blueScore, lastDamage }) {
           {result.label}
         </p>
 
-        <p className="mt-1 text-[11px] text-white/60 tabular-nums">
+        <p className="mt-1 text-[11px] text-foreground/60 tabular-nums">
           {redScore} : {blueScore}
         </p>
       </div>

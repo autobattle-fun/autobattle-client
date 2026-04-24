@@ -34,11 +34,12 @@ export function AgentSidePanel({
 
   return (
     <section
-      className="relative flex h-full flex-col justify-between rounded-3xl border border-white/10 bg-black/20 p-4"
+      className="relative flex h-full flex-col justify-between rounded-3xl border border-border bg-background p-4"
       style={{
         boxShadow: isActive
           ? `inset 0 0 0 1px ${tint}66, 0 0 28px ${tint}28`
           : "none",
+        margin: side === "red" ? "0 0 0 32px" : "0 32px 0 0",
       }}
     >
       <div>
@@ -49,7 +50,7 @@ export function AgentSidePanel({
               style={{ background: tint, boxShadow: `0 0 14px ${tint}` }}
             />
 
-            <p className="text-sm font-semibold text-white">{name}</p>
+            <p className="text-sm font-semibold">{name}</p>
           </div>
 
           {isActive ? (
@@ -68,20 +69,18 @@ export function AgentSidePanel({
 
         <div className="mb-3 flex items-end justify-between">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.14em] text-white/55">
-              Score
-            </p>
+            <p className="text-[11px] uppercase tracking-[0.14em]">Score</p>
 
             <p
-              className="text-5xl font-extrabold leading-none tabular-nums"
               style={{ color: scoreColor }}
+              className="text-5xl font-extrabold leading-none tabular-nums"
             >
               {player.score}
             </p>
           </div>
 
           {player.stayed ? (
-            <div className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-white/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/80">
+            <div className="inline-flex items-center gap-1 rounded-full border border-border bg-element px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em]">
               <Crown className="h-3 w-3" /> Stay
             </div>
           ) : null}
@@ -89,11 +88,11 @@ export function AgentSidePanel({
       </div>
 
       <div className="space-y-2">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/55">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em]">
           Hand
         </p>
 
-        <div className="min-h-30 overflow-x-auto rounded-2xl border border-white/10 bg-black/25 p-2">
+        <div className="min-h-30 overflow-x-auto rounded-2xl border border-border bg-element p-2">
           <div className="flex min-w-max items-center px-1 py-1">
             {stackedCards.map(
               ({ card, isRiver: cardRiver, isTb: cardTb }, index) => (
@@ -118,7 +117,7 @@ export function AgentSidePanel({
           </div>
 
           {player.hand.length === 0 ? (
-            <div className="grid h-22.5 w-16 place-items-center rounded-lg border border-dashed border-white/15 text-white/25">
+            <div className="grid h-22.5 w-16 place-items-center rounded-lg border border-dashed border-border bg-background">
               ?
             </div>
           ) : null}

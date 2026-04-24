@@ -93,15 +93,13 @@ export function GameArena({ onGameEvent, getAgentAction }) {
   }
 
   return (
-    <div className="relative h-full overflow-hidden rounded-2xl border border-white/10 bg-[#070b14] p-3 text-white">
+    <div className="relative h-full overflow-hidden rounded-2xl px-5 pb-6">
       <style>{`
         @keyframes arenaFlame {
           0%, 100% { transform: translateY(0) scale(1); opacity: 0.85; }
           50% { transform: translateY(-2px) scale(1.12); opacity: 1; }
         }
       `}</style>
-
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(244,63,94,0.16),transparent_40%),radial-gradient(circle_at_80%_18%,rgba(56,189,248,0.18),transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.02),transparent_55%)]" />
 
       <div className="relative z-10 flex h-full flex-col gap-3">
         <GameHud
@@ -137,7 +135,7 @@ export function GameArena({ onGameEvent, getAgentAction }) {
         </div>
 
         {phase === "Ended" && winner ? (
-          <div className="rounded-2xl border border-emerald-300/30 bg-emerald-500/15 px-4 py-2 text-center text-sm font-semibold uppercase tracking-[0.16em] text-emerald-200">
+          <div className="rounded-2xl border border-emerald-300/30 bg-emerald-500/15 px-4 py-2 text-center text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700 dark:text-emerald-200 mx-8">
             {winner === "red" ? "Red Agent" : "Blue Agent"} won this match.
           </div>
         ) : null}
