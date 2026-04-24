@@ -13,7 +13,7 @@ export function OracleLogSection({ logs }) {
   return (
     <SectionCard
       title="Oracle Log"
-      className="border-white/10 bg-slate-950/70"
+      className="border-border/70 bg-surface/95"
       subtitle="Live event feed from the round engine"
       right={
         <span className="text-xs text-text-muted">{logs.length} events</span>
@@ -21,7 +21,7 @@ export function OracleLogSection({ logs }) {
     >
       <div
         ref={containerRef}
-        className="max-h-95 space-y-1 overflow-y-auto rounded-xl border border-white/10 bg-black/25 p-2"
+        className="max-h-95 space-y-1 overflow-y-auto rounded-2xl border border-border/70 bg-element/55 p-2"
       >
         {logs.length === 0 ? (
           <p className="px-1 py-2 text-xs text-text-muted">
@@ -31,16 +31,18 @@ export function OracleLogSection({ logs }) {
           logs.map((entry, index) => (
             <p
               key={`${entry}_${index}`}
-              className="rounded px-2 py-1 text-xs text-text-muted"
+              className="rounded-lg px-2 py-1 text-xs text-text-muted"
               style={{
                 background:
-                  index === logs.length - 1
-                    ? "rgba(255,255,255,0.05)"
-                    : "transparent",
+                  index === logs.length - 1 ? "var(--surface)" : "transparent",
                 color:
                   index === logs.length - 1
-                    ? "rgba(255,255,255,0.82)"
+                    ? "var(--foreground)"
                     : "var(--muted)",
+                boxShadow:
+                  index === logs.length - 1
+                    ? "inset 0 0 0 1px color-mix(in srgb, var(--primary) 18%, transparent)"
+                    : "none",
               }}
             >
               <span className="mr-2 font-mono text-[10px] text-text-muted/80">

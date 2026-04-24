@@ -9,9 +9,7 @@ import {
 } from "@/components/dashboard/bettingLogic";
 
 import { SubBetSection } from "../bets/SubBetSection";
-import { MainBetSection } from "../bets/MainBetSection";
-
-import { SectionCard } from "./SectionCard";
+import { MainBetTradeCard } from "../bets/MainBetTradeCard";
 
 export function BetsSection({ gameState }) {
   const [bets, setBets] = useState(makeBetState);
@@ -82,26 +80,20 @@ export function BetsSection({ gameState }) {
   );
 
   return (
-    <SectionCard
-      title="Markets"
-      className="border-white/10 bg-slate-950/70"
-      subtitle="Main winner first, then round winner markets"
-    >
-      <div className="space-y-4">
-        <MainBetSection
-          markets={mainMarkets}
-          activeBets={bets.active}
-          onPlace={handlePlace}
-          maxStake={bets.balance}
-        />
+    <div className="space-y-4">
+      <MainBetTradeCard
+        markets={mainMarkets}
+        activeBets={bets.active}
+        onPlace={handlePlace}
+        maxStake={bets.balance}
+      />
 
-        <SubBetSection
-          markets={subMarkets}
-          activeBets={bets.active}
-          onPlace={handlePlace}
-          maxStake={bets.balance}
-        />
-      </div>
-    </SectionCard>
+      <SubBetSection
+        markets={subMarkets}
+        activeBets={bets.active}
+        onPlace={handlePlace}
+        maxStake={bets.balance}
+      />
+    </div>
   );
 }

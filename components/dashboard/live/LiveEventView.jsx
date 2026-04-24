@@ -21,7 +21,7 @@ const LiveEventView = () => {
         <CommentsSection />
       </section>
 
-      <aside className="h-full min-h-0 overflow-y-auto space-y-4 pb-3">
+      <aside className="h-full min-h-0 overflow-y-auto space-y-4 pb-3 pr-5">
         <BetsSection gameState={gameState} />
         <OracleLogSection logs={gameState?.log || []} />
       </aside>

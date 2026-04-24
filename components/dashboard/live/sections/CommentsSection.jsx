@@ -32,15 +32,15 @@ export function CommentsSection() {
     <SectionCard
       title="Comments"
       subtitle="Community signal below the arena"
-      className="border-white/10 bg-slate-950/70 mx-8"
+      className="mx-8 border-border/70 bg-surface/95"
       right={<span className="text-xs text-text-muted">{countLabel}</span>}
     >
       <div className="space-y-3">
-        <div className="max-h-65 space-y-2 overflow-y-auto rounded-xl border border-white/10 bg-black/25 p-2.5">
+        <div className="max-h-65 space-y-2 overflow-y-auto rounded-2xl border border-border/70 bg-element/55 p-2.5">
           {comments.map((comment) => (
             <article
               key={comment.id}
-              className="rounded-lg border border-white/10 bg-white/3 px-3 py-2"
+              className="rounded-xl border border-border/70 bg-background/70 px-3 py-2 shadow-sm"
             >
               <div className="mb-1 flex items-center justify-between text-[11px]">
                 <span className="font-semibold text-text-main">
@@ -76,12 +76,12 @@ export function CommentsSection() {
             value={draft}
             placeholder="Share your market read..."
             onChange={(event) => setDraft(event.target.value)}
-            className="w-full resize-none rounded-xl border border-white/15 bg-black/30 px-3 py-2 text-sm text-text-main outline-none placeholder:text-text-muted"
+            className="w-full resize-none rounded-xl border border-border/70 bg-background/85 px-3 py-2 text-sm text-text-main outline-none placeholder:text-text-muted"
           />
 
           <button
             type="submit"
-            className="rounded-xl border border-cyan-300/40 bg-cyan-400/15 px-3 py-1.5 text-xs font-semibold text-cyan-100 transition hover:bg-cyan-400/25"
+            className="rounded-xl border border-primary/25 bg-primary/12 px-3 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary/18"
           >
             Post Comment
           </button>

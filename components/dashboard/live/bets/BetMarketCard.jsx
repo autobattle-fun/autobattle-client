@@ -25,7 +25,7 @@ export function BetMarketCard({ market, onPlace, existingBet, maxStake }) {
 
   return (
     <article
-      className="overflow-hidden rounded-2xl border border-white/10 bg-[#0e1628]/85 shadow-[0_8px_24px_rgba(0,0,0,0.26)]"
+      className="overflow-hidden rounded-2xl border border-border/70 bg-surface/95 shadow-[0_8px_24px_rgba(15,23,42,0.08)]"
       style={{
         boxShadow: expanded && !locked ? `inset 0 0 0 1px ${accent}55` : "none",
       }}
@@ -45,7 +45,7 @@ export function BetMarketCard({ market, onPlace, existingBet, maxStake }) {
         </div>
 
         {locked ? (
-          <span className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-300">
+          <span className="rounded-md border border-emerald-500/25 bg-emerald-500/12 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300">
             ${existingBet.amount}
           </span>
         ) : null}
@@ -63,7 +63,7 @@ export function BetMarketCard({ market, onPlace, existingBet, maxStake }) {
       </button>
 
       {expanded && !locked ? (
-        <div className="space-y-2.5 border-t border-white/10 px-3 pb-3 pt-2">
+        <div className="space-y-2.5 border-t border-border/70 px-3 pb-3 pt-2">
           <div className="grid grid-cols-6 gap-1.5">
             {QUICK_AMOUNTS.map((value) => (
               <button
@@ -73,9 +73,9 @@ export function BetMarketCard({ market, onPlace, existingBet, maxStake }) {
                 style={{
                   color: amount === value ? accent : "var(--muted)",
                   borderColor:
-                    amount === value ? `${accent}70` : "rgba(255,255,255,0.18)",
+                    amount === value ? `${accent}70` : "var(--border)",
                   background:
-                    amount === value ? `${accent}1c` : "rgba(255,255,255,0.03)",
+                    amount === value ? `${accent}18` : "var(--background)",
                 }}
                 onClick={() => setAmount(value)}
               >
@@ -104,7 +104,7 @@ export function BetMarketCard({ market, onPlace, existingBet, maxStake }) {
 
                   setAmount(Math.max(1, Math.min(maxStake, next)));
                 }}
-                className="w-full rounded-lg border border-white/20 bg-black/20 py-2 pl-6 pr-2 text-sm font-semibold text-text-main outline-none"
+                className="w-full rounded-lg border border-border/70 bg-background/85 py-2 pl-6 pr-2 text-sm font-semibold text-text-main outline-none"
               />
             </label>
 

@@ -6,15 +6,15 @@
 
 :root {
   --surface: #ffffff;
-  --element: #f1f1ef;
-  --element-hover: #e8e8e5;
-  --muted: #8b8b8b;
-  --border: #eaeaea;
-  --primary: #8754ff;
-  --primary-hover: #703ee0;
+  --element: #eef2f7;
+  --element-hover: #e2e8f0;
+  --muted: #5f6778;
+  --border: #d9e0ea;
+  --primary: #6d4cff;
+  --primary-hover: #5638ea;
   color-scheme: light;
-  --background: #f9f9f6;
-  --foreground: #1a1a1a;
+  --background: #f4f6fb;
+  --foreground: #121826;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
@@ -46,15 +46,15 @@
 }
 
 .dark {
-  --background: #0b0c12;
-  --surface: #11131a;
-  --element: #171a24;
-  --element-hover: #1f2330;
-  --foreground: #f5f6fb;
-  --muted: #a0a4b5;
-  --border: #262b3b;
-  --primary: #8754ff;
-  --primary-hover: #9a75ff;
+  --background: #080b12;
+  --surface: #101521;
+  --element: #161c2c;
+  --element-hover: #1d263a;
+  --foreground: #f4f7ff;
+  --muted: #9ba4b9;
+  --border: #263149;
+  --primary: #8b5cf6;
+  --primary-hover: #a78bfa;
   color-scheme: dark;
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
@@ -141,6 +141,18 @@ html {
 
 body {
   background-color: var(--color-background);
+  background-image:
+    radial-gradient(
+      circle at top left,
+      color-mix(in srgb, var(--primary) 10%, transparent),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at top right,
+      color-mix(in srgb, var(--primary) 8%, transparent),
+      transparent 30%
+    );
+  background-attachment: fixed;
   color: var(--color-text-main);
   font-family: var(--font-open-runde), ui-sans-serif, system-ui;
 
