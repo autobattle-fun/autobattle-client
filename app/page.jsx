@@ -1,5 +1,9 @@
-import LiveEventView from "@/components/dashboard/live/LiveEventView";
+import GameUI from "@/components/dashboard/GameUI";
 
 export default function LivePage() {
-  return <LiveEventView />;
+  return (
+    <>
+      <GameUI />
+    </>
+  );
 }

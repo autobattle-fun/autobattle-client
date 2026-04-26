@@ -141,17 +141,6 @@ html {
 
 body {
   background-color: var(--color-background);
-  background-image:
-    radial-gradient(
-      circle at top left,
-      color-mix(in srgb, var(--primary) 10%, transparent),
-      transparent 34%
-    ),
-    radial-gradient(
-      circle at top right,
-      color-mix(in srgb, var(--primary) 8%, transparent),
-      transparent 30%
-    );
   background-attachment: fixed;
   color: var(--color-text-main);
   font-family: var(--font-open-runde), ui-sans-serif, system-ui;
