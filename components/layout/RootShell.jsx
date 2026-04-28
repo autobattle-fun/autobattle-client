@@ -4,9 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
+import { API_BASE_URL } from "@/lib/config";
 
 export function RootShell({ children, initialLoggedIn = false }) {
   const pathname = usePathname();

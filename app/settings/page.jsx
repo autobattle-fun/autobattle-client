@@ -7,9 +7,7 @@ import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import { useLogout, useUser } from "@privy-io/react-auth";
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
+import { API_BASE_URL } from "@/lib/config";
 
 export default function SettingsPage() {
   const { resolvedTheme, setTheme } = useTheme();

@@ -12,14 +12,12 @@ import {
 } from "@privy-io/react-auth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { API_BASE_URL } from "@/lib/config";
 import { normalizeUsername } from "@/lib/username";
 import { LoginShell } from "@/components/auth/login/LoginShell";
 import { LoginStatusCard } from "@/components/auth/login/LoginStatusCard";
 import { LoginMethodCard } from "@/components/auth/login/LoginMethodCard";
 import { LoginUsernameCard } from "@/components/auth/login/LoginUsernameCard";
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
 
 function normalizeAuthProvider(value) {
   if (!value) {

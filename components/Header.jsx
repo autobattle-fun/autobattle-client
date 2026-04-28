@@ -9,9 +9,7 @@ import { useRouter } from "next/navigation";
 import { useLogout } from "@privy-io/react-auth";
 import Avatar from "boring-avatars";
 import ReadyToEarnDialog from "./dialog/ReadyToEarnDialog";
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
+import { API_BASE_URL } from "@/lib/config";
 
 export function Header({ isAuthenticated = false }) {
   const router = useRouter();

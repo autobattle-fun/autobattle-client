@@ -5,9 +5,7 @@ import { ProfileHero } from "@/components/profile/ProfileHero";
 import { ProfileActions } from "@/components/profile/ProfileActions";
 import { ProfileRecentHistory } from "@/components/profile/ProfileRecentHistory";
 import { ProfilePerformanceCards } from "@/components/profile/ProfilePerformanceCards";
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
+import { API_BASE_URL } from "@/lib/config";
 
 async function getProfile() {
   try {
