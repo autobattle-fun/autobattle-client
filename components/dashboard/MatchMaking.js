@@ -64,8 +64,8 @@ export default function MatchMaking() {
   };
 
   return (
-    <div className="w-full h-screen flex flex-col relative overflow-hidden">
-      <div className="flex-1 flex flex-col items-center mt-52 z-10 w-full px-4">
+    <div className="w-full h-full flex flex-col relative overflow-hidden">
+      <div className="flex-1 flex flex-col items-center justify-center z-10 w-full px-4">
         <div className="flex flex-col items-center justify-center gap-2">
           <Image
             src="/logo/Autobattle-logo.svg"
