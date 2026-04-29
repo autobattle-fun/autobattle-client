@@ -30,7 +30,7 @@ export function Header({ isAuthenticated = false }) {
       }
 
       try {
-        const response = await fetch(`${API_BASE_URL}/me`, {
+        const response = await fetch(`${API_BASE_URL}/user/me`, {
           method: "GET",
           credentials: "include",
           cache: "no-store",
