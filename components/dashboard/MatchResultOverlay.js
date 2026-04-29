@@ -6,6 +6,8 @@ import PlayingCard from "./PlayingCard";
 
 export default function MatchResultOverlay({
   winnerSide = "red", // "red" | "blue" | "draw"
+  redName,
+  blueName,
   redCards = [],
   blueCards = [],
   redScore = 0,
@@ -16,25 +18,12 @@ export default function MatchResultOverlay({
   const [timeLeft, setTimeLeft] = useState(60);
 
   const isRedWin = winnerSide === "red";
-  const isDraw = winnerSide === "draw";
 
-  const winnerName = isDraw
-    ? "It's a Draw!"
-    : isRedWin
-      ? "Donald Trump"
-      : "Joe Biden";
+  const winnerName = isRedWin ? redName : blueName;
 
-  const winnerColor = isDraw
-    ? "text-amber-500"
-    : isRedWin
-      ? "text-red-500"
-      : "text-blue-500";
+  const winnerColor = isRedWin ? "text-red-500" : "text-blue-500";
 
-  const winnerBg = isDraw
-    ? "bg-amber-500"
-    : isRedWin
-      ? "bg-red-500"
-      : "bg-blue-500";
+  const winnerBg = isRedWin ? "bg-red-500" : "bg-blue-500";
 
   // --- Countdown Timer Logic ---
   useEffect(() => {
@@ -87,7 +76,7 @@ export default function MatchResultOverlay({
         <div
           className={`text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter uppercase mb-8 relative z-10 text-center ${winnerColor}`}
         >
-          {winnerName} {isDraw ? "" : "Wins!"}
+          {winnerName} Wins!
         </div>
 
         {/* Final Decks Container */}
@@ -156,16 +145,12 @@ export default function MatchResultOverlay({
           <div
             onClick={handleNextMatch}
             className={`flex-1 rounded-xl md:rounded-2xl pb-[4px] md:pb-[7px] cursor-pointer group ${
-              isDraw ? "bg-amber-700" : isRedWin ? "bg-red-700" : "bg-blue-700"
+              isRedWin ? "bg-red-700" : "bg-blue-700"
             }`}
           >
             <div
               className={`h-full py-3 md:py-4 rounded-xl md:rounded-2xl flex justify-center items-center transition-transform duration-150 ease-out group-hover:-translate-y-1 group-active:translate-y-[4px] md:group-active:translate-y-[7px] ${
-                isDraw
-                  ? "bg-amber-500"
-                  : isRedWin
-                    ? "bg-red-500"
-                    : "bg-blue-500"
+                isRedWin ? "bg-red-500" : "bg-blue-500"
               }`}
             >
               <div className="flex items-center gap-2">

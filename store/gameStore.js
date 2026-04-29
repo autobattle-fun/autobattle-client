@@ -5,6 +5,7 @@ export const useGameStore = create((set) => ({
   latency: null,
   gameState: null,
   countdown: null,
+  playerHit: null,
   serverTimestamp: null,
   isSocketWorking: true,
 
@@ -13,6 +14,7 @@ export const useGameStore = create((set) => ({
   setLatency: (v) => set({ latency: v }),
   setGameState: (v) => set({ gameState: v }),
   setCountdown: (v) => set({ countdown: v }),
+  setPlayerHit: (v) => set({ playerHit: v }),
   setServerTimestamp: (v) => set({ serverTimestamp: v }),
   setIsSocketWorking: (v) => set({ isSocketWorking: v }),
 

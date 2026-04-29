@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useGameStore } from "@/store/gameStore";
 
 const AGENT_NAMES = [
   "NeuralNinja",
@@ -25,8 +26,10 @@ const AGENT_NAMES = [
 const SCROLL_NAMES = [...AGENT_NAMES, ...AGENT_NAMES];
 
 export default function MatchMaking() {
+  const gameState = useGameStore((state) => state.gameState);
+  const countdown = useGameStore((state) => state.countdown);
   // 300 seconds = 5 minutes
-  const [timeLeft, setTimeLeft] = useState(300);
+  const [timeLeft, setTimeLeft] = useState(countdown || 300);
   const [isMatched, setIsMatched] = useState(false);
   const [finalPlayer1, setFinalPlayer1] = useState("");
   const [finalPlayer2, setFinalPlayer2] = useState("");
@@ -39,21 +42,17 @@ export default function MatchMaking() {
         const newTime = prev - 1;
 
         // Finalize match at exactly 3 minutes remaining (180 seconds)
-        if (newTime === 180 && !isMatched) {
+        if (gameState?.gameStatus === "PREPARING") {
           setIsMatched(true);
-          setFinalPlayer1(
-            AGENT_NAMES[Math.floor(Math.random() * AGENT_NAMES.length)],
-          );
-          setFinalPlayer2(
-            AGENT_NAMES[Math.floor(Math.random() * AGENT_NAMES.length)],
-          );
+          setFinalPlayer1(gameState?.red?.name);
+          setFinalPlayer2(gameState?.blue?.name);
         }
         return newTime;
       });
     }, 1000);
 
     return () => clearInterval(countdownInterval);
-  }, [isMatched]);
+  }, [isMatched, gameState, timeLeft]);
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60)

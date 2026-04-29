@@ -95,6 +95,7 @@ export default function useGameEngine() {
       case "AwaitingFinalRevealVRF": {
         const rc = drawRandomCard(allCardsInPlay);
         const bc = drawRandomCard([...allCardsInPlay, rc]);
+        console.log(redCards);
         setRedCards((prev) => [...prev, rc]);
         setBlueCards((prev) => [...prev, bc]);
         setLogs((p) => [

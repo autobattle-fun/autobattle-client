@@ -1,7 +1,7 @@
 "use client";
 
 import { API_BASE_URL } from "@/lib/config";
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { io } from "socket.io-client";
 import { useGameStore } from "@/store/gameStore";
 
@@ -13,8 +13,9 @@ export default function useSocket() {
   const setServerTimestamp = useGameStore((state) => state.setServerTimestamp);
   const setIsLoading = useGameStore((state) => state.setIsLoading);
   const setIsSocketWorking = useGameStore((state) => state.setIsSocketWorking);
+  const updateGameState = useGameStore((state) => state.updateGameState);
 
-  const initializeWebSocket = useCallback(() => {
+  const initializeWebSocket = () => {
     if (socket) {
       socket.disconnect();
 
@@ -53,6 +54,8 @@ export default function useSocket() {
       ({ latency, gameState, countdown, serverTimestamp }) => {
         console.log("Received pong");
 
+        console.log(latency, gameState, countdown, serverTimestamp);
+
         setIsLoading(false);
         setLatency(latency);
         setGameState(gameState);
@@ -61,24 +64,72 @@ export default function useSocket() {
       },
     );
 
-    return websocket;
-  }, [
-    socket,
-    setIsLoading,
-    setLatency,
-    setGameState,
-    setCountdown,
-    setServerTimestamp,
-  ]);
+    websocket.on("match:created", (envelope) => {
+      console.log("Match created", envelope);
+      setGameState(envelope.data);
+    });
 
-  const disconnectWebSocket = useCallback(() => {
+    websocket.on("round:started", (envelope) => {
+      console.log("Round started", envelope);
+      updateGameState(envelope.data);
+    });
+
+    websocket.on("cards:dealt", (envelope) => {
+      console.log("Cards dealt", envelope);
+      updateGameState(envelope.data);
+    });
+
+    websocket.on("agent:decision", (envelope) => {
+      console.log("Agent decision", envelope);
+      updateGameState(envelope.data);
+    });
+
+    websocket.on("river:flowing", (envelope) => {
+      console.log("River flowing", envelope);
+      updateGameState(envelope.data);
+    });
+
+    websocket.on("round:resolved", (envelope) => {
+      console.log("Round resolved", envelope);
+      updateGameState(envelope.data);
+    });
+
+    websocket.on("tiebreaker:started", (envelope) => {
+      console.log("Tiebreaker started", envelope);
+      updateGameState(envelope.data);
+    });
+
+    websocket.on("tiebreaker:resolved", (envelope) => {
+      console.log("Tiebreaker resolved", envelope);
+      updateGameState(envelope.data);
+    });
+
+    websocket.on("match:ended", (envelope) => {
+      console.log("Match ended", envelope);
+      updateGameState(envelope.data);
+    });
+
+    websocket.on("game:paused", (envelope) => {
+      console.log("Game paused", envelope);
+      updateGameState(envelope.data);
+    });
+
+    websocket.on("game:resumed", (envelope) => {
+      console.log("Game resumed", envelope);
+      websocket.emit("ping", { timestamp: Date.now() });
+    });
+
+    return websocket;
+  };
+
+  const disconnectWebSocket = () => {
     if (socket) {
       socket.disconnect();
       setSocket(null);
     }
-  }, [socket]);
+  };
 
-  const handleNetworkIssue = useCallback(() => {
+  const handleNetworkIssue = () => {
     const currentGameState = useGameStore.getState().gameState;
 
     if (!currentGameState) {
@@ -89,16 +140,16 @@ export default function useSocket() {
         initializeWebSocket();
       }, 5000);
     }
-  }, [setIsLoading, setIsSocketWorking, initializeWebSocket]);
+  };
 
-  const sendPing = useCallback(async () => {
+  const sendPing = async () => {
     console.log("Sending ping");
 
     socket.emit("ping", { timestamp: Date.now() });
 
     await new Promise((resolve) => setTimeout(resolve, 5000));
     handleNetworkIssue();
-  }, [socket, handleNetworkIssue]);
+  };
 
   return { initializeWebSocket, socket, disconnectWebSocket, sendPing };
 }

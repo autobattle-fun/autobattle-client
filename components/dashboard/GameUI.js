@@ -7,12 +7,16 @@ import AgentSide from "./AgentSide";
 import PredictionMarkets from "./PredictionMarket";
 import LiveComments from "./LiveComments";
 import useGameEngine from "../../hooks/useGameEngine";
-import { calculateScore, getDamageValue } from "../../lib/cards";
+import { adaptServerStateToEngine, getDamageValue } from "../../lib/cards";
 import MatchResultOverlay from "./MatchResultOverlay";
+import { useGameStore } from "@/store/gameStore";
 
 export default function GameUI() {
   const engine = useGameEngine();
   const { resolvedTheme } = useTheme();
+  const gameState = useGameStore((state) => state.gameState);
+  const { round, redHP, blueHP, redCards, blueCards } =
+    adaptServerStateToEngine(gameState || {});
 
   const isDark = resolvedTheme === "dark";
 
@@ -26,7 +30,7 @@ export default function GameUI() {
             <h1
               className={`text-2xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-center leading-[1.1] ${isDark ? "text-white" : "text-[#111827]"}`}
             >
-              Match #24
+              Match #{gameState?.gameId}
               <br />
               <span className="text-zinc-500 font-semibold text-base sm:text-2xl md:text-4xl mt-0.5 md:mt-2 block">
                 Closest to 21 Wins
@@ -42,16 +46,16 @@ export default function GameUI() {
                 className={`${isDark ? "bg-zinc-900/80" : "bg-white/80"} w-full border-foreground/20 backdrop-blur-xl border p-4 md:p-8 rounded-[24px] md:rounded-[32px] flex flex-col items-center text-center relative overflow-hidden transition-colors duration-500`}
               >
                 <div className="text-sm md:text-lg uppercase font-bold tracking-[0.05em] text-zinc-500 mb-1">
-                  <span>ROUND {engine.round}</span>
+                  <span>ROUND {round}</span>
                 </div>
                 <div
                   className={`text-[10px] md:text-xs font-bold tracking-tight mb-3 md:mb-6 bg-primary/10 border border-primary text-primary rounded-lg px-2 py-1`}
                 >
-                  {engine.phase.replace(/([A-Z])/g, " $1").trim()}
+                  {gameState?.phase?.replace(/([A-Z])/g, " $1").trim()}
                 </div>
 
                 <div className="flex-1 mb-4 flex flex-col items-center justify-center relative w-full gap-2 md:gap-4 p-4 rounded-xl overflow-hidden mt-1 md:mt-2 dark:bg-zinc-900 bg-white border border-amber-500/50 transition-colors duration-500 h-24 md:h-32">
-                  {getDamageValue(engine.round) >= 4 && (
+                  {getDamageValue(round) >= 4 && (
                     <div className="absolute inset-0 bg-gradient-to-t from-orange-500/20 via-orange-500/5 to-transparent blur-xl animate-pulse pointer-events-none" />
                   )}
                   <span className="text-[8px] md:text-[10px] text-zinc-500 font-bold tracking-[0.2em] uppercase mb-0 md:mb-1 z-10 relative mt-1 md:mt-2">
@@ -60,27 +64,27 @@ export default function GameUI() {
                   <div
                     className={`text-5xl md:text-7xl font-black tracking-tighter flex items-end gap-1 z-10 relative ${getDamageValue(engine.round) >= 4 ? "text-orange-600 dark:text-orange-500 drop-shadow-[0_0_15px_rgba(249,115,22,0.4)]" : "text-amber-600 dark:text-amber-500"}`}
                   >
-                    {getDamageValue(engine.round)}
+                    {getDamageValue(round)}
                     <span className="text-xs md:text-lg font-bold tracking-widest opacity-50 mb-1 ml-1">
                       HP
                     </span>
                   </div>
-                  {getDamageValue(engine.round) === 1 && (
+                  {getDamageValue(round) === 1 && (
                     <div className="text-[8px] md:text-[10px] font-bold text-orange-600 dark:text-orange-400 bg-orange-500/10 px-2 md:px-3 py-1 rounded-full border border-orange-500/20 tracking-[0.2em] uppercase mt-1 md:mt-3 z-10 relative mb-2 md:mb-0">
                       Let the round begin!
                     </div>
                   )}
-                  {getDamageValue(engine.round) === 2 && (
+                  {getDamageValue(round) === 2 && (
                     <div className="text-[8px] md:text-[10px] font-bold text-orange-600 dark:text-orange-400 bg-orange-500/10 px-2 md:px-3 py-1 rounded-full border border-orange-500/20 tracking-[0.2em] uppercase mt-1 md:mt-3 z-10 relative mb-2 md:mb-0">
                       Getting serious...
                     </div>
                   )}
-                  {getDamageValue(engine.round) >= 8 && (
+                  {getDamageValue(round) >= 8 && (
                     <div className="text-[8px] md:text-[10px] font-bold text-red-600 dark:text-red-500 bg-red-500/10 px-2 md:px-3 py-1 rounded-full border border-red-500/20 tracking-[0.2em] uppercase mt-1 md:mt-3 animate-bounce z-10 relative shadow-[0_0_10px_rgba(239,68,68,0.2)] mb-2 md:mb-0">
                       Lethal Stakes
                     </div>
                   )}
-                  {getDamageValue(engine.round) === 4 && (
+                  {getDamageValue(round) === 4 && (
                     <div className="text-[8px] md:text-[10px] font-bold text-orange-600 dark:text-orange-400 bg-orange-500/10 px-2 md:px-3 py-1 rounded-full border border-orange-500/20 tracking-[0.2em] uppercase mt-1 md:mt-3 z-10 relative mb-2 md:mb-0">
                       High Stakes
                     </div>
@@ -106,38 +110,46 @@ export default function GameUI() {
             <div className="w-full flex flex-row justify-between xl:contents order-2 xl:order-none gap-2 sm:gap-4">
               <div className="w-[49%] xl:w-2/5 flex justify-end xl:order-1">
                 <AgentSide
-                  agentName="Donald Trump"
+                  agentName={gameState?.red?.name}
                   side="red"
-                  hp={engine.redHP}
-                  cards={engine.redCards}
-                  score={calculateScore(engine.redCards).score}
+                  hp={redHP}
+                  cards={redCards}
+                  score={gameState?.red?.score}
                   align="left"
+                  status={gameState?.playerStatus?.red}
                   atRisk={
-                    engine.phase === "Ended" ? 0 : getDamageValue(engine.round)
+                    gameState?.phase === "Ended" ? 0 : getDamageValue(round)
                   }
                   showRiverPlaceholder={
-                    ["RedTurn", "BlueTurn", "AwaitingFinalRevealVRF"].includes(
-                      engine.phase,
-                    ) && engine.redCards.length > 0
+                    [
+                      "RedTurn",
+                      "BlueTurn",
+                      "AwaitingFinalReveal",
+                      "AwaitingTiebreaker",
+                    ].includes(gameState?.phase) && redCards.length > 0
                   }
                 />
               </div>
 
               <div className="w-[49%] xl:w-2/5 flex justify-start xl:order-3">
                 <AgentSide
-                  agentName="Joe Biden"
+                  agentName={gameState?.blue?.name}
                   side="blue"
-                  hp={engine.blueHP}
-                  cards={engine.blueCards}
-                  score={calculateScore(engine.blueCards).score}
+                  hp={blueHP}
+                  cards={blueCards}
+                  score={gameState?.blue?.score}
                   align="right"
+                  status={gameState?.playerStatus?.blue}
                   atRisk={
-                    engine.phase === "Ended" ? 0 : getDamageValue(engine.round)
+                    gameState?.phase === "Ended" ? 0 : getDamageValue(round)
                   }
                   showRiverPlaceholder={
-                    ["RedTurn", "BlueTurn", "AwaitingFinalRevealVRF"].includes(
-                      engine.phase,
-                    ) && engine.blueCards.length > 0
+                    [
+                      "RedTurn",
+                      "BlueTurn",
+                      "AwaitingFinalReveal",
+                      "AwaitingTiebreaker",
+                    ].includes(gameState?.phase) && blueCards.length > 0
                   }
                 />
               </div>
@@ -147,13 +159,17 @@ export default function GameUI() {
           <PredictionMarkets />
           <LiveComments logs={engine.logs} />
 
-          {engine.phase === "Ended" && (
+          {gameState?.phase === "Ended" && (
             <MatchResultOverlay
-              winnerSide={engine.winner} // Ensure your engine returns "red", "blue", or "draw"
-              redCards={engine.redCards}
-              blueCards={engine.blueCards}
-              redScore={calculateScore(engine.redCards).score}
-              blueScore={calculateScore(engine.blueCards).score}
+              redName={gameState?.red?.name}
+              blueName={gameState?.blue?.name}
+              winnerSide={
+                gameState?.blue?.hp > gameState?.red?.hp ? "blue" : "red"
+              }
+              redCards={redCards}
+              blueCards={blueCards}
+              redScore={gameState?.red?.score}
+              blueScore={gameState?.blue?.score}
               onNextMatch={() => console.log("Routing to MatchMaking...")}
               onProfile={() => console.log("Routing to Profile...")}
             />

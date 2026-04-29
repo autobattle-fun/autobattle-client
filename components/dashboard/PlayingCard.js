@@ -79,7 +79,7 @@ export default function PlayingCard({
       <div
         className={`text-[9px] sm:text-xs md:text-base font-bold ${SUIT_COLORS[card.suit]} leading-none w-full rotate-180 ${textAlignClass}`}
       >
-        {card.rank}
+        {card.rank === 1 ? "A" : card.rank}
       </div>
     </div>
   );

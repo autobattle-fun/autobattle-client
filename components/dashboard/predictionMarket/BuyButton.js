@@ -17,7 +17,7 @@ export default function BuyButton({ candidate, price, color }) {
         )}
       >
         <div className="text-[10px] md:text-sm text-white font-bold tracking-widest mb-1 md:mb-2 text-center">
-          {candidate}
+          {candidate?.length > 20 ? candidate?.slice(0, 20) + "..." : candidate}
         </div>
         <div className="text-xl md:text-3xl text-white font-bold tracking-tighter">
           {price}

@@ -1,6 +1,6 @@
 "use client";
 
-import { Cpu, ShieldAlert } from "lucide-react";
+import { CheckCircle, Cpu, ShieldAlert } from "lucide-react";
 import PlayingCard from "./PlayingCard";
 import { useRef, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
@@ -10,6 +10,7 @@ export default function AgentSide({
   side,
   hp,
   cards,
+  status,
   score,
   align,
   atRisk = 0,
@@ -26,6 +27,30 @@ export default function AgentSide({
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
+
+  const [actionPopup, setActionPopup] = useState(null);
+  const prevStatus = useRef(status);
+  const prevCardsLength = useRef(cards.length);
+
+  useEffect(() => {
+    const justFinalized =
+      (status === "FINALIZED" || status === "DONE") &&
+      prevStatus.current !== "FINALIZED" &&
+      prevStatus.current !== "DONE";
+
+    if (justFinalized) {
+      if (cards.length > prevCardsLength.current) {
+        setActionPopup("HIT!");
+      } else {
+        setActionPopup("STAY");
+      }
+
+      const timer = setTimeout(() => setActionPopup(null), 2000);
+      return () => clearTimeout(timer);
+    }
+    prevStatus.current = status;
+    prevCardsLength.current = cards.length;
+  }, [status, cards.length]);
 
   useEffect(() => {
     if (cards.length <= 1 && scrollRef.current) {
@@ -66,10 +91,45 @@ export default function AgentSide({
             {agentName}
           </h3>
           <div className="flex items-center gap-1 opacity-60 dark:text-zinc-400 text-zinc-600">
-            <ShieldAlert className="w-2.5 h-2.5 md:w-4 md:h-4" />
-            <span className="text-[9px] md:text-sm font-bold font-mono tracking-tighter tabular-nums">
-              {Math.max(0, hp)} / 10
-            </span>
+            {status === "WAITING" && (
+              <>
+                <ShieldAlert className="w-2.5 h-2.5 md:w-4 md:h-4" />
+                <span className="text-[9px] md:text-sm font-bold font-mono tracking-tighter tabular-nums">
+                  {Math.max(0, hp)} / 10
+                </span>
+              </>
+            )}
+
+            {status === "THINKING" && (
+              <>
+                <div className="rounded-full w-2 h-2 bg-amber-500 relative">
+                  <div className="rounded-full w-2 h-2 bg-amber-500 animate-ping absolute"></div>
+                </div>
+                <span className="text-[9px] md:text-sm font-bold font-mono tracking-tighter tabular-nums">
+                  THINKING...
+                </span>
+              </>
+            )}
+
+            {status === "TXPENDING" && (
+              <>
+                <div className="rounded-full w-2 h-2 bg-green-500 relative">
+                  <div className="rounded-full w-2 h-2 bg-green-500 animate-ping absolute"></div>
+                </div>
+                <span className="text-[9px] md:text-sm font-bold font-mono tracking-tighter tabular-nums">
+                  EXECUTING...
+                </span>
+              </>
+            )}
+
+            {(status === "FINALIZED" || status === "DONE") && (
+              <>
+                <CheckCircle className="w-2.5 h-2.5 md:w-4 md:h-4 text-green-700" />
+                <span className="text-[9px] md:text-sm font-bold font-mono tracking-tighter tabular-nums">
+                  FINALIZED
+                </span>
+              </>
+            )}
           </div>
         </div>
         <div
@@ -178,6 +238,32 @@ export default function AgentSide({
               )}
             </AnimatePresence>
           </div>
+
+          <AnimatePresence>
+            {actionPopup && (
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  scale: 0.3,
+                  y: 20,
+                  rotate: isLeft ? -15 : 15,
+                }}
+                animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
+                exit={{ opacity: 0, scale: 1.5, filter: "blur(10px)" }}
+                transition={{ type: "spring", bounce: 0.6 }}
+                className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none drop-shadow-2xl"
+              >
+                <span
+                  className={`text-5xl md:text-7xl font-black italic tracking-tighter shadow-black drop-shadow-[0_4px_4px_rgba(146,146,146,1)] ${
+                    actionPopup === "HIT!" ? "text-red-400" : "text-blue-400"
+                  }`}
+                  style={{ WebkitTextStroke: "2px #18181b" }}
+                >
+                  {actionPopup}
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </div>
