@@ -4,6 +4,7 @@ import { API_BASE_URL } from "@/lib/config";
 import { useState } from "react";
 import { io } from "socket.io-client";
 import { useGameStore } from "@/store/gameStore";
+import { useMarketStore } from "@/store/marketStore";
 
 export default function useSocket() {
   const [socket, setSocket] = useState(null);
@@ -14,6 +15,7 @@ export default function useSocket() {
   const setIsLoading = useGameStore((state) => state.setIsLoading);
   const setIsSocketWorking = useGameStore((state) => state.setIsSocketWorking);
   const updateGameState = useGameStore((state) => state.updateGameState);
+  const setMarket = useMarketStore((state) => state.setMarket);
 
   const initializeWebSocket = () => {
     if (socket) {
@@ -51,22 +53,24 @@ export default function useSocket() {
 
     websocket.on(
       "pong",
-      ({ latency, gameState, countdown, serverTimestamp }) => {
+      ({ latency, gameState, countdown, market, serverTimestamp }) => {
         console.log("Received pong");
 
-        console.log(latency, gameState, countdown, serverTimestamp);
+        console.log(latency, gameState, market, countdown, serverTimestamp);
 
         setIsLoading(false);
         setLatency(latency);
         setGameState(gameState);
         setCountdown(countdown);
         setServerTimestamp(serverTimestamp);
+        setMarket(market);
       },
     );
 
     websocket.on("match:created", (envelope) => {
       console.log("Match created", envelope);
-      setGameState(envelope.data);
+      setGameState(envelope.data.game);
+      setMarket(envelope.data.market);
     });
 
     websocket.on("round:started", (envelope) => {
@@ -76,7 +80,8 @@ export default function useSocket() {
 
     websocket.on("cards:dealt", (envelope) => {
       console.log("Cards dealt", envelope);
-      updateGameState(envelope.data);
+      updateGameState(envelope.data.game);
+      setMarket(envelope.data.market);
     });
 
     websocket.on("agent:decision", (envelope) => {
@@ -117,6 +122,11 @@ export default function useSocket() {
     websocket.on("game:resumed", (envelope) => {
       console.log("Game resumed", envelope);
       websocket.emit("ping", { timestamp: Date.now() });
+    });
+
+    websocket.on("market:prices", (envelope) => {
+      console.log("Market prices", envelope);
+      setMarket(envelope.data);
     });
 
     return websocket;

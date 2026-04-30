@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
 import BuyButton from "./predictionMarket/BuyButton";
-import { useGameStore } from "@/store/gameStore"; // Assuming this is your import
+import { useGameStore } from "@/store/gameStore";
+import { useMarketStore } from "@/store/marketStore"; // Assuming this is your import
 
 export default function PredictionMarkets() {
   const gameState = useGameStore((state) => state.gameState);
-
-  // Use the server's round number if available, fallback to 1
-  const roundNum = gameState?.roundNumber || 1;
-
+  const market = useMarketStore((state) => state.market);
   const [isWinnerShowing, setIsWinnerShowing] = useState(false);
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
   const [isBlueWin, setIsBlueWin] = useState(false);
@@ -56,13 +54,15 @@ export default function PredictionMarkets() {
         <div className="flex justify-between items-end gap-3">
           <BuyButton
             candidate={gameState?.red?.name}
-            price="54 $AUTO"
+            price={`${market?.mainMarket?.yesPrice?.toFixed(2) || 0} $AUTO`}
             color="red"
+            market={market?.mainMarket}
           />
           <BuyButton
             candidate={gameState?.blue?.name}
-            price="46 $AUTO"
+            price={`${market?.mainMarket?.noPrice?.toFixed(2) || 0} $AUTO`}
             color="blue"
+            market={market?.mainMarket}
           />
         </div>
       </div>
@@ -94,20 +94,23 @@ export default function PredictionMarkets() {
           <div className="text-xl sm:text-3xl flex flex-col font-bold mb-5 whitespace-nowrap">
             <span className="truncate">Who will win this round?</span>
             <span className="text-sm md:text-lg text-zinc-600 dark:text-zinc-400 opacity-50 transition-all">
-              Match #{gameState?.gameId || 24} - Round {roundNum}
+              Match #{gameState?.gameId || 24} - Round{" "}
+              {market?.roundMarket?.targetRound}
             </span>
           </div>
 
           <div className="flex justify-between items-end gap-3">
             <BuyButton
               candidate={gameState?.red?.name}
-              price="54 $AUTO"
+              price={`${market?.roundMarket?.yesPrice?.toFixed(2) || 0} $AUTO`}
               color="red"
+              market={market?.roundMarket}
             />
             <BuyButton
               candidate={gameState?.blue?.name}
-              price="46 $AUTO"
+              price={`${market?.roundMarket?.noPrice?.toFixed(2) || 0} $AUTO`}
               color="blue"
+              market={market?.roundMarket}
             />
           </div>
         </div>

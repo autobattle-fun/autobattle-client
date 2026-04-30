@@ -90,7 +90,7 @@ export default function MatchMaking() {
         </div>
 
         {/* Matchmaking Container */}
-        <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 w-full max-w-5xl">
+        <div className="flex flex-col md:flex-row items-center justify-center w-full max-w-5xl">
           {/* Player 1 Box */}
           <div className="flex-1 flex justify-center items-start w-full bg-transparent rounded-3xl h-[120px] md:h-[160px] overflow-hidden relative">
             {!isMatched ? (
@@ -127,7 +127,7 @@ export default function MatchMaking() {
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1.1, opacity: 1 }}
                 transition={{ type: "spring", stiffness: 200, damping: 10 }}
-                className="text-3xl md:text-5xl font-black italic uppercase tracking-tighter text-black h-full flex items-center"
+                className="text-3xl font-black italic uppercase tracking-tighter text-center text-black h-full flex items-center"
               >
                 {finalPlayer1}
               </motion.span>
@@ -177,7 +177,7 @@ export default function MatchMaking() {
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1.1, opacity: 1 }}
                 transition={{ type: "spring", stiffness: 200, damping: 10 }}
-                className="text-3xl md:text-5xl font-black italic uppercase tracking-tighter text-black h-full flex items-center"
+                className="text-3xl font-black italic uppercase tracking-tighter text-center text-black h-full flex items-center"
               >
                 {finalPlayer2}
               </motion.span>

@@ -249,18 +249,17 @@ export default function AgentSide({
                   rotate: isLeft ? -15 : 15,
                 }}
                 animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
-                exit={{ opacity: 0, scale: 1.5, filter: "blur(10px)" }}
+                exit={{ opacity: 0, scale: 1.5 }}
                 transition={{ type: "spring", bounce: 0.6 }}
                 className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none drop-shadow-2xl"
               >
-                <span
-                  className={`text-5xl md:text-7xl font-black italic tracking-tighter shadow-black drop-shadow-[0_4px_4px_rgba(146,146,146,1)] ${
-                    actionPopup === "HIT!" ? "text-red-400" : "text-blue-400"
+                <div
+                  className={`text-5xl md:text-7xl font-black rounded-xl px-5 py-2 tracking-tighter text-white ${
+                    actionPopup === "HIT!" ? "bg-red-500" : "bg-blue-500"
                   }`}
-                  style={{ WebkitTextStroke: "2px #18181b" }}
                 >
                   {actionPopup}
-                </span>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
