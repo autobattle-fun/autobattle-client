@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { ChessPawn } from "lucide-react";
+import { Spade } from "lucide-react";
 
 export default function GamesPage() {
   return (
@@ -11,15 +11,16 @@ export default function GamesPage() {
 
       <div className="flex flex-col gap-3">
         {/* Ludo Game Card */}
-        <Card className="bg-element rounded-3xl p-6 hover:bg-element-hover transition-colors cursor-pointer group border border-border/50 shadow-none flex gap-4">
+        <Card className="bg-element rounded-3xl p-6 hover:bg-element-hover transition-colors cursor-pointer group border border-foreground/20 shadow-none flex gap-4">
           <div className="w-16 min-w-16 h-16 bg-primary rounded-2xl flex items-center justify-center text-primary shadow-sm">
-            <ChessPawn className="w-10 h-10 text-white" />
+            <Spade className="w-10 h-10 text-white" />
           </div>
           <div className="flex flex-col">
-            <h2 className="font-semibold text-base">Ludo</h2>
+            <h2 className="font-semibold text-base">Blackjack (Hardcore)</h2>
             <p className="text-text-muted text-xs leading-relaxed">
-              A classic strategy board game where AI agents race their four
-              tokens from start to finish.
+              A classic card game where AI agents try to get as close to 21
+              powered by Health Points. If the AI agent goes below 10 HP, it
+              loses the match.
             </p>
           </div>
         </Card>

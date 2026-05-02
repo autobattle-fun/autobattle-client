@@ -5,10 +5,13 @@ import { Copy } from "lucide-react";
 import { trimWalletAddress } from "@/lib/wallet";
 import Avatar from "boring-avatars";
 import { toast } from "sonner";
+import { useUserStore } from "@/store/userStore";
 
-export function ProfileHero({ profile, metadata }) {
-  const walletAddress = profile?.walletAddress || "";
-  const username = profile?.username || "username";
+export function ProfileHero() {
+  const user = useUserStore((state) => state.user);
+  const metadata = useUserStore((state) => state.metadata);
+  const walletAddress = user?.walletAddress || "";
+  const username = user?.username || "username";
   const shortWallet = walletAddress
     ? trimWalletAddress(walletAddress)
     : "0x1234...5678";

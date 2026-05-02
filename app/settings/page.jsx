@@ -6,15 +6,15 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
-import { useLogout, useUser } from "@privy-io/react-auth";
-import { API_BASE_URL } from "@/lib/config";
+import { useOpenfort } from "@openfort/react";
+import { useUserStore } from "@/store/userStore";
 
 export default function SettingsPage() {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-  const { logout } = useLogout();
-  const { user } = useUser();
+  const { logout } = useOpenfort();
+  const user = useUserStore((state) => state.user);
 
   useEffect(() => {
     setMounted(true);
@@ -22,11 +22,6 @@ export default function SettingsPage() {
 
   async function handleLogout() {
     try {
-      await fetch(`${API_BASE_URL}/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
-
       await logout();
     } catch (error) {
       console.error("Logout error:", error);

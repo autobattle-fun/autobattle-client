@@ -6,61 +6,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useRouter } from "next/navigation";
-import { useLogout } from "@privy-io/react-auth";
 import Avatar from "boring-avatars";
 import ReadyToEarnDialog from "./dialog/ReadyToEarnDialog";
-import { API_BASE_URL } from "@/lib/config";
+import { useOpenfort } from "@openfort/react";
+import { useUserStore } from "@/store/userStore";
+import { Loader2 } from "lucide-react";
 
 export function Header({ isAuthenticated = false }) {
   const router = useRouter();
-  const { logout } = useLogout();
+  const { logout } = useOpenfort();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
-  const [splBalance, setSplBalance] = useState(0);
-  const [username, setUsername] = useState("");
-  const [solBalance, setSolBalance] = useState(0);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadMe() {
-      if (!isAuthenticated) {
-        setUsername("");
-        return;
-      }
-
-      try {
-        const response = await fetch(`${API_BASE_URL}/user/me`, {
-          method: "GET",
-          credentials: "include",
-          cache: "no-store",
-        });
-
-        if (!response.ok || cancelled) {
-          return;
-        }
-
-        const payload = await response.json();
-
-        if (!cancelled) {
-          setUsername(payload?.user?.username || "");
-          setSplBalance(payload?.metadata?.splTokenBalance || 0);
-          setSolBalance(payload?.metadata?.solBalance || 0);
-        }
-      } catch {
-        if (!cancelled) {
-          setUsername("");
-          setSplBalance(0);
-        }
-      }
-    }
-
-    loadMe();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [isAuthenticated]);
+  const splBalance = useUserStore(
+    (state) => state.metadata?.splTokenBalance || 0,
+  );
+  const isLoadingUser = useUserStore((state) => state.isLoadingUser);
+  const username = useUserStore((state) => state.user?.username || "");
+  const user = useUserStore((state) => state.user);
 
   useEffect(() => {
     function onClickOutside(event) {
@@ -78,24 +40,16 @@ export function Header({ isAuthenticated = false }) {
 
   async function handleLogout() {
     try {
-      // Call backend to clear session
-      await fetch(`${API_BASE_URL}/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
-
       await logout();
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
-      // Notify app of logout
       window.dispatchEvent(
         new CustomEvent("autobattle-auth-changed", {
           detail: { isAuthenticated: false },
         }),
       );
       setIsMenuOpen(false);
-      // Redirect to login
       router.push("/login");
     }
   }
@@ -118,11 +72,11 @@ export function Header({ isAuthenticated = false }) {
       <div />
 
       <div className="flex items-center gap-3">
-        <ReadyToEarnDialog solBalance={solBalance} autoBalance={splBalance} />
+        {user && <ReadyToEarnDialog autoBalance={splBalance} />}
 
         <ThemeToggle className="bg-element hover:bg-element-hover border border-border shadow-inner" />
 
-        {isAuthenticated ? (
+        {user ? (
           <div className="relative" ref={menuRef}>
             <button
               type="button"
@@ -165,8 +119,14 @@ export function Header({ isAuthenticated = false }) {
             className="flex items-center gap-2 font-semibold py-1 rounded-full transition-all! hover:scale-105 duration-200 cursor-pointer"
             onClick={() => router.push("/login")}
           >
-            <Plus className="w-4 h-4" />
-            Sign In
+            {isLoadingUser ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <>
+                <Plus className="w-4 h-4" />
+                Sign In
+              </>
+            )}
           </Button>
         )}
       </div>

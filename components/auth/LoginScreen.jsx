@@ -1,433 +1,98 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Wallet, Globe, User, LogOut, AlertTriangle } from "lucide-react";
-import {
-  useLogin,
-  usePrivy,
-  useWallets,
-  useLogout,
-  useUser,
-} from "@privy-io/react-auth";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { API_BASE_URL } from "@/lib/config";
-import { normalizeUsername } from "@/lib/username";
+import { Wallet, Globe } from "lucide-react";
 import { LoginShell } from "@/components/auth/login/LoginShell";
-import { LoginStatusCard } from "@/components/auth/login/LoginStatusCard";
 import { LoginMethodCard } from "@/components/auth/login/LoginMethodCard";
-import { LoginUsernameCard } from "@/components/auth/login/LoginUsernameCard";
-
-function normalizeAuthProvider(value) {
-  if (!value) {
-    return "privy";
-  }
-
-  const lowerValue = String(value).toLowerCase();
-
-  if (lowerValue.includes("twitter")) {
-    return "x";
-  }
-
-  if (lowerValue.includes("google")) {
-    return "google";
-  }
-
-  if (lowerValue.includes("wallet")) {
-    return "wallet";
-  }
-
-  if (lowerValue.includes("email")) {
-    return "email";
-  }
-
-  return lowerValue;
-}
+import Image from "next/image";
+import { OAuthProvider, useOAuth } from "@openfort/react";
 
 export function LoginScreen() {
-  const router = useRouter();
-  const { ready, authenticated, getAccessToken } = usePrivy();
-  const { logout } = useLogout();
-  const { user: privyUser } = useUser();
-  const { ready: walletsReady, wallets } = useWallets();
-  const [username, setUsername] = useState("");
-  const [usernameError, setUsernameError] = useState("");
-  const [flowError, setFlowError] = useState("");
-  const [isSubmittingUsername, setIsSubmittingUsername] = useState(false);
-  const [isBootstrapping, setIsBootstrapping] = useState(false);
-  const [needsUsername, setNeedsUsername] = useState(false);
-  const [pendingAccessToken, setPendingAccessToken] = useState(null);
-  const [appUser, setAppUser] = useState(null);
-  const [authProfile, setAuthProfile] = useState({
-    authProvider: "privy",
-    walletAddress: null,
-    email: null,
-  });
+  const { initOAuth, isLoading } = useOAuth();
 
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const isExistingPrivySession = ready && authenticated;
-  const authProfileKey = `${authProfile.authProvider}|${authProfile.walletAddress || ""}|${authProfile.email || ""}`;
-
-  const isBusy = isLoggingIn || isBootstrapping;
-
-  const statusText = !ready
-    ? "Preparing sign-in"
-    : isExistingPrivySession && !needsUsername
-      ? "Checking your app account"
-      : needsUsername
-        ? "Finish account setup"
-        : "Choose a sign-in method";
-
-  const statusDescription = !ready
-    ? "Connecting to authentication and loading your session."
-    : isExistingPrivySession && !needsUsername
-      ? "We found an active Privy session and are syncing it with your app account."
-      : needsUsername
-        ? "Create the public username that will show in your app profile."
-        : "Use a social account or Solana wallet to continue.";
-
-  const { login } = useLogin({
-    onComplete: ({ user, loginMethod, loginAccount }) => {
-      const walletAddress =
-        loginAccount?.address || user?.wallet?.address || null;
-      const email =
-        user?.email?.address ||
-        user?.google?.email ||
-        loginAccount?.email ||
-        null;
-
-      setAuthProfile({
-        authProvider: normalizeAuthProvider(
-          loginMethod ||
-            (user?.google
-              ? "google"
-              : user?.twitter
-                ? "twitter"
-                : user?.wallet
-                  ? "wallet"
-                  : user?.email
-                    ? "email"
-                    : "privy"),
-        ),
-        walletAddress,
-        email,
-      });
-    },
-  });
-
-  useEffect(() => {
-    if (!privyUser) {
-      return;
-    }
-
-    setAuthProfile({
-      authProvider: normalizeAuthProvider(
-        privyUser.twitter
-          ? "twitter"
-          : privyUser.google
-            ? "google"
-            : privyUser.wallet
-              ? "wallet"
-              : privyUser.email
-                ? "email"
-                : "privy",
-      ),
-      walletAddress: privyUser.wallet?.address || null,
-      email: privyUser.email?.address || privyUser.google?.email || null,
+  const handleGoogleLogin = () => {
+    initOAuth({
+      provider: OAuthProvider.GOOGLE,
+      redirectTo: "/verify-login",
     });
-  }, [privyUser]);
+  };
 
-  async function runLogin(options) {
-    setFlowError("");
-    setIsLoggingIn(true);
+  const handleXLogin = () => {
+    initOAuth({
+      provider: OAuthProvider.TWITTER,
+      redirectTo: "/verify-login",
+    });
+  };
 
-    try {
-      await login(options);
-    } catch (error) {
-      setFlowError(
-        error instanceof Error ? error.message : "Login cancelled or failed.",
-      );
-    } finally {
-      setIsLoggingIn(false);
-    }
-  }
+  const handleDiscordLogin = () => {
+    initOAuth({
+      provider: OAuthProvider.DISCORD,
+      redirectTo: "/verify-login",
+    });
+  };
 
   const methods = [
     {
-      id: "social",
-      label: "Continue with Social",
-      description: "Use Google or X.",
-      icon: <Globe className="h-4 w-4" />,
-      action: () =>
-        runLogin({
-          loginMethods: ["google", "twitter"],
-        }),
+      id: "Google",
+      label: "Google",
+      icon: (
+        <Image src="/provider/google.svg" width={24} height={24} alt="Google" />
+      ),
+      action: () => {
+        handleGoogleLogin();
+      },
     },
     {
-      id: "wallet",
-      label: "Continue with Wallet",
-      description: "Sign in with your Solana wallet.",
-      icon: <Wallet className="h-4 w-4" />,
-      action: () =>
-        runLogin({
-          loginMethods: ["wallet"],
-          walletChainType: "solana-only",
-        }),
+      id: "X",
+      label: "X/Twitter",
+      icon: (
+        <Image src="/provider/x.png" width={24} height={24} alt="X/Twitter" />
+      ),
+      action: () => {
+        handleXLogin();
+      },
+    },
+    {
+      id: "Discord",
+      label: "Discord",
+      icon: (
+        <Image
+          src="/provider/discord.svg"
+          width={24}
+          height={24}
+          alt="Discord"
+        />
+      ),
+      action: () => {
+        handleDiscordLogin();
+      },
     },
   ];
-
-  async function syncWithServer() {
-    if (!ready || !authenticated) {
-      return;
-    }
-
-    setIsBootstrapping(true);
-    setFlowError("");
-
-    try {
-      const accessToken = await getAccessToken();
-
-      if (!accessToken) {
-        throw new Error("No access token returned.");
-      }
-
-      setPendingAccessToken(accessToken);
-
-      const response = await fetch(`${API_BASE_URL}/auth/session`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(authProfile),
-      });
-
-      const payload = await response.json();
-
-      if (!response.ok) {
-        throw new Error(payload.error || "Failed to verify your account.");
-      }
-
-      if (payload.status === "needs_username") {
-        setAppUser(payload.user);
-        setNeedsUsername(true);
-        setUsername(payload.user?.suggestedUsername || "");
-        return;
-      }
-
-      window.dispatchEvent(
-        new CustomEvent("autobattle-auth-changed", {
-          detail: { isAuthenticated: true },
-        }),
-      );
-
-      router.push("/");
-    } catch (error) {
-      setFlowError(
-        error instanceof Error ? error.message : "Authentication failed.",
-      );
-    } finally {
-      setIsBootstrapping(false);
-    }
-  }
-
-  useEffect(() => {
-    if (!ready || !authenticated || needsUsername) {
-      return;
-    }
-
-    syncWithServer();
-  }, [authenticated, needsUsername, ready, authProfileKey]);
-
-  async function handleUsernameSubmit(event) {
-    event.preventDefault();
-
-    const normalized = normalizeUsername(username);
-
-    if (normalized.length < 3 || normalized.length > 20) {
-      setUsernameError("Usernames must be 3-20 characters.");
-      return;
-    }
-
-    if (!/^[a-z0-9_]+$/.test(normalized)) {
-      setUsernameError("Use only lowercase letters, numbers, and underscores.");
-      return;
-    }
-
-    setIsSubmittingUsername(true);
-    setUsernameError("");
-
-    try {
-      const accessToken = pendingAccessToken || (await getAccessToken());
-
-      if (!accessToken) {
-        throw new Error("Your session expired before onboarding completed.");
-      }
-
-      const response = await fetch(`${API_BASE_URL}/auth/username`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ username: normalized, ...authProfile }),
-      });
-
-      const payload = await response.json();
-
-      if (!response.ok) {
-        throw new Error(payload.error || "Unable to create your account.");
-      }
-
-      setAppUser(payload.user);
-      window.dispatchEvent(
-        new CustomEvent("autobattle-auth-changed", {
-          detail: { isAuthenticated: true },
-        }),
-      );
-      router.push("/");
-    } catch (error) {
-      setUsernameError(
-        error instanceof Error ? error.message : "Username setup failed.",
-      );
-    } finally {
-      setIsSubmittingUsername(false);
-    }
-  }
-
-  async function handleSignOut() {
-    try {
-      if (walletsReady && wallets.length > 0) {
-        await Promise.allSettled(
-          wallets.map((wallet) => Promise.resolve(wallet.disconnect())),
-        );
-      }
-
-      await fetch(`${API_BASE_URL}/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
-
-      await logout();
-    } finally {
-      setNeedsUsername(false);
-      setUsername("");
-      setPendingAccessToken(null);
-      setAppUser(null);
-      setAuthProfile({
-        authProvider: "privy",
-        walletAddress: null,
-        email: null,
-      });
-
-      window.dispatchEvent(
-        new CustomEvent("autobattle-auth-changed", {
-          detail: { isAuthenticated: false },
-        }),
-      );
-
-      router.push("/login");
-    }
-  }
-
-  if (!ready) {
-    return (
-      <LoginShell
-        eyebrow="AutoBattle access"
-        title="Welcome"
-        description="Connecting authentication and loading your session."
-      >
-        <LoginStatusCard
-          title="Preparing sign-in"
-          description="Connecting to authentication and loading your session."
-        />
-      </LoginShell>
-    );
-  }
-
-  if (isExistingPrivySession && !needsUsername) {
-    return (
-      <LoginShell
-        eyebrow="AutoBattle access"
-        title="Welcome back"
-        description="You are already signed in. Finishing account setup..."
-      >
-        {flowError ? (
-          <Card className="rounded-3xl border border-red-500/20 bg-red-500/10 p-4 shadow-none">
-            <div className="flex items-start gap-2 text-red-400 text-sm">
-              <AlertTriangle className="h-4 w-4 mt-0.5" />
-              <span>{flowError}</span>
-            </div>
-          </Card>
-        ) : null}
-        <LoginStatusCard
-          title="Checking your app account"
-          description="Syncing your login with the app session."
-        />
-        <div className="flex flex-wrap gap-2 pt-1 mt-2">
-          <Button
-            type="button"
-            className="flex-1 h-12 rounded-2xl font-semibold"
-            onClick={syncWithServer}
-            disabled={isBootstrapping}
-          >
-            Retry
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            className="rounded-2xl h-12"
-            onClick={handleSignOut}
-          >
-            <LogOut className="h-4 w-4" />
-          </Button>
-        </div>
-      </LoginShell>
-    );
-  }
 
   return (
     <LoginShell title="Login" description="Access your Autobattle.fun account">
       <div className="space-y-4">
-        {isBusy ? (
-          <LoginStatusCard title={statusText} description={statusDescription} />
-        ) : null}
+        <div className="space-y-3">
+          {methods.map((method) => (
+            <LoginMethodCard
+              key={method.id}
+              method={method}
+              busy={isLoading}
+              onSelect={method.action}
+            />
+          ))}
+        </div>
 
-        {flowError ? (
-          <Card className="rounded-3xl border border-red-500/20 bg-red-500/10 p-4 shadow-none">
-            <div className="flex items-start gap-2 text-red-400 text-sm">
-              <AlertTriangle className="mt-0.5 h-4 w-4" />
-              <span>{flowError}</span>
-            </div>
-          </Card>
-        ) : null}
-
-        {needsUsername ? (
-          <LoginUsernameCard
-            username={username}
-            onUsernameChange={setUsername}
-            usernameError={usernameError}
-            onSubmit={handleUsernameSubmit}
-            onSignOut={handleSignOut}
-            isSubmittingUsername={isSubmittingUsername}
-            appUser={appUser}
-            walletAddress={authProfile.walletAddress}
-          />
-        ) : (
-          <div className="space-y-3">
-            {methods.map((method) => (
-              <LoginMethodCard
-                key={method.id}
-                method={method}
-                busy={isBusy}
-                onSelect={method.action}
-              />
-            ))}
-          </div>
-        )}
+        <div className="text-center text-sm mt-5 font-semibold opacity-50 -mb-2 flex justify-center items-center gap-2">
+          Powered by{" "}
+          <Image
+            src="/provider/openfort.svg"
+            width={20}
+            height={20}
+            alt="Openfort"
+            className="-mx-1"
+          />{" "}
+          Openfort
+        </div>
       </div>
     </LoginShell>
   );

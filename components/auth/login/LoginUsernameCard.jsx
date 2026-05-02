@@ -12,8 +12,6 @@ export function LoginUsernameCard({
   onSubmit,
   onSignOut,
   isSubmittingUsername,
-  appUser,
-  walletAddress,
 }) {
   return (
     <div className="border-t border-border border-dashed pt-5">
@@ -24,13 +22,20 @@ export function LoginUsernameCard({
         This username is used for your app account.
       </p>
 
-      <form onSubmit={onSubmit} className="flex flex-col gap-3">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSubmit();
+        }}
+        className="flex flex-col gap-3"
+      >
         <Input
           value={username}
           onChange={(event) => onUsernameChange(event.target.value)}
           placeholder="your_handle"
           autoComplete="off"
           className="h-11 bg-surface font-semibold"
+          disabled={isSubmittingUsername}
         />
 
         {usernameError ? (

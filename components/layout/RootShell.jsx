@@ -5,13 +5,20 @@ import { usePathname, useRouter } from "next/navigation";
 import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
 import { API_BASE_URL } from "@/lib/config";
+import { useUser } from "@openfort/react";
+import { useUserStore } from "@/store/userStore";
 
 export function RootShell({ children, initialLoggedIn = false }) {
   const pathname = usePathname();
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(initialLoggedIn);
+  const { user, getAccessToken } = useUser();
+  const setUser = useUserStore((state) => state.setUser);
+  const setMetadata = useUserStore((state) => state.setMetadata);
+  const reset = useUserStore((state) => state.reset);
+  const setIsLoadingUser = useUserStore((state) => state.setIsLoadingUser);
 
-  const isLoginRoute = pathname === "/login";
+  const isLoginRoute = pathname === "/login" || pathname === "/verify-login";
   const showShell = !isLoginRoute;
 
   useEffect(() => {
@@ -19,21 +26,50 @@ export function RootShell({ children, initialLoggedIn = false }) {
 
     async function syncAuthState() {
       try {
+        setIsLoadingUser(true);
+        const access_token = await getAccessToken();
+
+        if (!access_token) {
+          reset();
+          setIsLoggedIn(false);
+          return;
+        }
+
         const response = await fetch(`${API_BASE_URL}/user/me`, {
           method: "GET",
           credentials: "include",
           cache: "no-store",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${access_token}`,
+          },
         });
 
         if (cancelled) {
           return;
         }
 
-        setIsLoggedIn(response.ok);
-      } catch {
+        if (!response.ok) {
+          reset();
+          setIsLoggedIn(false);
+          return;
+        }
+
+        const payload = await response.json();
+        setUser(payload?.user);
+        setMetadata(payload?.metadata);
+        setIsLoggedIn(true);
+      } catch (error) {
+        console.log(error);
+
         if (!cancelled) {
+          reset();
           setIsLoggedIn(false);
         }
+      } finally {
+        setTimeout(() => {
+          setIsLoadingUser(false);
+        }, 1000);
       }
     }
 
@@ -42,7 +78,7 @@ export function RootShell({ children, initialLoggedIn = false }) {
     return () => {
       cancelled = true;
     };
-  }, [pathname]);
+  }, [user?.id]);
 
   useEffect(() => {
     function onAuthChanged(event) {

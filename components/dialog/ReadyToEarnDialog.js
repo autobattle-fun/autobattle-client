@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { Copy, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,14 +10,15 @@ import {
   DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Card } from "@/components/ui/card";
 import Image from "next/image";
+import { ReactQRCode } from "@lglab/react-qr-code";
+import { useUserStore } from "@/store/userStore";
+import { toast } from "sonner";
 import { useTheme } from "next-themes";
 
-export default function ReadyToEarnDialog({ solBalance, autoBalance }) {
+export default function ReadyToEarnDialog({ autoBalance }) {
+  const user = useUserStore((state) => state.user);
   const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
-
   return (
     <Dialog>
       <DialogTrigger
@@ -47,30 +48,65 @@ export default function ReadyToEarnDialog({ solBalance, autoBalance }) {
         </DialogHeader>
 
         <DialogPanel className="flex flex-col gap-4 py-4 mb-3">
-          {/* Solana Balance Card */}
-          <div className="flex items-center gap-4 p-4 rounded-2xl bg-element border border-text-muted/30">
-            {/* Icon Placeholder */}
-
-            <Image
-              src="/logo/Sol-logo.svg"
-              width={32}
-              height={32}
-              alt="Solana"
-              className="ml-1.5"
+          <div className="flex flex-col items-center justify-center p-6 bg-element border border-text-muted/30 rounded-2xl">
+            <div className="text-xl font-semibold">Deposit $AUTO</div>
+            <ReactQRCode
+              value={user?.walletAddress}
+              finderPatternInnerSettings={{
+                style: "rounded",
+              }}
+              finderPatternOuterSettings={{
+                style: "rounded-lg",
+              }}
+              dataModulesSettings={{
+                style: "rounded",
+              }}
+              imageSettings={{
+                src: "/logo/Autobattle-logo.svg",
+                height: 30,
+                width: 27,
+                excavate: true,
+              }}
+              size={200}
+              gradient={{
+                type: "linear",
+                stops: [
+                  {
+                    offset: 0,
+                    color: resolvedTheme === "light" ? "#000000" : "#FFFFFF",
+                  },
+                  {
+                    offset: 1,
+                    color: resolvedTheme === "light" ? "#000000" : "#FFFFFF",
+                  },
+                ],
+              }}
             />
-            <div className="flex flex-col">
-              <span className="font-semibold text-2xl leading-tight">
-                {solBalance || 0} SOL
-              </span>
-              <span className="text-sm text-muted-foreground font-semibold opacity-50">
-                You need SOL to pay for gas
-              </span>
+
+            <div className="flex justify-between items-center w-full mt-2">
+              <div>
+                <div className="text-foreground/50 text-sm font-semibold text-left w-full">
+                  Deposit Address
+                </div>
+                <div className="text-lg font-semibold text-left w-full">
+                  {user?.walletAddress?.slice(0, 10)}...
+                  {user?.walletAddress?.slice(-4)}
+                </div>
+              </div>
+
+              <div
+                className="bg-primary/10 rounded-lg p-3 text-foreground cursor-pointer"
+                onClick={() => {
+                  navigator.clipboard.writeText(user?.walletAddress);
+                  toast.success("Address copied to clipboard");
+                }}
+              >
+                <Copy className="w-4 h-4 opacity-90" strokeWidth={2.5} />
+              </div>
             </div>
           </div>
 
-          {/* $AUTO Balance Card */}
           <div className="flex items-center gap-4 p-4 bg-element border border-text-muted/30 rounded-2xl">
-            {/* Icon Placeholder */}
             <Image
               src="/logo/Autobattle-logo.svg"
               width={32}
@@ -93,10 +129,7 @@ export default function ReadyToEarnDialog({ solBalance, autoBalance }) {
           the default footer background/borders. 
           A grid is used to place the buttons side-by-side.
         */}
-        <DialogFooter
-          variant="bare"
-          className="grid grid-cols-2 gap-4 sm:space-x-0"
-        >
+        <DialogFooter variant="bare" className="gap-4 sm:space-x-0">
           <Button className="h-14 flex-1 items-center gap-2 rounded-full! font-semibold py-1 transition-all duration-200 hover:scale-105 cursor-pointer">
             <Image
               src="/logo/Autobattle-logo.svg"
@@ -107,18 +140,6 @@ export default function ReadyToEarnDialog({ solBalance, autoBalance }) {
             />
             Get $AUTO
           </Button>
-          <Card className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full! border border-text-muted bg-element p-3 text-center shadow-inner transition-all duration-200 hover:scale-105">
-            <Image
-              src="/logo/Sol-logo.svg"
-              width={15}
-              height={15}
-              alt="Solana"
-              style={{
-                filter: isDark ? "brightness(0) invert(1)" : "brightness(0)",
-              }}
-            />
-            <div className="text-sm font-bold">Get SOL</div>
-          </Card>
         </DialogFooter>
       </DialogPopup>
     </Dialog>
