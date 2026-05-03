@@ -144,50 +144,6 @@ body {
   background-attachment: fixed;
   color: var(--color-text-main);
   font-family: var(--font-open-runde), ui-sans-serif, system-ui;
-
-  --privy-color-background: var(--surface);
-  --privy-color-background-2: var(--element);
-  --privy-color-background-3: var(--element-hover);
-  --privy-color-foreground: var(--foreground);
-  --privy-color-foreground-2: color-mix(
-    in srgb,
-    var(--foreground) 75%,
-    transparent
-  );
-  --privy-color-foreground-3: color-mix(
-    in srgb,
-    var(--foreground) 60%,
-    transparent
-  );
-  --privy-color-foreground-4: color-mix(
-    in srgb,
-    var(--foreground) 45%,
-    transparent
-  );
-  --privy-color-accent: var(--primary);
-  --privy-color-accent-light: color-mix(
-    in srgb,
-    var(--primary) 22%,
-    transparent
-  );
-  --privy-color-accent-lightest: color-mix(
-    in srgb,
-    var(--primary) 12%,
-    transparent
-  );
-  --privy-color-accent-dark: var(--primary-hover);
-  --privy-color-accent-darkest: color-mix(
-    in srgb,
-    var(--primary-hover) 70%,
-    black
-  );
-  --privy-color-success: #22c55e;
-  --privy-color-error: #ef4444;
-  --privy-color-error-light: color-mix(in srgb, #ef4444 16%, transparent);
-  --privy-border-radius-sm: 10px;
-  --privy-border-radius-md: 16px;
-  --privy-border-radius-lg: 24px;
-  --privy-border-radius-full: 9999px;
 }
 
 * {
