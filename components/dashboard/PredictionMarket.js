@@ -57,11 +57,13 @@ export default function PredictionMarkets() {
             price={`${market?.mainMarket?.yesPrice?.toFixed(2) || 0} $AUTO`}
             color="red"
             market={market?.mainMarket}
+            isRound={false}
           />
           <BuyButton
             candidate={gameState?.blue?.name}
             price={`${market?.mainMarket?.noPrice?.toFixed(2) || 0} $AUTO`}
             color="blue"
+            isRound={false}
             market={market?.mainMarket}
           />
         </div>
@@ -105,11 +107,13 @@ export default function PredictionMarkets() {
               price={`${market?.roundMarket?.yesPrice?.toFixed(2) || 0} $AUTO`}
               color="red"
               market={market?.roundMarket}
+              isRound={true}
             />
             <BuyButton
               candidate={gameState?.blue?.name}
               price={`${market?.roundMarket?.noPrice?.toFixed(2) || 0} $AUTO`}
               color="blue"
+              isRound={true}
               market={market?.roundMarket}
             />
           </div>

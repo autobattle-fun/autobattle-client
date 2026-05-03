@@ -63,15 +63,17 @@ export default async function RootLayout({ children }) {
             position="bottom-right"
             richColors
             toastOptions={{
-              className: `flex items-center justify-center text-center border ${openRunde.className}`,
+              className: `flex items-center justify-center text-center font-semibold [text-shadow:0.1px_0_0_currentColor,-0.1px_0_0_currentColor]`,
               style: {
-                backgroundColor: "var(--background)",
+                backgroundColor: "var(--card)",
                 color: "var(--text-main)",
                 borderColor: "var(--foreground)",
-                borderRadius: "6px",
+                borderRadius: "10px",
+                borderBottom: "5px solid var(--foreground)",
                 fontSize: "12px",
                 padding: "15px",
                 fontWeight: 700,
+                fontFamily: openRunde.style.fontFamily,
               },
             }}
           />

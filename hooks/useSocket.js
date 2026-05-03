@@ -16,6 +16,8 @@ export default function useSocket() {
   const setIsSocketWorking = useGameStore((state) => state.setIsSocketWorking);
   const updateGameState = useGameStore((state) => state.updateGameState);
   const setMarket = useMarketStore((state) => state.setMarket);
+  const setLogs = useGameStore((state) => state.setLogs);
+  const addLog = useGameStore((state) => state.addLog);
 
   const initializeWebSocket = () => {
     if (socket) {
@@ -53,7 +55,7 @@ export default function useSocket() {
 
     websocket.on(
       "pong",
-      ({ latency, gameState, countdown, market, serverTimestamp }) => {
+      ({ latency, gameState, countdown, market, logs, serverTimestamp }) => {
         console.log("Received pong");
 
         console.log(latency, gameState, market, countdown, serverTimestamp);
@@ -62,6 +64,7 @@ export default function useSocket() {
         setLatency(latency);
         setGameState(gameState);
         setCountdown(countdown);
+        setLogs(logs);
         setServerTimestamp(serverTimestamp);
         setMarket(market);
       },
@@ -127,6 +130,11 @@ export default function useSocket() {
     websocket.on("market:prices", (envelope) => {
       console.log("Market prices", envelope);
       setMarket(envelope.data);
+    });
+
+    websocket.on("log:broadcast", (envelope) => {
+      console.log("Log broadcast", envelope);
+      addLog(envelope.data);
     });
 
     return websocket;

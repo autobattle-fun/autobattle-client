@@ -15,24 +15,30 @@ import { ReactQRCode } from "@lglab/react-qr-code";
 import { useUserStore } from "@/store/userStore";
 import { toast } from "sonner";
 import { useTheme } from "next-themes";
+import { cn } from "@/lib/utils";
 
-export default function ReadyToEarnDialog({ autoBalance }) {
+export default function ReadyToEarnDialog({ autoBalance, renderElement }) {
   const user = useUserStore((state) => state.user);
   const { resolvedTheme } = useTheme();
   return (
     <Dialog>
       <DialogTrigger
         render={
-          <Button
-            type="button"
-            size="icon"
-            aria-label="Buy $AUTO"
-            className="cursor-pointer"
-          />
+          renderElement ? (
+            renderElement
+          ) : (
+            <Button
+              type="button"
+              size="icon"
+              aria-label="Buy $AUTO"
+              className="cursor-pointer"
+            >
+              {" "}
+              <Plus className="w-4 h-4" />
+            </Button>
+          )
         }
-      >
-        <Plus className="w-4 h-4" />
-      </DialogTrigger>
+      ></DialogTrigger>
 
       <DialogPopup
         className="bg-background rounded-4xl! p-3! border-text-muted/30 border"
@@ -129,17 +135,32 @@ export default function ReadyToEarnDialog({ autoBalance }) {
           the default footer background/borders. 
           A grid is used to place the buttons side-by-side.
         */}
-        <DialogFooter variant="bare" className="gap-4 sm:space-x-0">
-          <Button className="h-14 flex-1 items-center gap-2 rounded-full! font-semibold py-1 transition-all duration-200 hover:scale-105 cursor-pointer">
-            <Image
-              src="/logo/Autobattle-logo.svg"
-              width={15}
-              height={15}
-              alt="Autobattle.fun"
-              className="brightness-0 invert"
-            />
-            Get $AUTO
-          </Button>
+        <DialogFooter variant="bare" className="gap-4 sm:space-x-0 -mt-3">
+          <button
+            className={cn(
+              "flex-1 rounded-xl md:rounded-2xl pb-[4px] group bg-primary/70 cursor-pointer",
+            )}
+            onClick={() => {}}
+          >
+            <div
+              className={cn(
+                "h-full rounded-xl md:rounded-2xl p-4 flex flex-col items-center transition-transform duration-150 ease-out bg-primary",
+
+                "group-hover:-translate-y-1 group-active:translate-y-[4px] md:group-active:translate-y-[7px]",
+              )}
+            >
+              <div className="text-2xl text-white font-bold tracking-tighter flex items-center gap-2">
+                <Image
+                  src="/logo/Autobattle-logo.svg"
+                  width={20}
+                  height={20}
+                  alt="Autobattle.fun"
+                  className="brightness-0 invert"
+                />
+                Get $AUTO
+              </div>
+            </div>
+          </button>
         </DialogFooter>
       </DialogPopup>
     </Dialog>

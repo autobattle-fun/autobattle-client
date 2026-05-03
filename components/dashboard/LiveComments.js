@@ -10,9 +10,12 @@ import {
   ArrowUp,
   Shield,
 } from "lucide-react";
+import { useGameStore } from "@/store/gameStore";
 
-export default function LiveComments({ logs = [] }) {
+export default function LiveComments() {
   const [activeTab, setActiveTab] = useState("comments");
+  const logs = useGameStore((state) => state.logs) || [];
+  const gameState = useGameStore((state) => state.gameState) || [];
 
   const MOCK_COMMENTS = [
     {
@@ -166,15 +169,19 @@ export default function LiveComments({ logs = [] }) {
                   <div className="flex justify-between items-start md:items-center mb-0.5 md:mb-1 relative">
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-xs md:text-sm text-zinc-900 dark:text-zinc-200">
-                        System
+                        {log.role === "red"
+                          ? gameState?.red?.name
+                          : log.role === "blue"
+                            ? gameState?.blue?.name
+                            : "System"}
                       </span>
                       <span className="text-[10px] md:text-xs text-zinc-500">
-                        just now
+                        {new Date(log.timestamp).toLocaleTimeString()}
                       </span>
                     </div>
                   </div>
                   <p className="text-xs md:text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pr-4 md:pr-6">
-                    {log}
+                    {log.message}
                   </p>
                 </div>
               </div>

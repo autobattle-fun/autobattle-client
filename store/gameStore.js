@@ -6,6 +6,7 @@ export const useGameStore = create((set) => ({
   gameState: null,
   countdown: null,
   playerHit: null,
+  logs: [],
   serverTimestamp: null,
   isSocketWorking: true,
 
@@ -15,8 +16,14 @@ export const useGameStore = create((set) => ({
   setGameState: (v) => set({ gameState: v }),
   setCountdown: (v) => set({ countdown: v }),
   setPlayerHit: (v) => set({ playerHit: v }),
+  setLogs: (v) => set({ logs: v }),
   setServerTimestamp: (v) => set({ serverTimestamp: v }),
   setIsSocketWorking: (v) => set({ isSocketWorking: v }),
+
+  addLog: (log) =>
+    set((state) => ({
+      logs: [log, ...state.logs],
+    })),
 
   // 🔹 ACTIONS
   updateGameState: (newState) =>
@@ -35,5 +42,6 @@ export const useGameStore = create((set) => ({
       countdown: null,
       serverTimestamp: null,
       isSocketWorking: true,
+      logs: [],
     }),
 }));

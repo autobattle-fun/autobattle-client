@@ -7,6 +7,8 @@ import { Header } from "@/components/Header";
 import { API_BASE_URL } from "@/lib/config";
 import { useUser } from "@openfort/react";
 import { useUserStore } from "@/store/userStore";
+import { useMarketStore } from "@/store/marketStore";
+import useUserUtil from "@/hooks/useUserUtil";
 
 export function RootShell({ children, initialLoggedIn = false }) {
   const pathname = usePathname();
@@ -17,6 +19,8 @@ export function RootShell({ children, initialLoggedIn = false }) {
   const setMetadata = useUserStore((state) => state.setMetadata);
   const reset = useUserStore((state) => state.reset);
   const setIsLoadingUser = useUserStore((state) => state.setIsLoadingUser);
+  const { loadShares } = useUserUtil();
+  const market = useMarketStore((state) => state.market);
 
   const isLoginRoute = pathname === "/login" || pathname === "/verify-login";
   const showShell = !isLoginRoute;
@@ -97,6 +101,18 @@ export function RootShell({ children, initialLoggedIn = false }) {
       router.replace("/");
     }
   }, [isLoggedIn, isLoginRoute, router]);
+
+  useEffect(() => {
+    if (!market?.mainMarket?.id || !user?.id) return;
+
+    loadShares(market?.mainMarket?.id, false);
+  }, [market?.mainMarket?.id, user?.id]);
+
+  useEffect(() => {
+    if (!market?.roundMarket?.id || !user?.id) return;
+
+    loadShares(market?.roundMarket?.id, true);
+  }, [market?.roundMarket?.id, user?.id]);
 
   if (!showShell) {
     return children;

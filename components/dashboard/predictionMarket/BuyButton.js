@@ -12,12 +12,39 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useState } from "react";
-import { TriangleAlert } from "lucide-react";
+import { Loader2, TriangleAlert } from "lucide-react";
 import Image from "next/image";
+import { useMarketStore } from "@/store/marketStore";
+import { useUserStore } from "@/store/userStore";
+import { Skeleton } from "@/components/ui/skeleton";
+import useShares from "@/hooks/useShares";
+import { toast } from "sonner";
 
-export default function BuyButton({ candidate, price, color, market }) {
+export default function BuyButton({
+  candidate,
+  price,
+  color,
+  market,
+  isRound,
+}) {
   const [mode, setMode] = useState("buy");
   const [amount, setAmount] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const isYes = color === "red";
+  const user = useUserStore((state) => state.user);
+
+  const isLoadingMainShares = useMarketStore(
+    (state) => state.isLoadingMainShares,
+  );
+  const isLoadingRoundShares = useMarketStore(
+    (state) => state.isLoadingRoundShares,
+  );
+  const mainShares = useMarketStore((state) => state.mainShares);
+  const roundShares = useMarketStore((state) => state.roundShares);
+  const metadata = useUserStore((state) => state.metadata);
+  const isLoadingMetadata = useUserStore((state) => state.isLoadingMetadata);
+  const { buyShares, sellShares } = useShares();
 
   const handleAmount = (value) => {
     if (/^\d*\.?\d*$/.test(value)) {
@@ -27,16 +54,65 @@ export default function BuyButton({ candidate, price, color, market }) {
 
   const handleModeSwitch = (newMode) => {
     if (mode === newMode) return;
+    if (isLoading) return;
     setMode(newMode);
     setAmount("");
   };
 
   const addAmount = (val) => {
+    if (isLoading) return;
     setAmount((prev) => (Number(prev || 0) + val).toString());
   };
 
+  const handleDialogOpenChange = (open) => {
+    if (open === true && !user) {
+      toast.error("Login to Start Earning");
+      return;
+    }
+
+    if (isLoading) return;
+    setIsDialogOpen(open);
+  };
+
+  // --- NEW: Helper variables to clean up balance logic ---
+  const currentSplBalance = Number(metadata?.splTokenBalance || 0);
+  const currentShareBalance =
+    Number(
+      isRound
+        ? isYes
+          ? roundShares?.yesShares
+          : roundShares?.noShares
+        : isYes
+          ? mainShares?.yesShares
+          : mainShares?.noShares,
+    ) || 0;
+
+  // --- NEW: Dynamic Validation Logic ---
+  const numericAmount = Number(amount || 0);
+  let isError = false;
+  let errorMessage = "";
+
+  if (mode === "buy") {
+    if (numericAmount > 720000) {
+      isError = true;
+      errorMessage = "Exceeds Max Buy Limit";
+    } else if (numericAmount > currentSplBalance) {
+      isError = true;
+      errorMessage = "Insufficient $AUTO Balance";
+    }
+  } else if (mode === "sell") {
+    if (numericAmount > currentShareBalance) {
+      isError = true;
+      errorMessage = "Insufficient Shares";
+    }
+  }
+
+  // Disable submit if loading, empty, zero, or error
+  const isSubmitDisabled =
+    isLoading || isError || numericAmount <= 0 || amount === "";
+
   return (
-    <Dialog>
+    <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
       <DialogTrigger
         render={
           <button
@@ -116,9 +192,13 @@ export default function BuyButton({ candidate, price, color, market }) {
               </button>
 
               {mode === "buy" ? (
-                <div className="text-sm h-2 font-semibold opacity-50">
-                  4.52 $AUTO
-                </div>
+                isLoadingMetadata ? (
+                  <Skeleton className="w-10 h-2 rounded" />
+                ) : (
+                  <div className="text-sm h-2 font-semibold opacity-50">
+                    {currentSplBalance} $AUTO
+                  </div>
+                )
               ) : (
                 <div className="h-2"></div>
               )}
@@ -145,9 +225,13 @@ export default function BuyButton({ candidate, price, color, market }) {
               </button>
 
               {mode === "sell" ? (
-                <div className="text-sm h-2 font-semibold opacity-50">
-                  9.2 Shares
-                </div>
+                (isRound ? isLoadingRoundShares : isLoadingMainShares) ? (
+                  <Skeleton className="w-10 h-2 rounded" />
+                ) : (
+                  <div className="text-sm h-2 font-semibold opacity-50">
+                    {currentShareBalance} Shares
+                  </div>
+                )
               ) : (
                 <div className="h-2"></div>
               )}
@@ -194,7 +278,7 @@ export default function BuyButton({ candidate, price, color, market }) {
                 </button>
               </div>
 
-              <div className="w-[80%] mx-auto border-t border-foreground/20 mt-2"></div>
+              <div className="w-[80%] mx-auto border-t-2 border-foreground/20 border-dashed mt-2"></div>
 
               <div className="flex flex-row-reverse gap-2 relative overflow-hidden h-24">
                 <input
@@ -229,7 +313,7 @@ export default function BuyButton({ candidate, price, color, market }) {
             <>
               {" "}
               <button
-                onClick={() => {}}
+                onClick={() => setAmount(String(currentShareBalance))}
                 className="rounded-md w-fit font-semibold p-2 py-1 text-foreground/70 cursor-pointer border border-foreground/40 hover:bg-foreground/10 transition-all"
               >
                 MAX
@@ -241,17 +325,56 @@ export default function BuyButton({ candidate, price, color, market }) {
         <DialogFooter variant="bare" className="sm:space-x-0">
           <button
             className={cn(
-              "flex-1 rounded-xl md:rounded-2xl pb-[4px] cursor-pointer group bg-primary/70",
+              "flex-1 rounded-xl md:rounded-2xl pb-[4px] group bg-primary/70",
+              isSubmitDisabled
+                ? "cursor-not-allowed opacity-60"
+                : "cursor-pointer",
             )}
+            disabled={isSubmitDisabled}
+            onClick={() => {
+              if (mode === "buy") {
+                buyShares(
+                  market?.id,
+                  isYes ? "YES" : "NO",
+                  amount,
+                  isRound,
+                  setIsLoading,
+                );
+              } else {
+                sellShares(
+                  market?.id,
+                  isYes ? "YES" : "NO",
+                  amount,
+                  isRound,
+                  setIsLoading,
+                );
+              }
+            }}
           >
             <div
               className={cn(
-                "h-full  rounded-xl md:rounded-2xl p-4 flex flex-col items-center transition-transform duration-150 ease-out group-hover:-translate-y-1 group-active:translate-y-[4px] md:group-active:translate-y-[7px] bg-primary",
+                "h-full rounded-xl md:rounded-2xl p-4 flex flex-col items-center transition-transform duration-150 ease-out bg-primary",
+                !isSubmitDisabled &&
+                  "group-hover:-translate-y-1 group-active:translate-y-[4px] md:group-active:translate-y-[7px]",
               )}
             >
-              <div className="text-2xl text-white font-bold tracking-tighter">
-                {mode === "buy" ? "Buy" : "Sell"} @ {price}/Share
-              </div>
+              {isLoading ? (
+                <div className="flex items-center gap-2 text-2xl text-white font-bold tracking-tighter">
+                  <Loader2
+                    className="w-6 h-6 text-white animate-spin"
+                    strokeWidth={2.5}
+                  />
+                  {mode === "buy" ? "Buying" : "Selling"}...
+                </div>
+              ) : isError ? (
+                <div className="text-xl md:text-2xl text-white font-bold tracking-tighter">
+                  {errorMessage}
+                </div>
+              ) : (
+                <div className="text-2xl text-white font-bold tracking-tighter">
+                  {mode === "buy" ? "Buy" : "Sell"} @ {price}/Share
+                </div>
+              )}
             </div>
           </button>
         </DialogFooter>
