@@ -4,26 +4,44 @@ import { Wallet, Globe } from "lucide-react";
 import { LoginShell } from "@/components/auth/login/LoginShell";
 import { LoginMethodCard } from "@/components/auth/login/LoginMethodCard";
 import Image from "next/image";
-import { OAuthProvider, useOAuth } from "@openfort/react";
+import { OAuthProvider, useOAuth, useOpenfort } from "@openfort/react";
 
 export function LoginScreen() {
   const { initOAuth, isLoading } = useOAuth();
+  const { logout } = useOpenfort();
 
-  const handleGoogleLogin = () => {
+  const handleGoogleLogin = async () => {
+    try {
+      await logout();
+    } catch {
+      // ignore
+    }
+
     initOAuth({
       provider: OAuthProvider.GOOGLE,
       redirectTo: "/verify-login",
     });
   };
 
-  const handleXLogin = () => {
+  const handleXLogin = async () => {
+    try {
+      await logout();
+    } catch {
+      // ignore
+    }
+
     initOAuth({
       provider: OAuthProvider.TWITTER,
       redirectTo: "/verify-login",
     });
   };
 
-  const handleDiscordLogin = () => {
+  const handleDiscordLogin = async () => {
+    try {
+      await logout();
+    } catch {
+      // ignore
+    }
     initOAuth({
       provider: OAuthProvider.DISCORD,
       redirectTo: "/verify-login",

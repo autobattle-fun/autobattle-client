@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { Copy } from "lucide-react";
+import { ArrowUpDown, Copy } from "lucide-react";
 import { trimWalletAddress } from "@/lib/wallet";
 import Avatar from "boring-avatars";
 import { toast } from "sonner";
 import { useUserStore } from "@/store/userStore";
+import { useState } from "react";
 
 export function ProfileHero() {
   const user = useUserStore((state) => state.user);
@@ -15,15 +16,27 @@ export function ProfileHero() {
   const shortWallet = walletAddress
     ? trimWalletAddress(walletAddress)
     : "0x1234...5678";
+  const [currentShow, setCurrentShow] = useState("AUTO");
 
   return (
     <div className="mb-3 h-72 w-full rounded-4xl border border-border/50 bg-primary p-10 shadow-none">
       <div className="flex h-full flex-col justify-between">
         <div className="flex flex-col gap-1">
           <p className="text-xl font-semibold text-white opacity-50">Balance</p>
-          <p className="text-4xl font-semibold text-white">
-            {metadata?.splTokenBalance || 0} $AUTO
-          </p>
+          <div className="text-4xl font-semibold text-white flex items-center">
+            <p>
+              {currentShow === "AUTO"
+                ? metadata?.splTokenBalance?.toFixed(4) || 0
+                : metadata?.solBalance?.toFixed(4) || 0}{" "}
+              {currentShow === "AUTO" ? "$AUTO" : "SOL"}
+            </p>
+            <ArrowUpDown
+              className="h-5 w-5 text-white opacity-50 cursor-pointer mx-2"
+              onClick={() =>
+                setCurrentShow(currentShow === "AUTO" ? "SOL" : "AUTO")
+              }
+            />
+          </div>
           <div className="flex items-center gap-2">
             <p className="text-base font-semibold text-white opacity-50">
               {shortWallet}

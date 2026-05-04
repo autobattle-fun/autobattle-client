@@ -1,6 +1,5 @@
 "use client";
 
-import { ArrowUp } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import ReadyToEarnDialog from "../dialog/ReadyToEarnDialog";
@@ -11,10 +10,12 @@ export function ProfileActions() {
   const splBalance = useUserStore(
     (state) => state.metadata?.splTokenBalance || 0,
   );
+  const solBalance = useUserStore((state) => state.metadata?.solBalance || 0);
   return (
     <div className="mb-3 flex w-full gap-3">
       <ReadyToEarnDialog
         autoBalance={splBalance}
+        solBalance={solBalance}
         renderElement={
           <button
             className={cn(

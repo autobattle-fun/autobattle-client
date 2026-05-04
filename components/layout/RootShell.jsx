@@ -9,6 +9,7 @@ import { useUser } from "@openfort/react";
 import { useUserStore } from "@/store/userStore";
 import { useMarketStore } from "@/store/marketStore";
 import useUserUtil from "@/hooks/useUserUtil";
+import { useSolanaEmbeddedWallet } from "@openfort/react/solana";
 
 export function RootShell({ children, initialLoggedIn = false }) {
   const pathname = usePathname();
@@ -24,6 +25,8 @@ export function RootShell({ children, initialLoggedIn = false }) {
 
   const isLoginRoute = pathname === "/login" || pathname === "/verify-login";
   const showShell = !isLoginRoute;
+
+  const { setActive } = useSolanaEmbeddedWallet();
 
   const fetchUserFromDB = async (isCancelled = false) => {
     try {
@@ -106,6 +109,13 @@ export function RootShell({ children, initialLoggedIn = false }) {
       router.replace("/");
     }
   }, [isLoggedIn, isLoginRoute, router]);
+
+  useEffect(() => {
+    if (!user?.walletAddress) return;
+    setActive({
+      address: user?.walletAddress,
+    });
+  }, [user?.walletAddress]);
 
   useEffect(() => {
     if (!market?.mainMarket?.id || !user?.id) return;

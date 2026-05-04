@@ -17,7 +17,11 @@ import { toast } from "sonner";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 
-export default function ReadyToEarnDialog({ autoBalance, renderElement }) {
+export default function ReadyToEarnDialog({
+  solBalance,
+  autoBalance,
+  renderElement,
+}) {
   const user = useUserStore((state) => state.user);
   const { resolvedTheme } = useTheme();
   return (
@@ -54,8 +58,7 @@ export default function ReadyToEarnDialog({ autoBalance, renderElement }) {
         </DialogHeader>
 
         <DialogPanel className="flex flex-col gap-4 py-4 mb-3">
-          <div className="flex flex-col items-center justify-center p-6 bg-element border border-text-muted/30 rounded-2xl">
-            <div className="text-xl font-semibold">Deposit $AUTO</div>
+          <div className="flex flex-col items-center justify-center p-6 pt-4 bg-element border border-text-muted/30 rounded-2xl">
             <ReactQRCode
               value={user?.walletAddress}
               finderPatternInnerSettings={{
@@ -68,12 +71,12 @@ export default function ReadyToEarnDialog({ autoBalance, renderElement }) {
                 style: "rounded",
               }}
               imageSettings={{
-                src: "/logo/Autobattle-logo.svg",
-                height: 30,
-                width: 27,
+                src: "/logo/Autobattle-icon.svg",
+                height: 35,
+                width: 35,
                 excavate: true,
               }}
-              size={200}
+              size={175}
               gradient={{
                 type: "linear",
                 stops: [
@@ -126,6 +129,24 @@ export default function ReadyToEarnDialog({ autoBalance, renderElement }) {
               </span>
               <span className="text-sm text-muted-foreground font-semibold opacity-50">
                 You need $AUTO to execute trades
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 p-4 bg-element border border-text-muted/30 rounded-2xl">
+            <Image
+              src="/logo/Sol-logo.svg"
+              width={32}
+              height={32}
+              alt="solana"
+              className="ml-1.5"
+            />
+            <div className="flex flex-col">
+              <span className="font-semibold text-2xl leading-tight">
+                {solBalance ? solBalance.toFixed(2) : 0} SOL
+              </span>
+              <span className="text-sm text-muted-foreground font-semibold opacity-50">
+                You need SOL to pay for execution fees
               </span>
             </div>
           </div>

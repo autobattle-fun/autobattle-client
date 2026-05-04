@@ -12,7 +12,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useState } from "react";
-import { Loader2, ArrowUp, Wallet } from "lucide-react";
+import { Loader2, ArrowUp, Send } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
 import useShares from "@/hooks/useShares";
 import Image from "next/image";
@@ -20,11 +20,12 @@ import Image from "next/image";
 export default function SendButton() {
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState("");
+  const [assetType, setAssetType] = useState("AUTO"); // "AUTO" or "SOL"
   const [isLoading, setIsLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const metadata = useUserStore((state) => state.metadata);
-  const { transferTokens } = useShares();
+  const { transferTokens, transferSol } = useShares(); // <-- Destructure new function
 
   const handleAmount = (value) => {
     if (/^\d*\.?\d*$/.test(value)) {
@@ -39,30 +40,43 @@ export default function SendButton() {
       // Reset state when closed
       setAmount("");
       setRecipient("");
+      setAssetType("AUTO");
     }
   };
 
   // --- Helper variables for balance logic ---
   const currentSplBalance = Number(metadata?.splTokenBalance || 0);
+  const currentSolBalance = Number(metadata?.solBalance || 0);
   const numericAmount = Number(amount || 0);
+
+  // Active balance based on selected asset
+  const activeBalance =
+    assetType === "AUTO" ? currentSplBalance : currentSolBalance;
 
   // --- Dynamic Validation Logic ---
   let isError = false;
   let errorMessage = "";
 
-  if (numericAmount > currentSplBalance) {
+  if (numericAmount > activeBalance) {
     isError = true;
     errorMessage = "Insufficient Balance";
+  } else if (
+    assetType === "SOL" &&
+    activeBalance - numericAmount < 0.005 &&
+    numericAmount > 0
+  ) {
+    // Basic safety check to ensure they don't drain their entire SOL wallet
+    // and fail to pay the base network fee.
+    isError = true;
+    errorMessage = "Keep SOL for gas fees";
   } else if (
     recipient.length > 0 &&
     (recipient.length < 32 || recipient.length > 44)
   ) {
-    // Basic Solana address length validation
     isError = true;
     errorMessage = "Invalid Address";
   }
 
-  // Disable submit if loading, empty, zero, error, or no recipient
   const isSubmitDisabled =
     isLoading ||
     isError ||
@@ -72,7 +86,13 @@ export default function SendButton() {
 
   const handleSend = async () => {
     if (isSubmitDisabled) return;
-    const res = await transferTokens(recipient, amount, setIsLoading);
+
+    let res;
+    if (assetType === "AUTO") {
+      res = await transferTokens(recipient, amount, setIsLoading);
+    } else {
+      res = await transferSol(recipient, amount, setIsLoading);
+    }
 
     // Close modal on success
     if (res?.success) {
@@ -112,29 +132,65 @@ export default function SendButton() {
       >
         <DialogHeader className="relative">
           <DialogTitle className="text-3xl font-semibold flex items-center gap-2">
-            Send $AUTO
+            Send Assets
           </DialogTitle>
           <DialogDescription className="text-sm -mt-1 text-muted-foreground font-semibold opacity-60">
-            Transfer tokens instantly and gas-free.
+            Transfer {assetType} securely to any Solana wallet.
           </DialogDescription>
         </DialogHeader>
 
         <DialogPanel className="flex flex-col gap-4 py-4 mb-3 mt-2">
+          {/* Asset Type Selector */}
+          <div className="flex bg-foreground/5 p-1 rounded-xl">
+            <button
+              onClick={() => setAssetType("AUTO")}
+              className={cn(
+                "flex-1 py-2 font-semibold text-sm rounded-lg transition-all",
+                assetType === "AUTO"
+                  ? "bg-background shadow-sm text-foreground"
+                  : "text-foreground/50 hover:text-foreground/80 cursor-pointer",
+              )}
+            >
+              $AUTO Token
+            </button>
+            <button
+              onClick={() => setAssetType("SOL")}
+              className={cn(
+                "flex-1 py-2 font-semibold text-sm rounded-lg transition-all",
+                assetType === "SOL"
+                  ? "bg-background shadow-sm text-foreground"
+                  : "text-foreground/50 hover:text-foreground/80 cursor-pointer",
+              )}
+            >
+              Native SOL
+            </button>
+          </div>
+
           {/* Balance Display */}
           <div className="flex items-center gap-4 p-4 bg-element border border-text-muted/30 rounded-2xl">
-            <Image
-              src="/logo/Autobattle-logo.svg"
-              width={32}
-              height={32}
-              alt="Autobattle.fun"
-              className="ml-1.5"
-            />
+            {assetType === "AUTO" ? (
+              <Image
+                src="/logo/Autobattle-logo.svg"
+                width={32}
+                height={32}
+                alt="Autobattle.fun"
+                className="ml-1.5"
+              />
+            ) : (
+              <Image
+                src="/logo/SOL-logo.svg"
+                width={32}
+                height={32}
+                alt="SOL"
+                className="ml-1.5"
+              />
+            )}
             <div className="flex flex-col">
               <span className="font-semibold text-2xl leading-tight">
-                {currentSplBalance || 0} $AUTO
+                {activeBalance} {assetType === "AUTO" ? "$AUTO" : "SOL"}
               </span>
               <span className="text-sm text-muted-foreground font-semibold opacity-50">
-                Your $AUTO Balance
+                Your Balance
               </span>
             </div>
           </div>
@@ -160,14 +216,21 @@ export default function SendButton() {
               Amount
             </label>
             <button
-              onClick={() => setAmount(String(currentSplBalance))}
+              onClick={() => {
+                // If SOL, leave a tiny buffer so they can pay network fee to execute the tx
+                const maxVal =
+                  assetType === "SOL"
+                    ? Math.max(0, currentSolBalance - 0.005)
+                    : currentSplBalance;
+                setAmount(String(maxVal));
+              }}
               className="rounded-md w-fit font-semibold p-2 py-1 text-foreground/70 cursor-pointer border border-foreground/40 hover:bg-foreground/10 transition-all text-xs"
             >
               MAX
             </button>
           </div>
 
-          {/* Transparent Auto-Scaling Amount Input (Matches BuyButton) */}
+          {/* Transparent Auto-Scaling Amount Input */}
           <div className="flex flex-row-reverse gap-2 relative overflow-hidden h-24">
             <input
               type="text"
@@ -181,7 +244,9 @@ export default function SendButton() {
               disabled={isLoading}
               className="flex-1 w-full font-semibold h-full focus:outline-none text-right bg-transparent"
             />
-            <span className="text-lg font-semibold h-full mt-2">$AUTO</span>
+            <span className="text-lg font-semibold h-full mt-2">
+              {assetType === "AUTO" ? "$AUTO" : "SOL"}
+            </span>
           </div>
         </DialogPanel>
 
@@ -217,7 +282,7 @@ export default function SendButton() {
                 </div>
               ) : (
                 <div className="text-2xl text-white font-bold tracking-tighter flex items-center gap-2">
-                  Confirm Send <ArrowUp className="w-6 h-6" />
+                  Confirm Send <Send className="w-5 h-5 ml-1" />
                 </div>
               )}
             </div>

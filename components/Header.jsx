@@ -23,6 +23,7 @@ export function Header({ isAuthenticated = false }) {
   const isLoadingUser = useUserStore((state) => state.isLoadingUser);
   const username = useUserStore((state) => state.user?.username || "");
   const user = useUserStore((state) => state.user);
+  const solBalance = useUserStore((state) => state.metadata?.solBalance || 0);
 
   useEffect(() => {
     function onClickOutside(event) {
@@ -72,7 +73,9 @@ export function Header({ isAuthenticated = false }) {
       <div />
 
       <div className="flex items-center gap-3">
-        {user && <ReadyToEarnDialog autoBalance={splBalance} />}
+        {user && (
+          <ReadyToEarnDialog autoBalance={splBalance} solBalance={solBalance} />
+        )}
 
         <ThemeToggle className="bg-element hover:bg-element-hover border border-border shadow-inner" />
 
@@ -86,7 +89,11 @@ export function Header({ isAuthenticated = false }) {
             >
               <Avatar name={username} size={24} />
               <div className="max-w-28 truncate text-sm font-semibold text-text-main">
-                {splBalance} $AUTO
+                {splBalance ? splBalance.toFixed(2) : 0} $AUTO
+              </div>
+              <div className="border-r border-foreground/40 h-3 border-dashed w-px"></div>
+              <div className="max-w-28 truncate text-sm font-semibold text-text-main">
+                {solBalance ? solBalance.toFixed(2) : 0} SOL
               </div>
             </button>
 

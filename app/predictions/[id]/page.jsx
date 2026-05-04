@@ -58,11 +58,11 @@ export default async function PredictionDetailPage({ params }) {
       </Link>
 
       <PredictionHeader market={market} createdAt={createdAt} />
-      
-      <PredictionPerformanceCards 
-        amount={amount} 
-        share={shareAmount} 
-        side={side} 
+
+      <PredictionPerformanceCards
+        amount={amount}
+        share={shareAmount}
+        side={side}
       />
 
       <div className="w-full mt-6">
@@ -73,43 +73,68 @@ export default async function PredictionDetailPage({ params }) {
         <div className="flex w-full flex-col gap-3">
           {rounds.length === 0 ? (
             <Card className="flex w-full items-center justify-center rounded-2xl border border-border/50 bg-element p-8 shadow-none">
-              <p className="text-sm text-text-muted">No rounds recorded for this match</p>
+              <p className="text-sm text-text-muted">
+                No rounds recorded for this match
+              </p>
             </Card>
           ) : (
             rounds.map((round) => (
-              <Card key={round.id} className="flex w-full flex-col gap-4 rounded-2xl border border-border/50 bg-element p-4 shadow-none">
+              <Card
+                key={round.id}
+                className="flex w-full flex-col gap-4 rounded-2xl border border-border/50 bg-element p-4 shadow-none"
+              >
                 <div className="flex items-center justify-between border-b border-border/10 pb-2">
                   <span className="text-sm font-bold uppercase tracking-wider text-text-muted">
                     Round {round.roundNumber}
                   </span>
                 </div>
-                
+
                 <div className="flex flex-col gap-4">
                   {round.moves?.map((move) => (
-                    <div key={move.id} className="flex items-center justify-between">
+                    <div
+                      key={move.id}
+                      className="flex items-center justify-between"
+                    >
                       <div className="flex items-center gap-3">
-                        <div className={`flex h-8 w-8 items-center justify-center rounded-xl ${
-                          move.side === 'GREEN' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'
-                        }`}>
-                          {move.type === 'ATTACK' ? <Swords className="w-4 h-4" /> : 
-                           move.type === 'DEFEND' ? <Shield className="w-4 h-4" /> : <Zap className="w-4 h-4" />}
+                        <div
+                          className={`flex h-8 w-8 items-center justify-center rounded-xl ${
+                            move.side === "GREEN"
+                              ? "bg-green-500/10 text-green-500"
+                              : "bg-red-500/10 text-red-500"
+                          }`}
+                        >
+                          {move.type === "ATTACK" ? (
+                            <Swords className="w-4 h-4" />
+                          ) : move.type === "DEFEND" ? (
+                            <Shield className="w-4 h-4" />
+                          ) : (
+                            <Zap className="w-4 h-4" />
+                          )}
                         </div>
                         <div className="flex flex-col">
                           <span className="text-sm font-semibold">
-                            {move.side === 'GREEN' ? 'Green Agent' : 'Red Agent'}
+                            {move.side === "GREEN"
+                              ? "Green Agent"
+                              : "Red Agent"}
                           </span>
                           <span className="text-[10px] font-bold uppercase text-text-muted">
                             {move.type}
                           </span>
                         </div>
                       </div>
-                      
+
                       <div className="flex flex-col items-end">
-                        <span className={cn(
-                          "text-sm font-bold",
-                          move.isSuccessful ? (move.side === 'GREEN' ? 'text-green-500' : 'text-red-500') : 'text-text-muted line-through'
-                        )}>
-                          {move.damage > 0 ? `-${move.damage} HP` : 'MISSED'}
+                        <span
+                          className={cn(
+                            "text-sm font-bold",
+                            move.isSuccessful
+                              ? move.side === "GREEN"
+                                ? "text-green-500"
+                                : "text-red-500"
+                              : "text-text-muted line-through",
+                          )}
+                        >
+                          {move.damage > 0 ? `-${move.damage} HP` : "MISSED"}
                         </span>
                       </div>
                     </div>
@@ -123,4 +148,3 @@ export default async function PredictionDetailPage({ params }) {
     </div>
   );
 }
-

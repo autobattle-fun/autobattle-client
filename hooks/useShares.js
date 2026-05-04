@@ -5,8 +5,12 @@ import { useUserStore } from "@/store/userStore";
 import { toast } from "sonner";
 import { API_BASE_URL } from "@/lib/config";
 import { useSolanaEmbeddedWallet } from "@openfort/react/solana";
-import { Transaction, PublicKey } from "@solana/web3.js"; // <-- Make sure PublicKey is here!
+import { Transaction, PublicKey, Connection } from "@solana/web3.js"; // <-- Added Connection
 import useUserUtil from "./useUserUtil";
+
+// Configure your RPC. Make sure this matches your backend's network (devnet)
+const RPC_URL =
+  process.env.NEXT_PUBLIC_SOLANA_RPC_URL || "https://api.devnet.solana.com";
 
 export default function useShares() {
   const { getAccessToken } = useUser();
@@ -25,12 +29,11 @@ export default function useShares() {
     try {
       setIsLoading(true);
 
-      // 1. Ensure the embedded wallet is active and handle React stale state
       if (!solana.activeWallet) {
         await solana.setActive({ address: walletAddress });
         toast.info("Wallet connecting... Please click Confirm one more time.");
         setIsLoading(false);
-        return; // 🛑 Stop here to let React re-render with the provider!
+        return;
       }
 
       if (!solana.provider) {
@@ -66,9 +69,6 @@ export default function useShares() {
       const txBuffer = Buffer.from(buildData.transaction, "base64");
       const transaction = Transaction.from(txBuffer);
 
-      // 🔥 FIX 1: Aggressively lock in the Paymaster as the fee payer
-      transaction.feePayer = new PublicKey(buildData.feePayer);
-
       // Ask the Openfort embedded wallet to sign it
       const userSignedTx = await solana.provider.signTransaction(transaction);
 
@@ -84,22 +84,25 @@ export default function useShares() {
         sigBuffer,
       );
 
-      const partiallySignedBase64 = Buffer.from(
-        transaction.serialize({
-          requireAllSignatures: false,
-          verifySignatures: false,
-        }),
-      ).toString("base64");
+      // 🔥 FIX: Manually broadcast the transaction to the network
+      console.log("Broadcasting transaction to Solana network...");
+      const connection = new Connection(RPC_URL, "confirmed");
+      const rawTx = transaction.serialize();
 
-      // STEP 3: Send back to backend for Gas Sponsorship & Execution
-      console.log("Sending to backend for gasless execution...");
+      const signature = await connection.sendRawTransaction(rawTx, {
+        skipPreflight: false,
+        preflightCommitment: "confirmed",
+      });
+      console.log("Transaction broadcasted! Signature:", signature);
+
+      // STEP 3: Send back to backend for Database Sync
+      console.log("Sending signature to backend for syncing...");
       const executeResponse = await fetch(`${API_BASE_URL}/api/trades/verify`, {
         method: "POST",
         credentials: "include",
         cache: "no-store",
         body: JSON.stringify({
-          partiallySignedBase64,
-          feePayer: buildData.feePayer,
+          signature, // Valid base58 string passed to backend
           marketId,
           side,
           amountTokens,
@@ -120,7 +123,7 @@ export default function useShares() {
       toast.success("Trade executed and verified successfully!");
       return executeData;
     } catch (error) {
-      console.error(error);
+      console.error("Buy Error:", error);
       toast.error(error.message || "An error occurred");
     } finally {
       setIsLoading(false);
@@ -137,7 +140,6 @@ export default function useShares() {
     try {
       setIsLoading(true);
 
-      // 1. Ensure the embedded wallet is active and handle React stale state
       if (!solana.activeWallet) {
         await solana.setActive({ address: walletAddress });
         toast.info("Wallet connecting... Please click Confirm one more time.");
@@ -179,12 +181,8 @@ export default function useShares() {
       const txBuffer = Buffer.from(buildData.transaction, "base64");
       const transaction = Transaction.from(txBuffer);
 
-      // 🔥 FIX 1: Aggressively lock in the Paymaster as the fee payer
-      transaction.feePayer = new PublicKey(buildData.feePayer);
-
       const userSignedTx = await solana.provider.signTransaction(transaction);
 
-      // 🛡️ Defensive Serialization
       const bs58 = (await import("bs58")).default;
       let sigBuffer;
       try {
@@ -197,15 +195,19 @@ export default function useShares() {
         sigBuffer,
       );
 
-      const partiallySignedBase64 = Buffer.from(
-        transaction.serialize({
-          requireAllSignatures: false,
-          verifySignatures: false,
-        }),
-      ).toString("base64");
+      // 🔥 FIX: Manually broadcast the transaction to the network
+      console.log("Broadcasting transaction to Solana network...");
+      const connection = new Connection(RPC_URL, "confirmed");
+      const rawTx = transaction.serialize();
 
-      // STEP 3: Send back to backend for Gas Sponsorship & Execution
-      console.log("Sending to backend for gasless execution...");
+      const signature = await connection.sendRawTransaction(rawTx, {
+        skipPreflight: false,
+        preflightCommitment: "confirmed",
+      });
+      console.log("Transaction broadcasted! Signature:", signature);
+
+      // STEP 3: Send back to backend for Database Sync
+      console.log("Sending signature to backend for syncing...");
       const executeResponse = await fetch(
         `${API_BASE_URL}/api/trades/sell/verify`,
         {
@@ -213,8 +215,7 @@ export default function useShares() {
           credentials: "include",
           cache: "no-store",
           body: JSON.stringify({
-            partiallySignedBase64,
-            feePayer: buildData.feePayer,
+            signature, // Valid base58 string passed to backend
             marketId,
             side,
             amountShares,
@@ -236,7 +237,7 @@ export default function useShares() {
       toast.success("Shares sold successfully!");
       return executeData;
     } catch (error) {
-      console.error(error);
+      console.error("Sell Error:", error);
       toast.error(error.message || "An error occurred while selling");
     } finally {
       setIsLoading(false);
@@ -251,7 +252,6 @@ export default function useShares() {
     try {
       setIsLoading(true);
 
-      // 1. Ensure the embedded wallet is active and handle React stale state
       if (!solana.activeWallet) {
         await solana.setActive({ address: walletAddress });
         toast.info("Wallet connecting... Please click Confirm one more time.");
@@ -293,51 +293,33 @@ export default function useShares() {
       const txBuffer = Buffer.from(buildData.transaction, "base64");
       const transaction = Transaction.from(txBuffer);
 
-      // 🔥 FIX 1: Aggressively lock in the Paymaster as the fee payer
-      transaction.feePayer = new PublicKey(buildData.feePayer);
-
       const userSignedTx = await solana.provider.signTransaction(transaction);
 
-      let partiallySignedBase64;
-
-      if (userSignedTx?.signature && userSignedTx?.publicKey) {
-        // Openfort returns { signature, publicKey } — manually add sig to transaction
-        const { PublicKey } = await import("@solana/web3.js");
-
-        const signerPubkey = new PublicKey(userSignedTx.publicKey);
-        const signatureBytes = Buffer.from(userSignedTx.signature, "base64");
-
-        // Try base58 decode first, then base64
-        let sigBuffer;
-        try {
-          const bs58 = (await import("bs58")).default;
-          sigBuffer = bs58.decode(userSignedTx.signature);
-        } catch {
-          sigBuffer = Buffer.from(userSignedTx.signature, "base64");
-        }
-
-        // Add the signature to the transaction
-        transaction.addSignature(signerPubkey, sigBuffer);
-
-        partiallySignedBase64 = Buffer.from(
-          transaction.serialize({
-            requireAllSignatures: false,
-            verifySignatures: false,
-          }),
-        ).toString("base64");
-      } else if (typeof userSignedTx === "string") {
-        partiallySignedBase64 = userSignedTx;
-      } else if (userSignedTx?.serialize) {
-        partiallySignedBase64 = Buffer.from(
-          userSignedTx.serialize({
-            requireAllSignatures: false,
-            verifySignatures: false,
-          }),
-        ).toString("base64");
+      const bs58 = (await import("bs58")).default;
+      let sigBuffer;
+      try {
+        sigBuffer = bs58.decode(userSignedTx.signature);
+      } catch {
+        sigBuffer = Buffer.from(userSignedTx.signature, "base64");
       }
+      transaction.addSignature(
+        new PublicKey(userSignedTx.publicKey),
+        sigBuffer,
+      );
 
-      // STEP 3: Send back to backend for Gas Sponsorship & Execution
-      console.log("Sending to backend for gasless execution...");
+      // 🔥 FIX: Manually broadcast the transaction to the network
+      console.log("Broadcasting transaction to Solana network...");
+      const connection = new Connection(RPC_URL, "confirmed");
+      const rawTx = transaction.serialize();
+
+      const signature = await connection.sendRawTransaction(rawTx, {
+        skipPreflight: false,
+        preflightCommitment: "confirmed",
+      });
+      console.log("Transaction broadcasted! Signature:", signature);
+
+      // STEP 3: Send back to backend for Database Sync
+      console.log("Sending signature to backend for syncing...");
       const executeResponse = await fetch(
         `${API_BASE_URL}/api/trades/transfer/verify`,
         {
@@ -345,8 +327,7 @@ export default function useShares() {
           credentials: "include",
           cache: "no-store",
           body: JSON.stringify({
-            partiallySignedBase64,
-            feePayer: buildData.feePayer,
+            signature, // Valid base58 string passed to backend
           }),
           headers: {
             "Content-Type": "application/json",
@@ -363,12 +344,195 @@ export default function useShares() {
       toast.success("Tokens transferred successfully!");
       return executeData;
     } catch (error) {
-      console.error(error);
+      console.error("Transfer Error:", error);
       toast.error(error.message || "An error occurred while transferring");
     } finally {
       setIsLoading(false);
     }
   };
 
-  return { buyShares, sellShares, transferTokens };
+  const transferSol = async (recipientAddress, amountSol, setIsLoading) => {
+    try {
+      setIsLoading(true);
+
+      if (!solana.activeWallet) {
+        await solana.setActive({ address: walletAddress });
+        toast.info("Wallet connecting... Please click Confirm one more time.");
+        setIsLoading(false);
+        return;
+      }
+
+      if (!solana.provider) {
+        throw new Error(
+          "Wallet provider is still waking up. Please try again.",
+        );
+      }
+
+      const accessToken = await getAccessToken();
+      if (!accessToken) throw new Error("No access token found");
+
+      // STEP 1: Ask backend to build the SOL TRANSFER transaction
+      console.log("Building SOL transfer transaction...");
+      const buildResponse = await fetch(
+        `${API_BASE_URL}/api/trades/transfer-sol/build`,
+        {
+          method: "POST",
+          credentials: "include",
+          cache: "no-store",
+          body: JSON.stringify({ recipientAddress, amountSol }),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      const buildData = await buildResponse.json();
+      if (!buildData.success)
+        throw new Error(buildData.error || "Failed to prepare SOL transfer");
+
+      // STEP 2: Decode the transaction and get user signature
+      console.log("Requesting signature...");
+      const txBuffer = Buffer.from(buildData.transaction, "base64");
+      const transaction = Transaction.from(txBuffer);
+
+      const userSignedTx = await solana.provider.signTransaction(transaction);
+
+      const bs58 = (await import("bs58")).default;
+      let sigBuffer;
+      try {
+        sigBuffer = bs58.decode(userSignedTx.signature);
+      } catch {
+        sigBuffer = Buffer.from(userSignedTx.signature, "base64");
+      }
+      transaction.addSignature(
+        new PublicKey(userSignedTx.publicKey),
+        sigBuffer,
+      );
+
+      // 🔥 FIX: Manually broadcast the transaction to the network
+      console.log("Broadcasting transaction to Solana network...");
+      const connection = new Connection(RPC_URL, "confirmed");
+      const rawTx = transaction.serialize();
+
+      const signature = await connection.sendRawTransaction(rawTx, {
+        skipPreflight: false,
+        preflightCommitment: "confirmed",
+      });
+      console.log("Transaction broadcasted! Signature:", signature);
+
+      // STEP 3: Send back to backend for verification
+      console.log("Sending signature to backend for syncing...");
+      const executeResponse = await fetch(
+        `${API_BASE_URL}/api/trades/transfer-sol/verify`,
+        {
+          method: "POST",
+          credentials: "include",
+          cache: "no-store",
+          body: JSON.stringify({ signature }),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      const executeData = await executeResponse.json();
+      if (!executeData.success)
+        throw new Error(executeData.error || "Failed to verify SOL transfer");
+
+      await loadMetadata();
+      toast.success("SOL transferred successfully!");
+      return executeData;
+    } catch (error) {
+      console.error("SOL Transfer Error:", error);
+      toast.error(error.message || "An error occurred while transferring SOL");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const claimTokens = async (marketId, setIsLoading) => {
+    try {
+      setIsLoading(true);
+      if (!solana.activeWallet) {
+        await solana.setActive({ address: walletAddress });
+        return;
+      }
+
+      const accessToken = await getAccessToken();
+      const buildResponse = await fetch(
+        `${API_BASE_URL}/api/trades/claim/build`,
+        {
+          method: "POST",
+          body: JSON.stringify({ marketId }),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      const buildData = await buildResponse.json();
+      if (!buildData.success) throw new Error(buildData.error);
+
+      // GASLESS FLOW: Decode -> Sign -> verify (sponsored by Openfort)
+      const transaction = Transaction.from(
+        Buffer.from(buildData.transaction, "base64"),
+      );
+
+      // Critical for Claim: Lock in the Paymaster as the fee payer
+      transaction.feePayer = new PublicKey(buildData.feePayer);
+
+      const userSignedTx = await solana.provider.signTransaction(transaction);
+
+      const bs58 = (await import("bs58")).default;
+      let sigBuffer;
+      try {
+        sigBuffer = bs58.decode(userSignedTx.signature);
+      } catch {
+        sigBuffer = Buffer.from(userSignedTx.signature, "base64");
+      }
+      transaction.addSignature(
+        new PublicKey(userSignedTx.publicKey),
+        sigBuffer,
+      );
+
+      const partiallySignedBase64 = Buffer.from(
+        transaction.serialize({
+          requireAllSignatures: false,
+          verifySignatures: false,
+        }),
+      ).toString("base64");
+
+      const executeResponse = await fetch(
+        `${API_BASE_URL}/api/trades/claim/verify`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            partiallySignedBase64,
+            feePayer: buildData.feePayer,
+            marketId,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      const executeData = await executeResponse.json();
+      if (!executeData.success) throw new Error(executeData.error);
+
+      toast.success("Winnings claimed successfully (gasless)!");
+      return executeData;
+    } catch (error) {
+      console.error("Claim Error:", error);
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { buyShares, sellShares, transferTokens, transferSol, claimTokens };
 }
