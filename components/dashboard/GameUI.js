@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "motion/react";
-import { ArrowRight } from "lucide-react";
 import { useTheme } from "next-themes";
 import AgentSide from "./AgentSide";
 import PredictionMarkets from "./PredictionMarket";
@@ -10,6 +9,7 @@ import useGameEngine from "../../hooks/useGameEngine";
 import { adaptServerStateToEngine, getDamageValue } from "../../lib/cards";
 import MatchResultOverlay from "./MatchResultOverlay";
 import { useGameStore } from "@/store/gameStore";
+import HowToPlayModal from "./HowToPlayModal";
 
 export default function GameUI() {
   const engine = useGameEngine();
@@ -25,7 +25,7 @@ export default function GameUI() {
       className={`flex h-screen overflow-hidden selection:bg-amber-500/30 transition-colors duration-500`}
     >
       <div className="flex-1 flex flex-col relative w-full h-full overflow-y-auto overflow-x-hidden">
-        <main className="flex-1 p-2 sm:p-4 md:p-8 flex !pb-0 flex-col max-w-6xl w-full mx-auto relative">
+        <main className="flex-1 p-2 sm:p-4 md:p-8 flex pb-0! flex-col max-w-6xl w-full mx-auto relative">
           <div className="flex flex-col items-center mt-2 md:mt-4 relative z-10 shrink-0">
             <h1
               className={`text-2xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-center leading-[1.1] ${isDark ? "text-white" : "text-[#111827]"}`}
@@ -40,7 +40,7 @@ export default function GameUI() {
 
           <div className="flex flex-col xl:flex-row items-center xl:items-stretch justify-center gap-3 md:gap-8 w-full mt-4 md:mt-10 flex-1 isolate">
             {/* Center Card - Ordered first on Mobile, centered on Desktop */}
-            <div className="flex flex-col justify-center items-center w-full max-w-[400px] xl:max-w-[340px] shrink-0 relative z-20 order-1 xl:order-2">
+            <div className="flex flex-col justify-center items-center w-full max-w-100 xl:max-w-85 shrink-0 relative z-20 order-1 xl:order-2">
               <motion.div
                 layout
                 className={`${isDark ? "bg-zinc-900/80" : "bg-white/80"} w-full border-foreground/20 backdrop-blur-xl border p-4 md:p-8 rounded-[24px] md:rounded-[32px] flex flex-col items-center text-center relative overflow-hidden transition-colors duration-500`}
@@ -56,7 +56,7 @@ export default function GameUI() {
 
                 <div className="flex-1 mb-4 flex flex-col items-center justify-center relative w-full gap-2 md:gap-4 p-4 rounded-xl overflow-hidden mt-1 md:mt-2 dark:bg-zinc-900 bg-white border border-amber-500/50 transition-colors duration-500 h-24 md:h-32">
                   {getDamageValue(round) >= 4 && (
-                    <div className="absolute inset-0 bg-gradient-to-t from-orange-500/20 via-orange-500/5 to-transparent blur-xl animate-pulse pointer-events-none" />
+                    <div className="absolute inset-0 bg-linear-to-t from-orange-500/20 via-orange-500/5 to-transparent blur-xl animate-pulse pointer-events-none" />
                   )}
                   <span className="text-[8px] md:text-[10px] text-zinc-500 font-bold tracking-[0.2em] uppercase mb-0 md:mb-1 z-10 relative mt-1 md:mt-2">
                     Round Stakes
@@ -90,24 +90,12 @@ export default function GameUI() {
                     </div>
                   )}
                 </div>
-
-                <motion.button
-                  disabled={engine.isProcessing}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={engine.crank}
-                  className={`w-full py-2 bg-primary/10 border cursor-pointer border-primary text-primary rounded-lg text-sm md:text-base font-bold tracking-wide transition-all flex justify-center items-center gap-2`}
-                >
-                  How to Play
-                  {engine.phase !== "Ended" && (
-                    <ArrowRight className="w-4 h-4 md:w-5 md:h-5 -mr-1" />
-                  )}
-                </motion.button>
+                <HowToPlayModal />
               </motion.div>
             </div>
 
             {/* Red and Blue Agents side-by-side on mobile */}
-            <div className="w-full flex flex-row justify-between xl:contents order-2 xl:order-none gap-2 sm:gap-4">
+            <div className="w-full flex flex-row justify-between xl:contents order-2 xl:order-0 gap-2 sm:gap-4">
               <div className="w-[49%] xl:w-2/5 flex justify-end xl:order-1">
                 <AgentSide
                   agentName={gameState?.red?.name}
