@@ -25,59 +25,59 @@ export function RootShell({ children, initialLoggedIn = false }) {
   const isLoginRoute = pathname === "/login" || pathname === "/verify-login";
   const showShell = !isLoginRoute;
 
+  const fetchUserFromDB = async (isCancelled = false) => {
+    try {
+      setIsLoadingUser(true);
+      const access_token = await getAccessToken();
+
+      if (!access_token) {
+        reset();
+        setIsLoggedIn(false);
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/user/me`, {
+        method: "GET",
+        credentials: "include",
+        cache: "no-store",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${access_token}`,
+        },
+      });
+
+      if (isCancelled) return;
+
+      if (!response.ok) {
+        reset();
+        setIsLoggedIn(false);
+        return;
+      }
+
+      const payload = await response.json();
+      setUser(payload?.user);
+      setMetadata(payload?.metadata);
+      setIsLoggedIn(true);
+    } catch (error) {
+      console.log(error);
+      if (!isCancelled) {
+        reset();
+        setIsLoggedIn(false);
+      }
+    } finally {
+      setTimeout(() => {
+        setIsLoadingUser(false);
+      }, 1000);
+    }
+  };
+
+  // 2. Trigger fetch when Openfort user ID changes (Login flow)
   useEffect(() => {
     let cancelled = false;
 
-    async function syncAuthState() {
-      try {
-        setIsLoadingUser(true);
-        const access_token = await getAccessToken();
-
-        if (!access_token) {
-          reset();
-          setIsLoggedIn(false);
-          return;
-        }
-
-        const response = await fetch(`${API_BASE_URL}/user/me`, {
-          method: "GET",
-          credentials: "include",
-          cache: "no-store",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${access_token}`,
-          },
-        });
-
-        if (cancelled) {
-          return;
-        }
-
-        if (!response.ok) {
-          reset();
-          setIsLoggedIn(false);
-          return;
-        }
-
-        const payload = await response.json();
-        setUser(payload?.user);
-        setMetadata(payload?.metadata);
-        setIsLoggedIn(true);
-      } catch (error) {
-        console.log(error);
-
-        if (!cancelled) {
-          reset();
-          setIsLoggedIn(false);
-        }
-      } finally {
-        setTimeout(() => {
-          setIsLoadingUser(false);
-        }, 1000);
-      }
+    if (user?.id) {
+      fetchUserFromDB(cancelled);
     }
-
-    syncAuthState();
 
     return () => {
       cancelled = true;
@@ -86,7 +86,12 @@ export function RootShell({ children, initialLoggedIn = false }) {
 
   useEffect(() => {
     function onAuthChanged(event) {
-      setIsLoggedIn(Boolean(event?.detail?.isAuthenticated));
+      if (event?.detail?.isAuthenticated) {
+        fetchUserFromDB();
+      } else {
+        setIsLoggedIn(false);
+        reset();
+      }
     }
 
     window.addEventListener("autobattle-auth-changed", onAuthChanged);
