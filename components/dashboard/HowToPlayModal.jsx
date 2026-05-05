@@ -1,29 +1,29 @@
 "use client";
 
-import { useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
 import {
-  ArrowLeft,
-  ArrowRight,
-  ShieldHalf,
+  Trophy,
   Shuffle,
   Sparkles,
-  Trophy,
+  ArrowLeft,
+  ShieldHalf,
+  ArrowRight,
 } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+
 import {
   Dialog,
   DialogPopup,
-  DialogHeader,
   DialogTitle,
   DialogPanel,
+  DialogHeader,
   DialogFooter,
-  DialogDescription,
   DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
-import { Button } from "../ui/button";
+
 import { cn } from "@/lib/utils";
-import Image from "next/image";
-import Link from "next/link";
 
 export default function HowToPlayModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -160,8 +160,9 @@ export default function HowToPlayModal() {
           <div className="w-full">
             <div className="flex w-full items-center justify-between gap-3">
               <button
-                className="flex-1 rounded-xl md:rounded-2xl pb-1 group cursor-pointer bg-foreground/30"
+                disabled={stepIndex === 0}
                 onClick={() => setStepIndex((v) => Math.max(v - 1, 0))}
+                className="flex-1 rounded-xl md:rounded-2xl pb-1 group cursor-pointer bg-foreground/30"
               >
                 <div
                   className={cn(
