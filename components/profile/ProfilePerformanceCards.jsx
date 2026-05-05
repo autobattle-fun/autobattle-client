@@ -12,7 +12,7 @@ export function ProfilePerformanceCards() {
       {PERFORMANCE_CARDS.map(([title, value]) => (
         <Card
           key={title}
-          className="flex-1 rounded-2xl border border-border bg-element p-3 text-center shadow-inner"
+          className="flex-1 rounded-2xl border border-border bg-element p-3 text-center shadow-none"
         >
           <div className="mb-0.5 text-[10px] font-semibold uppercase tracking-wider text-text-muted">
             {title}

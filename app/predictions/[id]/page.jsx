@@ -1,150 +1,120 @@
-import { cookies } from "next/headers";
-import { notFound, redirect } from "next/navigation";
-import { ChevronLeft, Swords, Shield, Zap } from "lucide-react";
-import Link from "next/link";
-import { API_BASE_URL } from "@/lib/config";
-import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import { PredictionHeader } from "@/components/predictions/PredictionHeader";
-import { PredictionPerformanceCards } from "@/components/predictions/PredictionPerformanceCards";
+"use client";
 
-async function getPredictionDetail(id) {
-  try {
-    const cookieStore = await cookies();
-    const cookieHeader = cookieStore.toString();
+import { useEffect, useState } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { Loader2, ChevronLeft } from "lucide-react";
+import { ProfileRecentHistory } from "@/components/profile/ProfileRecentHistory";
+import { Pagination } from "@/components/ui/pagination";
 
-    const response = await fetch(`${API_BASE_URL}/user/predictions/${id}`, {
-      headers: {
-        cookie: cookieHeader,
-      },
-      cache: "no-store",
-    });
+export default function PredictionsPage() {
+  const router = useRouter();
+  const params = useParams(); // Grab dynamic route parameters
+  const searchParams = useSearchParams();
 
-    if (response.status === 401) {
-      redirect("/login");
+  // Extract username from the route (e.g., app/predictions/[username]/page.jsx)
+  const username = params?.id;
+  const page = parseInt(searchParams.get("page")) || 1;
+
+  const [data, setData] = useState({
+    predictions: [],
+    pagination: { total: 0, totalPages: 0 },
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Wait until username is available from the URL params
+    if (!username) return;
+
+    let isMounted = true;
+    const controller = new AbortController();
+
+    async function fetchPredictions() {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/predictions/${username}?page=${page}&limit=10`,
+          {
+            signal: controller.signal,
+            credentials: "include",
+          },
+        );
+
+        if (response.status === 401) {
+          router.push("/login");
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch predictions");
+        }
+
+        const payload = await response.json();
+
+        if (isMounted) {
+          setData({
+            predictions: payload.predictions || [],
+            pagination: payload.pagination || { total: 0, totalPages: 0 },
+          });
+        }
+      } catch (error) {
+        if (isMounted && error.name !== "AbortError") {
+          console.error(error);
+          setData({ predictions: [], pagination: { total: 0, totalPages: 0 } });
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
     }
 
-    if (!response.ok) {
-      return null;
-    }
+    fetchPredictions();
 
-    const payload = await response.json();
-    return payload.data;
-  } catch {
-    return null;
-  }
-}
-
-export default async function PredictionDetailPage({ params }) {
-  const { id } = await params;
-  const prediction = await getPredictionDetail(id);
-
-  if (!prediction) {
-    notFound();
-  }
-
-  const { side, amount, market, createdAt, shareAmount } = prediction;
-  const match = market?.match;
-  const rounds = match?.rounds || [];
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [username, page, router]);
 
   return (
     <div className="mx-auto flex h-full w-full max-w-xl flex-col items-center pb-12 pt-8 px-4">
-      <Link
-        href="/profile"
-        className="mb-6 flex w-full items-center gap-2 text-sm text-text-muted hover:text-text-main transition-colors"
+      {/* Back Navigation */}
+      <button
+        onClick={() => router.back()}
+        className="mb-6 flex w-full items-center gap-2 text-sm font-medium text-text-muted hover:text-text-main transition-colors group"
       >
-        <ChevronLeft className="w-4 h-4" />
-        Back to Profile
-      </Link>
+        <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+        Back
+      </button>
 
-      <PredictionHeader market={market} createdAt={createdAt} />
-
-      <PredictionPerformanceCards
-        amount={amount}
-        share={shareAmount}
-        side={side}
-      />
-
-      <div className="w-full mt-6">
-        <div className="mb-4 text-[10px] font-bold uppercase tracking-wider text-text-muted">
-          Match History (Rounds)
-        </div>
-
-        <div className="flex w-full flex-col gap-3">
-          {rounds.length === 0 ? (
-            <Card className="flex w-full items-center justify-center rounded-2xl border border-border/50 bg-element p-8 shadow-none">
-              <p className="text-sm text-text-muted">
-                No rounds recorded for this match
-              </p>
-            </Card>
-          ) : (
-            rounds.map((round) => (
-              <Card
-                key={round.id}
-                className="flex w-full flex-col gap-4 rounded-2xl border border-border/50 bg-element p-4 shadow-none"
-              >
-                <div className="flex items-center justify-between border-b border-border/10 pb-2">
-                  <span className="text-sm font-bold uppercase tracking-wider text-text-muted">
-                    Round {round.roundNumber}
-                  </span>
-                </div>
-
-                <div className="flex flex-col gap-4">
-                  {round.moves?.map((move) => (
-                    <div
-                      key={move.id}
-                      className="flex items-center justify-between"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`flex h-8 w-8 items-center justify-center rounded-xl ${
-                            move.side === "GREEN"
-                              ? "bg-green-500/10 text-green-500"
-                              : "bg-red-500/10 text-red-500"
-                          }`}
-                        >
-                          {move.type === "ATTACK" ? (
-                            <Swords className="w-4 h-4" />
-                          ) : move.type === "DEFEND" ? (
-                            <Shield className="w-4 h-4" />
-                          ) : (
-                            <Zap className="w-4 h-4" />
-                          )}
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-semibold">
-                            {move.side === "GREEN"
-                              ? "Green Agent"
-                              : "Red Agent"}
-                          </span>
-                          <span className="text-[10px] font-bold uppercase text-text-muted">
-                            {move.type}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col items-end">
-                        <span
-                          className={cn(
-                            "text-sm font-bold",
-                            move.isSuccessful
-                              ? move.side === "GREEN"
-                                ? "text-green-500"
-                                : "text-red-500"
-                              : "text-text-muted line-through",
-                          )}
-                        >
-                          {move.damage > 0 ? `-${move.damage} HP` : "MISSED"}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            ))
-          )}
-        </div>
+      <div className="w-full mb-6">
+        <h1 className="text-2xl font-bold">Your Predictions</h1>
+        <p className="text-sm text-text-muted">
+          View all your historical match predictions
+        </p>
       </div>
+
+      {loading ? (
+        <div className="flex h-40 w-full items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-text-muted" />
+        </div>
+      ) : (
+        <>
+          <ProfileRecentHistory
+            predictions={data.predictions}
+            hideTitle={true}
+          />
+
+          {data.pagination.total > 10 && (
+            <div className="mt-8 w-full">
+              <Pagination
+                currentPage={page}
+                totalPages={data.pagination.totalPages}
+                // Update baseUrl so pagination links retain the username in the path
+                baseUrl={`/predictions/${username}`}
+              />
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
