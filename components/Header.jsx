@@ -12,7 +12,7 @@ import { useOpenfort } from "@openfort/react";
 import { useUserStore } from "@/store/userStore";
 import { Loader2 } from "lucide-react";
 
-export function Header({ isAuthenticated = false }) {
+export function Header() {
   const router = useRouter();
   const { logout } = useOpenfort();
   const [isMenuOpen, setIsMenuOpen] = useState(false);

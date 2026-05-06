@@ -145,7 +145,7 @@ export default function GameUI() {
           </div>
 
           <PredictionMarkets />
-          <LiveComments logs={engine.logs} />
+          <LiveComments />
 
           {gameState?.phase === "Ended" && (
             <MatchResultOverlay

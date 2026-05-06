@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import {
   Heart,
@@ -9,49 +9,179 @@ import {
   MoreHorizontal,
   ArrowUp,
   Shield,
+  Loader2,
 } from "lucide-react";
 import { useGameStore } from "@/store/gameStore";
+import { useMarketStore } from "@/store/marketStore";
+import { useUserStore } from "@/store/userStore";
+import { API_BASE_URL } from "@/lib/config";
+import { formatDistanceToNow } from "date-fns";
+import { useUser } from "@openfort/react";
+import Avatar from "boring-avatars";
+import { toast } from "sonner";
 
 export default function LiveComments() {
-  const [activeTab, setActiveTab] = useState("comments");
-  const logs = useGameStore((state) => state.logs) || [];
-  const gameState = useGameStore((state) => state.gameState) || [];
+  const { getAccessToken } = useUser();
 
-  const MOCK_COMMENTS = [
-    {
-      id: 1,
-      user: "formulaleon",
-      time: "2m ago",
-      text: "someone please help me with just 2-3$ i always give the tips back please check my pfp",
-      likes: 0,
-      avatar: "bg-[#4a3424]",
-    },
-    {
-      id: 2,
-      user: "kutik",
-      time: "5m ago",
-      text: "Hey, hardworking guys! How are you?",
-      likes: 0,
-      avatar: "bg-gradient-to-br from-green-400 to-emerald-600",
-    },
-    {
-      id: 3,
-      user: "Blue31",
-      time: "9m ago",
-      text: "Please help just one",
-      likes: 0,
-      avatar: "bg-blue-900 border border-red-500",
-    },
-    {
-      id: 4,
-      user: "Pizzard",
-      time: "11m ago",
-      text: "Никто не играет рынком, просто трейдеры сами не знают куда и что пойдёт и прыгают из стороны в сторону, а дяди с деньгами выцепляют неуверенных людей. Но факт остаётся фактом - перекаты в другую сторону это норма, но когда идёт задержка polymarket это уже не нормально, они судят по заполнения скана да/нет куда пойдёт цена, хотя эти данные часто приходят с задержкой так как если вливают много в нет, транзакции долго обрабатываются, что мы и получаем на выхо...",
-      likes: 0,
-      hasReadMore: true,
-      avatar: "bg-gradient-to-br from-purple-500 to-pink-500",
-    },
-  ];
+  const [activeTab, setActiveTab] = useState("comments");
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
+  const [isPosting, setIsPosting] = useState(false);
+  const [isLoadingComments, setIsLoadingComments] = useState(false);
+
+  const logs = useGameStore((state) => state.logs) || [];
+  const gameState = useGameStore((state) => state.gameState) || {};
+  const market = useMarketStore((state) => state.market);
+  const user = useUserStore((state) => state.user);
+
+  const marketId = market?.mainMarket?.id;
+
+  const fetchComments = useCallback(async () => {
+    if (!marketId) return;
+    setIsLoadingComments(true);
+
+    try {
+      const accessToken = await getAccessToken().catch(() => null);
+      const headers = {};
+      if (accessToken) {
+        headers["Authorization"] = `Bearer ${accessToken}`;
+      }
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/comments/market/${marketId}`,
+        { headers },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setComments(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch comments:", error);
+    } finally {
+      setIsLoadingComments(false);
+    }
+  }, [marketId, getAccessToken]);
+
+  useEffect(() => {
+    fetchComments();
+    const interval = setInterval(fetchComments, 60000);
+    return () => clearInterval(interval);
+  }, [fetchComments]);
+
+  const likeTimeouts = useRef({});
+
+  const handlePostComment = async () => {
+    if (!user) {
+      toast.warning("Please login to comment");
+      return;
+    }
+    if (!newComment.trim() || !marketId || isPosting) return;
+
+    setIsPosting(true);
+
+    const accessToken = await getAccessToken();
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/comments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          marketId,
+          comment: newComment,
+        }),
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        setNewComment("");
+        fetchComments();
+      } else {
+        const error = await response.json();
+        toast.error(error.error || "Failed to post comment");
+      }
+    } catch (error) {
+      console.error("Failed to post comment:", error);
+    } finally {
+      setIsPosting(false);
+    }
+  };
+
+  const handleToggleLike = async (commentId) => {
+    if (!user) {
+      toast.warning("Please login to like comments");
+      return;
+    }
+
+    let targetLikedState = false;
+
+    // 1. Optimistic Update
+    setComments((prevComments) =>
+      prevComments.map((c) => {
+        if (c.id === commentId) {
+          const wasLiked = c.isLiked;
+          targetLikedState = !wasLiked;
+          return {
+            ...c,
+            isLiked: targetLikedState,
+            likes: Math.max(0, (c.likes || 0) + (targetLikedState ? 1 : -1)),
+            _count: {
+              ...c._count,
+              commentLikes: Math.max(
+                0,
+                (c._count?.commentLikes || 0) + (targetLikedState ? 1 : -1),
+              ),
+            },
+          };
+        }
+        return c;
+      }),
+    );
+
+    // 2. Debounce the API call
+    if (likeTimeouts.current[commentId]) {
+      clearTimeout(likeTimeouts.current[commentId]);
+    }
+
+    likeTimeouts.current[commentId] = setTimeout(async () => {
+      const accessToken = await getAccessToken();
+
+      try {
+        await fetch(`${API_BASE_URL}/api/comments/${commentId}/like`, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ liked: targetLikedState }),
+        });
+      } catch (error) {
+        console.error("Failed to toggle like:", error);
+      } finally {
+        delete likeTimeouts.current[commentId];
+      }
+    }, 500);
+  };
+
+  const getAvatarColor = (username) => {
+    const colors = [
+      "bg-red-500",
+      "bg-blue-500",
+      "bg-green-500",
+      "bg-yellow-500",
+      "bg-purple-500",
+      "bg-pink-500",
+      "bg-indigo-500",
+    ];
+    const index =
+      username.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) %
+      colors.length;
+    return colors[index];
+  };
 
   return (
     <div className="w-full mt-6 md:mt-10 backdrop-blur-md rounded-3xl flex flex-col relative shrink-0">
@@ -65,7 +195,7 @@ export default function LiveComments() {
               : "text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
           }`}
         >
-          Comments (66,266)
+          Comments ({comments.length})
         </span>
         <span
           onClick={() => setActiveTab("logs")}
@@ -85,13 +215,22 @@ export default function LiveComments() {
           <div className="relative w-full flex items-center bg-zinc-50 dark:bg-[#18181b] border border-foreground/10 rounded-xl p-1 md:p-2 mb-4 md:mb-5 transition-colors">
             <input
               type="text"
-              placeholder="Add a comment..."
+              placeholder={user ? "Add a comment..." : "Login to comment"}
+              disabled={!user || isPosting}
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handlePostComment()}
               className="flex-1 bg-transparent px-3 text-xs md:text-sm outline-none dark:text-zinc-200 text-zinc-900 placeholder:text-zinc-500"
             />
             <div className="flex items-center gap-2 md:gap-3 pr-1 text-zinc-400">
               <Smile className="w-4 h-4 md:w-5 md:h-5 cursor-pointer hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors" />
               <ImageIcon className="w-4 h-4 md:w-5 md:h-5 cursor-pointer hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors" />
-              <button className="bg-primary hover:bg-primary/90 cursor-pointer transition-colors text-white px-3 md:px-5 py-1.5 rounded-lg text-[10px] md:text-sm font-semibold ml-1 md:ml-2">
+              <button
+                onClick={handlePostComment}
+                disabled={!user || isPosting || !newComment.trim()}
+                className="bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors text-white px-3 md:px-5 py-1.5 rounded-lg text-[10px] md:text-sm font-semibold ml-1 md:ml-2 flex items-center gap-2"
+              >
+                {isPosting && <Loader2 className="w-3 h-3 animate-spin" />}
                 Post
               </button>
             </div>
@@ -106,45 +245,63 @@ export default function LiveComments() {
 
           {/* Comments List */}
           <div className="flex flex-col gap-4 md:gap-6 overflow-y-auto pr-2 pb-10 min-h-[400px] max-h-[400px] scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-800 scrollbar-track-transparent">
-            {MOCK_COMMENTS.map((c) => (
-              <div key={c.id} className="flex gap-2 md:gap-3">
-                <div
-                  className={`w-7 h-7 md:w-10 md:h-10 rounded-full flex-shrink-0 shadow-sm ${c.avatar}`}
-                />
-                <div className="flex-1 flex flex-col group pt-0.5">
-                  <div className="flex justify-between items-start md:items-center mb-0.5 md:mb-1 relative">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-xs md:text-sm text-zinc-900 dark:text-zinc-200">
-                        {c.user}
-                      </span>
-                      <span className="text-[10px] md:text-xs text-zinc-500">
-                        {c.time}
+            {isLoadingComments && comments.length === 0 ? (
+              <div className="flex items-center justify-center py-10">
+                <Loader2 className="w-8 h-8 animate-spin text-zinc-400" />
+              </div>
+            ) : comments.length === 0 ? (
+              <div className="text-zinc-500 italic p-4 text-center text-sm">
+                No comments yet. Be the first to say something!
+              </div>
+            ) : (
+              comments.map((c) => (
+                <div key={c.id} className="flex gap-2 md:gap-3">
+                  <Avatar name={c.user.username} size={40} />
+                  <div className="flex-1 flex flex-col group pt-0.5">
+                    <div className="flex justify-between items-start md:items-center mb-0.5 md:mb-1 relative">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-xs md:text-sm text-zinc-900 dark:text-zinc-200">
+                          {c.user.username}
+                        </span>
+                        <span className="text-[10px] md:text-xs text-zinc-500">
+                          {formatDistanceToNow(new Date(c.createdAt))} ago
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-xs md:text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pr-4 md:pr-6">
+                      {c.comment}
+                    </p>
+                    <div
+                      onClick={() => handleToggleLike(c.id)}
+                      className="flex items-center gap-1.5 mt-2 md:mt-2.5 text-zinc-500 hover:text-red-500 cursor-pointer transition-colors w-fit"
+                    >
+                      <Heart
+                        className={`w-3 h-3 md:w-4 md:h-4 ${c.isLiked ? "fill-red-500 text-red-500" : ""}`}
+                      />
+                      <span className="text-[10px] md:text-xs">
+                        {c.likes || 0}
                       </span>
                     </div>
-                    <MoreHorizontal className="w-4 h-4 text-zinc-400 dark:text-zinc-500 md:opacity-0 md:group-hover:opacity-100 cursor-pointer transition-opacity absolute right-0" />
-                  </div>
-                  <p className="text-xs md:text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pr-4 md:pr-6">
-                    {c.text}
-                  </p>
-                  {c.hasReadMore && (
-                    <span className="text-[10px] md:text-sm text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-pointer mt-1 transition-colors">
-                      Read more
-                    </span>
-                  )}
-                  <div className="flex items-center gap-1.5 mt-2 md:mt-2.5 text-zinc-500 hover:text-red-500 cursor-pointer transition-colors w-fit">
-                    <Heart className="w-3 h-3 md:w-4 md:h-4" />
-                    <span className="text-[10px] md:text-xs">{c.likes}</span>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
 
             {/* Back to top button */}
-            <div className="flex justify-center mt-2 mb-2">
-              <button className="flex items-center gap-1 md:gap-1.5 text-[10px] md:text-xs bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-zinc-600 dark:text-zinc-300 transition-colors">
-                Back to top <ArrowUp className="w-3 h-3 md:w-3.5 md:h-3.5" />
-              </button>
-            </div>
+            {comments.length > 5 && (
+              <div className="flex justify-center mt-2 mb-2">
+                <button
+                  onClick={() =>
+                    document
+                      .querySelector(".overflow-y-auto")
+                      ?.scrollTo({ top: 0, behavior: "smooth" })
+                  }
+                  className="flex items-center gap-1 md:gap-1.5 text-[10px] md:text-xs bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-zinc-600 dark:text-zinc-300 transition-colors"
+                >
+                  Back to top <ArrowUp className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                </button>
+              </div>
+            )}
           </div>
         </>
       ) : (
@@ -158,7 +315,7 @@ export default function LiveComments() {
               <div key={index} className="flex gap-2 md:gap-3">
                 <div className="w-7 h-7 md:w-10 md:h-10 rounded-full flex-shrink-0 bg-primary flex items-center justify-center text-white">
                   <Image
-                    src="logo/AutoBattle-logo.svg"
+                    src="/logo/AutoBattle-logo.svg"
                     alt="Logo"
                     width={15}
                     height={15}
@@ -176,12 +333,14 @@ export default function LiveComments() {
                             : "System"}
                       </span>
                       <span className="text-[10px] md:text-xs text-zinc-500">
-                        {new Date(log.timestamp).toLocaleTimeString()}
+                        {new Date(
+                          log.timestamp || log.timeStamp,
+                        ).toLocaleTimeString()}
                       </span>
                     </div>
                   </div>
                   <p className="text-xs md:text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pr-4 md:pr-6">
-                    {log.message}
+                    {log.log || log.message}
                   </p>
                 </div>
               </div>
