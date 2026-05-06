@@ -4,19 +4,16 @@ import { useEffect, useState } from "react";
 import { ProfileRecentHistory } from "./ProfileRecentHistory";
 import { Pagination } from "../ui/pagination";
 import Link from "next/link";
-import { useUserStore } from "@/store/userStore";
 import { Loader2 } from "lucide-react";
 import { Card } from "../ui/card";
 
-export default function Predictions() {
+export default function Predictions({ username }) {
   const [predictions, setPredictions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({
     total: 0,
     totalPages: 0,
   });
-
-  const username = useUserStore((state) => state.user?.username);
 
   useEffect(() => {
     if (!username) return;
@@ -57,7 +54,7 @@ export default function Predictions() {
   }, [username]);
 
   return (
-    <div className="w-full mt-8 pb-8">
+    <div className="w-full mt-4 pb-8">
       {loading ? (
         <div className="w-full space-y-4">
           <div className="mb-4 text-2xl font-bold text-foreground flex items-center gap-2">

@@ -86,9 +86,9 @@ export default function PredictionsPage() {
       </button>
 
       <div className="w-full mb-6">
-        <h1 className="text-2xl font-bold">Your Predictions</h1>
+        <h1 className="text-4xl font-bold">Predictions</h1>
         <p className="text-sm text-text-muted">
-          View all your historical match predictions
+          View all historical match predictions
         </p>
       </div>
 

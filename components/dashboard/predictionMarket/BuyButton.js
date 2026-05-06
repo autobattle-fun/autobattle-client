@@ -19,6 +19,7 @@ import { useUserStore } from "@/store/userStore";
 import { Skeleton } from "@/components/ui/skeleton";
 import useShares from "@/hooks/useShares";
 import { toast } from "sonner";
+import { formatNumber } from "@/lib/format";
 
 export default function BuyButton({
   candidate,
@@ -93,7 +94,7 @@ export default function BuyButton({
   let errorMessage = "";
 
   if (mode === "buy") {
-    if (numericAmount > 720000) {
+    if (numericAmount > 7200000) {
       isError = true;
       errorMessage = "Exceeds Max Buy Limit";
     } else if (numericAmount > currentSplBalance) {
@@ -196,7 +197,7 @@ export default function BuyButton({
                   <Skeleton className="w-10 h-2 rounded" />
                 ) : (
                   <div className="text-sm h-2 font-semibold opacity-50">
-                    {currentSplBalance} $AUTO
+                    {formatNumber(currentSplBalance, 2)} $AUTO
                   </div>
                 )
               ) : (
@@ -229,7 +230,7 @@ export default function BuyButton({
                   <Skeleton className="w-10 h-2 rounded" />
                 ) : (
                   <div className="text-sm h-2 font-semibold opacity-50">
-                    {currentShareBalance} Shares
+                    {formatNumber(currentShareBalance, 2)} Shares
                   </div>
                 )
               ) : (
@@ -303,7 +304,7 @@ export default function BuyButton({
               </div>
 
               <div className="w-fit flex items-center gap-2 text-[10px] md:text-xs text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-white/5 px-3 py-1.5 rounded-full border dark:border-white/5 border-black/5">
-                <TriangleAlert className="w-3.5 h-3.5" /> Max Buy is 720,000
+                <TriangleAlert className="w-3.5 h-3.5" /> Max Buy is 7,200,000
                 $AUTO
               </div>
             </>

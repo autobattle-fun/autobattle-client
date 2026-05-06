@@ -1,77 +1,99 @@
 "use client";
 
-import { ArrowLeft, Calendar, Swords, Trophy, Cpu } from "lucide-react";
-import Link from "next/link";
+import { ChevronLeft, Swords, Calendar, Trophy } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
 export function MatchHero({ match }) {
+  const router = useRouter();
+
+  const isResolved = match.status === "RESOLVED";
+  const redName = match.redName || "Red Agent";
+  const blueName = match.blueName || "Blue Agent";
   const isRedWinner = match.winner === "RED";
   const isBlueWinner = match.winner === "BLUE";
 
   return (
-    <div className="relative mb-6 w-full rounded-4xl border border-border/50 bg-primary p-8 md:p-10 shadow-2xl shadow-primary/20 overflow-hidden">
-      {/* Decorative background elements */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/10 rounded-full -ml-10 -mb-10 blur-2xl" />
+    <div className="relative w-full rounded-[2rem] min-h-100 min-[510px]:min-h-90 bg-primary p-6 sm:p-8 shadow-xl overflow-hidden mb-8">
+      {/* Subtle Background Glows for depth */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/10 rounded-full -ml-10 -mb-10 blur-2xl pointer-events-none" />
 
-      <div className="relative z-10 flex h-full flex-col justify-between gap-8">
-        <div className="flex items-start justify-between">
-          <Link
-            href="/history"
-            className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-white text-sm font-bold backdrop-blur-md border border-white/10"
+      <div className="relative z-10 flex flex-col h-full w-full items-center justify-center">
+        {/* Top Bar: Back Button & Status */}
+        <div className="flex items-center justify-between w-full">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 rounded-xl bg-white/10 border border-white/10 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-white/20 backdrop-blur-md"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ChevronLeft className="w-4 h-4" />
             Back to History
-          </Link>
+          </button>
 
-          <div className="flex flex-col items-end">
-            <div
-              className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest text-white border-2 border-white/20 ${
-                match.status === "RESOLVED" ? "bg-green-500" : "bg-yellow-500"
-              }`}
-            >
-              {match.status}
-            </div>
+          <div
+            className={cn(
+              "rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white shadow-sm",
+              isResolved ? "bg-green-500" : "bg-yellow-500",
+            )}
+          >
+            {match.status}
           </div>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2 text-white/60 text-sm font-bold uppercase tracking-widest">
+        {/* Match Headers */}
+        <div className="mt-10 flex flex-col gap-2 w-full">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/70">
             <Swords className="w-4 h-4" />
             Match Details
           </div>
-          <h1 className="text-3xl md:text-4xl font-black text-white leading-tight">
+          <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight tracking-tight">
             Match #{match.gameId}
           </h1>
-          <div className="flex flex-wrap items-center gap-4 mt-2">
-            <div className="flex items-center gap-2 text-white/80 font-medium bg-white/5 px-3 py-1 rounded-lg">
+
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 text-sm font-medium text-white/90 backdrop-blur-sm">
               <Calendar className="w-4 h-4" />
               {match.createdAt
-                ? format(new Date(match.createdAt), "PPP")
+                ? format(new Date(match.createdAt), "MMM do, yyyy")
                 : "Unknown Date"}
             </div>
-            <div className="flex items-center gap-2 text-white/80 font-medium bg-white/5 px-3 py-1 rounded-lg">
-              <Cpu className="w-4 h-4" />
-              {match.llmRed} vs {match.llmBlue}
-            </div>
+
+            {/* Winner Pill next to Date */}
+            {match.winner && (
+              <div className="flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 text-sm font-medium text-white/90 backdrop-blur-sm">
+                <Trophy className="w-4 h-4 text-yellow-400" />
+                {isRedWinner ? `${redName} Won` : `${blueName} Won`}
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-6 border-t border-white/10">
-          <div className="flex items-center gap-10">
-            <div className="flex flex-col">
-              <p className="text-xs font-bold text-white/50 uppercase">Red Agent</p>
-              <p className={`text-base font-bold ${isRedWinner ? "text-yellow-400" : "text-white"}`}>
-                {isRedWinner && "🏆 "}{match.agentRed.slice(0, 4)}...{match.agentRed.slice(-4)}
-              </p>
-            </div>
-            <div className="text-white/20 font-black text-2xl">VS</div>
-            <div className="flex flex-col items-end text-right">
-              <p className="text-xs font-bold text-white/50 uppercase">Blue Agent</p>
-              <p className={`text-base font-bold ${isBlueWinner ? "text-yellow-400" : "text-white"}`}>
-                {match.agentBlue.slice(0, 4)}...{match.agentBlue.slice(-4)}{isBlueWinner && " 🏆"}
-              </p>
-            </div>
+        {/* Divider */}
+        <hr className="my-6 border-white/10 w-full" />
+
+        {/* Clean VS Section */}
+        <div className="flex items-start justify-between w-full">
+          <div className="flex flex-col items-start flex-1">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">
+              Red Agent
+            </span>
+            <span className="text-xl sm:text-2xl font-bold leading-tight text-white">
+              {redName}
+            </span>
+          </div>
+
+          <div className="text-white/20 font-black text-2xl italic px-4 mt-2">
+            VS
+          </div>
+
+          <div className="flex flex-col items-end flex-1 text-right">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">
+              Blue Agent
+            </span>
+            <span className="text-xl sm:text-2xl font-bold leading-tight text-white">
+              {blueName}
+            </span>
           </div>
         </div>
       </div>

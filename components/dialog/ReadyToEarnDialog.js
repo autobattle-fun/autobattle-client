@@ -16,6 +16,7 @@ import { useUserStore } from "@/store/userStore";
 import { toast } from "sonner";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
+import { formatNumber } from "@/lib/format";
 
 export default function ReadyToEarnDialog({
   solBalance,
@@ -125,7 +126,7 @@ export default function ReadyToEarnDialog({
             />
             <div className="flex flex-col">
               <span className="font-semibold text-2xl leading-tight">
-                {autoBalance || 0} $AUTO
+                {autoBalance ? formatNumber(autoBalance, 4) : 0} $AUTO
               </span>
               <span className="text-sm text-muted-foreground font-semibold opacity-50">
                 You need $AUTO to execute trades
@@ -143,7 +144,7 @@ export default function ReadyToEarnDialog({
             />
             <div className="flex flex-col">
               <span className="font-semibold text-2xl leading-tight">
-                {solBalance ? solBalance.toFixed(2) : 0} SOL
+                {solBalance ? formatNumber(solBalance, 4) : 0} SOL
               </span>
               <span className="text-sm text-muted-foreground font-semibold opacity-50">
                 You need SOL to pay for execution fees

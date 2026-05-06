@@ -455,12 +455,25 @@ export default function useShares() {
   const claimTokens = async (marketId, setIsLoading) => {
     try {
       setIsLoading(true);
+
       if (!solana.activeWallet) {
         await solana.setActive({ address: walletAddress });
+        toast.info("Wallet connecting... Please click Confirm one more time.");
+        setIsLoading(false);
         return;
       }
 
+      if (!solana.provider) {
+        throw new Error(
+          "Wallet provider is still waking up. Please try again.",
+        );
+      }
+
       const accessToken = await getAccessToken();
+      if (!accessToken) throw new Error("No access token found");
+
+      // STEP 1: Ask backend to build the CLAIM transaction
+      console.log("Building claim transaction...");
       const buildResponse = await fetch(
         `${API_BASE_URL}/api/trades/claim/build`,
         {
@@ -474,15 +487,13 @@ export default function useShares() {
       );
 
       const buildData = await buildResponse.json();
-      if (!buildData.success) throw new Error(buildData.error);
+      if (!buildData.success)
+        throw new Error(buildData.error || "Failed to prepare claim");
 
-      // GASLESS FLOW: Decode -> Sign -> verify (sponsored by Openfort)
-      const transaction = Transaction.from(
-        Buffer.from(buildData.transaction, "base64"),
-      );
-
-      // Critical for Claim: Lock in the Paymaster as the fee payer
-      transaction.feePayer = new PublicKey(buildData.feePayer);
+      // STEP 2: Decode the transaction and get user signature
+      console.log("Requesting signature...");
+      const txBuffer = Buffer.from(buildData.transaction, "base64");
+      const transaction = Transaction.from(txBuffer);
 
       const userSignedTx = await solana.provider.signTransaction(transaction);
 
@@ -498,20 +509,25 @@ export default function useShares() {
         sigBuffer,
       );
 
-      const partiallySignedBase64 = Buffer.from(
-        transaction.serialize({
-          requireAllSignatures: false,
-          verifySignatures: false,
-        }),
-      ).toString("base64");
+      // 🔥 MANUALLY BROADCAST TO SOLANA NETWORK (Standard Pattern)
+      console.log("Broadcasting transaction to Solana network...");
+      const connection = new Connection(RPC_URL, "confirmed");
+      const rawTx = transaction.serialize();
 
+      const signature = await connection.sendRawTransaction(rawTx, {
+        skipPreflight: false,
+        preflightCommitment: "confirmed",
+      });
+      console.log("Transaction broadcasted! Signature:", signature);
+
+      // STEP 3: Send back to backend for Database Sync
+      console.log("Sending signature to backend for syncing...");
       const executeResponse = await fetch(
         `${API_BASE_URL}/api/trades/claim/verify`,
         {
           method: "POST",
           body: JSON.stringify({
-            partiallySignedBase64,
-            feePayer: buildData.feePayer,
+            signature, // Sending standard signature instead of partially signed base64
             marketId,
           }),
           headers: {
@@ -522,13 +538,17 @@ export default function useShares() {
       );
 
       const executeData = await executeResponse.json();
-      if (!executeData.success) throw new Error(executeData.error);
+      if (!executeData.success)
+        throw new Error(executeData.error || "Failed to verify claim");
 
-      toast.success("Winnings claimed successfully (gasless)!");
+      // Reload balances after claiming
+      await loadMetadata();
+
+      toast.success("Winnings claimed successfully!");
       return executeData;
     } catch (error) {
       console.error("Claim Error:", error);
-      toast.error(error.message);
+      toast.error(error.message || "An error occurred while claiming");
     } finally {
       setIsLoading(false);
     }

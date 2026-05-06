@@ -11,6 +11,7 @@ import ReadyToEarnDialog from "./dialog/ReadyToEarnDialog";
 import { useOpenfort } from "@openfort/react";
 import { useUserStore } from "@/store/userStore";
 import { Loader2 } from "lucide-react";
+import { formatNumber } from "@/lib/format";
 
 export function Header() {
   const router = useRouter();
@@ -89,11 +90,11 @@ export function Header() {
             >
               <Avatar name={username} size={24} />
               <div className="max-w-28 truncate text-sm font-semibold text-text-main">
-                {splBalance ? splBalance.toFixed(2) : 0} $AUTO
+                {splBalance ? formatNumber(splBalance, 2) : 0} $AUTO
               </div>
               <div className="border-r border-foreground/40 h-3 border-dashed w-px"></div>
               <div className="max-w-28 truncate text-sm font-semibold text-text-main">
-                {solBalance ? solBalance.toFixed(2) : 0} SOL
+                {solBalance ? formatNumber(solBalance, 2) : 0} SOL
               </div>
             </button>
 

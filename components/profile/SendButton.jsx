@@ -16,6 +16,7 @@ import { Loader2, ArrowUp, Send } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
 import useShares from "@/hooks/useShares";
 import Image from "next/image";
+import { formatNumber } from "@/lib/format";
 
 export default function SendButton() {
   const [recipient, setRecipient] = useState("");
@@ -187,7 +188,8 @@ export default function SendButton() {
             )}
             <div className="flex flex-col">
               <span className="font-semibold text-2xl leading-tight">
-                {activeBalance} {assetType === "AUTO" ? "$AUTO" : "SOL"}
+                {formatNumber(activeBalance, 4)}{" "}
+                {assetType === "AUTO" ? "$AUTO" : "SOL"}
               </span>
               <span className="text-sm text-muted-foreground font-semibold opacity-50">
                 Your Balance

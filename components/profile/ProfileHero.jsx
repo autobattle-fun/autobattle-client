@@ -5,12 +5,10 @@ import { ArrowUpDown, Copy } from "lucide-react";
 import { trimWalletAddress } from "@/lib/wallet";
 import Avatar from "boring-avatars";
 import { toast } from "sonner";
-import { useUserStore } from "@/store/userStore";
 import { useState } from "react";
+import { formatNumber } from "@/lib/format";
 
-export function ProfileHero() {
-  const user = useUserStore((state) => state.user);
-  const metadata = useUserStore((state) => state.metadata);
+export function ProfileHero({ user, metadata }) {
   const walletAddress = user?.walletAddress || "";
   const username = user?.username || "username";
   const shortWallet = walletAddress
@@ -26,8 +24,8 @@ export function ProfileHero() {
           <div className="text-4xl font-semibold text-white flex items-center">
             <p>
               {currentShow === "AUTO"
-                ? metadata?.splTokenBalance?.toFixed(4) || 0
-                : metadata?.solBalance?.toFixed(4) || 0}{" "}
+                ? formatNumber(metadata?.splTokenBalance, 4) || 0
+                : formatNumber(metadata?.solBalance, 4) || 0}{" "}
               {currentShow === "AUTO" ? "$AUTO" : "SOL"}
             </p>
             <ArrowUpDown
@@ -54,8 +52,17 @@ export function ProfileHero() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Avatar name={username} size={32} />
-            <p className="text-base font-semibold text-white opacity-50">
-              autobattle.fun/${username.toUpperCase()}
+            <p
+              className="text-base font-semibold text-white opacity-50 hover:opacity-70 cursor-pointer transition-all duration-200 ease-in-out"
+              onClick={() => {
+                navigator.clipboard.writeText(
+                  "autobattle.fun/profile/" + username,
+                );
+                toast.success("Profile URL copied to clipboard");
+              }}
+            >
+              autobattle.fun/profile/
+              {username?.length > 20 ? username.slice(0, 20) + "..." : username}
             </p>
           </div>
 

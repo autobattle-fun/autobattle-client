@@ -22,6 +22,7 @@ import { API_BASE_URL } from "@/lib/config";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useUserStore } from "@/store/userStore";
+import useShares from "@/hooks/useShares";
 
 // Helper to format dates
 const formatDate = (dateString) => {
@@ -43,6 +44,8 @@ export default function PredictionDetailPage() {
   // Global State
   const currentUser = useUserStore((state) => state.user);
 
+  const { claimTokens } = useShares();
+
   // Local State
   const [prediction, setPrediction] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -60,7 +63,7 @@ export default function PredictionDetailPage() {
           `${API_BASE_URL}/api/user/predictions/get/${id}`,
           {
             method: "GET",
-            credentials: "include", // Ensures auth cookies are sent
+            credentials: "include",
             headers: {
               "Content-Type": "application/json",
             },
@@ -96,15 +99,17 @@ export default function PredictionDetailPage() {
     };
   }, [id, router]);
 
-  // Handle mock claim action
+  // 👇 Integrated actual claim logic
   const handleClaim = async () => {
-    if (isClaiming) return;
-    setIsClaiming(true);
-    // Add your actual claim logic/API call here
-    setTimeout(() => {
-      setIsClaiming(false);
-      // setPrediction(prev => ({ ...prev, hasClaimed: true })) // Optimistic update
-    }, 2000);
+    if (isClaiming || !prediction?.market?.id) return;
+
+    // Call the hook, passing the marketId and the state setter for the loading spinner
+    const result = await claimTokens(prediction.market.id, setIsClaiming);
+
+    // If the claim was successful, optimistically update the UI so it shows "Claimed" immediately
+    if (result && result.success) {
+      setPrediction((prev) => ({ ...prev, hasClaimed: true }));
+    }
   };
 
   if (loading) {
