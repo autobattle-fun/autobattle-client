@@ -36,7 +36,7 @@ export default function ReadyToEarnDialog({
               type="button"
               size="icon"
               aria-label="Buy $AUTO"
-              className="cursor-pointer"
+              className="cursor-pointer h-8 w-8 md:h-9 md:w-9"
             >
               {" "}
               <Plus className="w-4 h-4" />

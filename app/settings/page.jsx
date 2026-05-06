@@ -36,7 +36,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="max-w-xl mx-auto h-full flex flex-col pt-16">
+    <div className="max-w-xl mx-auto h-full flex flex-col pt-16 px-4">
       <h1 className="text-4xl font-bold mb-2">Settings</h1>
       <p className="text-text-muted text-sm mb-6">
         Manage your preferences and settings

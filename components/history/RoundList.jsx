@@ -9,6 +9,8 @@ import {
   PlusSquare,
   Hand,
   MinusCircle,
+  Layers,
+  Zap,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -102,6 +104,7 @@ export function RoundList({ rounds, redName, blueName }) {
 
             {isExpanded && (
               <Card className="ml-4 sm:ml-8 flex flex-col gap-0 rounded-2xl shadow-none border border-border/50 bg-element overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                {/* 1. AGENT MOVES LIST */}
                 <div className="flex flex-col gap-0">
                   {!round.moves || round.moves.length === 0 ? (
                     <div className="text-sm text-center text-text-muted py-6">
@@ -187,6 +190,83 @@ export function RoundList({ rounds, redName, blueName }) {
                   )}
                 </div>
 
+                {/* 2. RIVER CARDS */}
+                {(round.riverRed || round.riverBlue) && (
+                  <div className="flex flex-col border-t border-border/30 p-4 bg-element-hover/30">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Layers className="w-4 h-4 text-text-muted" />
+                      <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
+                        River Cards Revealed
+                      </span>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
+                      {round.riverRed && (
+                        <div className="flex items-center gap-2 rounded-lg bg-element border border-border/50 px-3 py-2 flex-1">
+                          <span className="text-xs font-bold text-red-500 flex-1 truncate">
+                            {redName}
+                          </span>
+                          <div className="rounded border border-border/50 bg-element-hover px-2 py-0.5 text-xs font-bold text-text-main">
+                            {round.riverRed.label || round.riverRed.value}
+                          </div>
+                        </div>
+                      )}
+                      {round.riverBlue && (
+                        <div className="flex items-center gap-2 rounded-lg bg-element border border-border/50 px-3 py-2 flex-1">
+                          <span className="text-xs font-bold text-blue-500 flex-1 truncate">
+                            {blueName}
+                          </span>
+                          <div className="rounded border border-border/50 bg-element-hover px-2 py-0.5 text-xs font-bold text-text-main">
+                            {round.riverBlue.label || round.riverBlue.value}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* 3. SUDDEN DEATH TIEBREAKER */}
+                {round.tiebreakerCards && round.tiebreakerCards.length > 0 && (
+                  <div className="flex flex-col border-t border-border/30 p-4 bg-yellow-500/5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Zap className="w-4 h-4 text-yellow-500" />
+                      <span className="text-[10px] font-bold text-yellow-500/80 uppercase tracking-wider">
+                        Sudden Death Tiebreaker
+                      </span>
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                      {round.tiebreakerCards.map((tie, idx) => (
+                        <div
+                          key={idx}
+                          className="flex flex-col sm:flex-row gap-4 sm:items-center"
+                        >
+                          {tie.red && (
+                            <div className="flex items-center gap-2 rounded-lg bg-element border border-border/50 px-3 py-2 flex-1">
+                              <span className="text-xs font-bold text-red-500 flex-1 truncate">
+                                {redName}
+                              </span>
+                              <div className="rounded border border-border/50 bg-element-hover px-2 py-0.5 text-xs font-bold text-text-main">
+                                {tie.red.label || tie.red.value}
+                              </div>
+                            </div>
+                          )}
+                          {tie.blue && (
+                            <div className="flex items-center gap-2 rounded-lg bg-element border border-border/50 px-3 py-2 flex-1">
+                              <span className="text-xs font-bold text-blue-500 flex-1 truncate">
+                                {blueName}
+                              </span>
+                              <div className="rounded border border-border/50 bg-element-hover px-2 py-0.5 text-xs font-bold text-text-main">
+                                {tie.blue.label || tie.blue.value}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 4. DAMAGE PHASE */}
                 {roundResolved && round.damageDealt > 0 && (
                   <div className="flex items-center justify-between border-t border-border/30 bg-red-500/5 px-4 py-3">
                     <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">

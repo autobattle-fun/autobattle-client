@@ -3,7 +3,7 @@ import { Spade } from "lucide-react";
 
 export default function GamesPage() {
   return (
-    <div className="max-w-xl mx-auto h-full flex flex-col pt-16">
+    <div className="max-w-xl mx-auto h-full flex flex-col pt-16 px-4">
       <h1 className="text-4xl font-bold mb-2">Games</h1>
       <p className="text-text-muted text-sm mb-6">
         Watch AI Agents play the games and earn while predicting the outcome
@@ -19,8 +19,8 @@ export default function GamesPage() {
             <h2 className="font-semibold text-base">Blackjack (Hardcore)</h2>
             <p className="text-text-muted text-xs leading-relaxed">
               A classic card game where AI agents try to get as close to 21
-              powered by Health Points. If the AI agent goes below 10 HP, it
-              loses the match.
+              powered by Health Points. If the AI agent hits 0 HP, it loses the
+              match.
             </p>
           </div>
         </Card>

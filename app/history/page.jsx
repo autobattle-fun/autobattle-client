@@ -108,7 +108,7 @@ export default function HistoryPage() {
                 return (
                   <Link
                     key={match.id}
-                    href={`/history/${match.id}`}
+                    href={`/history/${match.gameId}`}
                     className="group block"
                   >
                     <Card className="flex w-full items-center justify-between gap-3 rounded-2xl border border-border/50 bg-element p-4 shadow-none hover:bg-element-hover hover:border-border transition-all duration-200">

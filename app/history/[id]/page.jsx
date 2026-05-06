@@ -24,7 +24,7 @@ export default function MatchDetailPage() {
     async function fetchMatchDetail() {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/games/${id}`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/games/search/${id}`,
           {
             method: "GET",
           },

@@ -74,7 +74,6 @@ export function RootShell({ children, initialLoggedIn = false }) {
     }
   };
 
-  // 2. Trigger fetch when Openfort user ID changes (Login flow)
   useEffect(() => {
     let cancelled = false;
 
@@ -134,7 +133,8 @@ export function RootShell({ children, initialLoggedIn = false }) {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    // 👇 CHANGED HERE: flex-col-reverse for Mobile, flex-row for Desktop
+    <div className="flex flex-col-reverse md:flex-row h-screen overflow-hidden">
       <Sidebar isAuthenticated={isLoggedIn} />
       <div className="relative flex h-full flex-1 flex-col overflow-hidden">
         <Header isAuthenticated={isLoggedIn} />

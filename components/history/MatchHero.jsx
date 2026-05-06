@@ -15,7 +15,7 @@ export function MatchHero({ match }) {
   const isBlueWinner = match.winner === "BLUE";
 
   return (
-    <div className="relative w-full rounded-[2rem] min-h-100 min-[510px]:min-h-90 bg-primary p-6 sm:p-8 shadow-xl overflow-hidden mb-8">
+    <div className="relative w-full rounded-[2rem] min-h-100 min-[430px]:min-h-90 bg-primary p-6 sm:p-8 shadow-xl overflow-hidden mb-8">
       {/* Subtle Background Glows for depth */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/10 rounded-full -ml-10 -mb-10 blur-2xl pointer-events-none" />
