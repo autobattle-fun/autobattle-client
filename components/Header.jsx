@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Search, Plus, LogOut, User } from "lucide-react";
+import { Plus, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { GlobalSearch } from "./GlobalSearch";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useRouter } from "next/navigation";
 import Avatar from "boring-avatars";
@@ -60,9 +60,7 @@ export function Header() {
   }
 
   return (
-    <header className="h-16 md:h-20 flex items-center justify-between px-3 md:px-8 w-full shrink-0 bg-background/80 backdrop-blur-md z-[50] border-b border-border md:border-none gap-2 md:gap-4">
-      {/* 1. LEFT: Mobile Logo / Desktop Spacer */}
-      {/* On mobile: Shrink to fit logo. On desktop: flex-1 to push search to exact center */}
+    <header className="h-16 md:h-20 flex items-center justify-between px-3 md:px-8 w-full shrink-0 bg-background/80 backdrop-blur-md z-50 border-b border-border md:border-none gap-2 md:gap-4">
       <div className="flex shrink-0 md:flex-1 items-center justify-start min-w-0">
         <Link href="/" className="md:hidden flex items-center shrink-0">
           <Image
@@ -75,22 +73,8 @@ export function Header() {
         </Link>
       </div>
 
-      {/* 2. CENTER: Search Bar */}
-      {/* On mobile: flex-1 (fills all remaining space). On desktop: fixed max-width */}
-      <div className="flex-1 md:w-full md:max-w-md shrink flex justify-center min-w-0">
-        <div className="relative flex items-center w-full border border-border shadow-inner h-9 md:h-10 rounded-full bg-element px-3 md:px-4 transition-colors focus-within:bg-surface focus-within:ring-1 focus-within:ring-border min-w-0">
-          <Search className="w-4 h-4 text-text-muted mr-2 shrink-0" />
-          <Input
-            type="text"
-            aria-label="Search by address or name"
-            placeholder="Search..."
-            className="h-auto bg-transparent px-0 py-0 text-sm shadow-none border-0 focus-visible:ring-0! w-full min-w-0 truncate"
-          />
-        </div>
-      </div>
+      <GlobalSearch />
 
-      {/* 3. RIGHT: Actions */}
-      {/* On mobile: Shrink to fit avatar. On desktop: flex-1 to balance the left side */}
       <div className="flex shrink-0 md:flex-1 items-center gap-2 md:gap-3 justify-end min-w-0">
         {user && (
           <div className="hidden sm:block">
@@ -125,7 +109,7 @@ export function Header() {
             </button>
 
             {isMenuOpen ? (
-              <div className="absolute right-0 top-12 z-99 w-48 md:min-w-44 rounded-2xl border border-border bg-surface p-1.5 shadow-lg">
+              <div className="absolute right-0 top-12 z-50 w-48 md:min-w-44 rounded-2xl border border-border bg-surface p-1.5 shadow-lg">
                 <div className="flex flex-col xl:hidden px-3 py-2 border-b border-border/50 mb-1 gap-1">
                   <div className="text-xs text-text-muted">Balances</div>
                   <div className="text-sm font-bold text-text-main">

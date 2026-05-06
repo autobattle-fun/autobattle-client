@@ -24,7 +24,7 @@ export default function MatchDetailPage() {
     async function fetchMatchDetail() {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/games/search/${id}`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/games/${id}/details`,
           {
             method: "GET",
           },
@@ -37,10 +37,10 @@ export default function MatchDetailPage() {
         const payload = await response.json();
 
         if (isMounted) {
+          const result = payload?.data;
           setData({
-            match: payload?.data?.match || payload?.match,
-            liveGameState:
-              payload?.data?.liveGameState || payload?.liveGameState,
+            match: result?.match || null,
+            liveGameState: result?.liveGameState || null,
           });
           setLoading(false);
         }
