@@ -4,6 +4,7 @@ import { CheckCircle, Cpu, ShieldAlert } from "lucide-react";
 import PlayingCard from "./PlayingCard";
 import { useRef, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import Image from "next/image";
 
 export default function AgentSide({
   agentName,
@@ -12,6 +13,7 @@ export default function AgentSide({
   cards,
   status,
   score,
+  imageUrl,
   align,
   atRisk = 0,
   showRiverPlaceholder = false,
@@ -132,11 +134,19 @@ export default function AgentSide({
             )}
           </div>
         </div>
-        <div
-          className={`w-6 h-6 sm:w-10 sm:h-10 md:w-14 md:h-14 rounded-full border md:border-2 flex items-center justify-center shadow-sm ${avatarRing} dark:bg-transparent bg-white`}
-        >
-          <Cpu className="w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6" />
-        </div>
+        {imageUrl ? (
+          <div
+            className={`w-6 h-6 sm:w-10 sm:h-10 md:w-14 md:h-14 rounded-full overflow-hidden relative border md:border-2 flex items-center justify-center shadow-sm ${avatarRing} dark:bg-transparent bg-white`}
+          >
+            <Image src={imageUrl} width={70} height={70} alt="" />
+          </div>
+        ) : (
+          <div
+            className={`w-6 h-6 sm:w-10 sm:h-10 md:w-14 md:h-14 rounded-full border md:border-2 flex items-center justify-center shadow-sm ${avatarRing} dark:bg-transparent bg-white`}
+          >
+            <Cpu className="w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6" />
+          </div>
+        )}
       </div>
 
       <div

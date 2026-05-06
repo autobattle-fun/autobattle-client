@@ -313,14 +313,32 @@ export default function LiveComments() {
           ) : (
             [...logs].reverse().map((log, index) => (
               <div key={index} className="flex gap-2 md:gap-3">
-                <div className="w-7 h-7 md:w-10 md:h-10 rounded-full flex-shrink-0 bg-primary flex items-center justify-center text-white">
-                  <Image
-                    src="/logo/AutoBattle-logo.svg"
-                    alt="Logo"
-                    width={15}
-                    height={15}
-                    className="brightness-0 invert w-3 md:w-4"
-                  />
+                <div className="w-7 h-7 md:w-10 md:h-10 rounded-full flex-shrink-0 bg-primary relative overflow-hidden flex items-center justify-center text-white">
+                  {log.role === "system" ? (
+                    <Image
+                      src="/logo/AutoBattle-logo.svg"
+                      alt="Logo"
+                      width={15}
+                      height={15}
+                      className="brightness-0 invert w-3 md:w-4"
+                    />
+                  ) : log.role === "red" ? (
+                    <Image
+                      src={gameState?.red?.celebrity?.image}
+                      alt="Logo"
+                      width={50}
+                      height={50}
+                      className=""
+                    />
+                  ) : (
+                    <Image
+                      src={gameState?.blue?.celebrity?.image}
+                      alt="Logo"
+                      width={50}
+                      height={50}
+                      className=""
+                    />
+                  )}
                 </div>
                 <div className="flex-1 flex flex-col group pt-0.5">
                   <div className="flex justify-between items-start md:items-center mb-0.5 md:mb-1 relative">

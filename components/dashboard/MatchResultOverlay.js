@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { useState, useEffect } from "react";
 import PlayingCard from "./PlayingCard";
+import { useGameStore } from "@/store/gameStore";
 
 export default function MatchResultOverlay({
   winnerSide = "red", // "red" | "blue" | "draw"
@@ -25,6 +26,13 @@ export default function MatchResultOverlay({
 
   const winnerBg = isRedWin ? "bg-red-500" : "bg-blue-500";
 
+  const setIsLoading = useGameStore((state) => state.setIsLoading);
+
+  const handleNextMatch = async () => {
+    setIsLoading(true);
+    await onNextMatch();
+  };
+
   // --- Countdown Timer Logic ---
   useEffect(() => {
     if (timeLeft <= 0) {
@@ -40,10 +48,6 @@ export default function MatchResultOverlay({
   }, [timeLeft]);
 
   // Consolidate the Next Match click action
-  const handleNextMatch = () => {
-    if (onNextMatch) onNextMatch(); // Call the prop if you have extra parent logic
-    window.location.reload();
-  };
 
   // Math for the SVG circle (Circumference = 2 * PI * Radius)
   const radius = 10;
@@ -85,7 +89,7 @@ export default function MatchResultOverlay({
           <div className="flex-1 flex flex-col items-center dark:bg-zinc-800/50 bg-zinc-100 rounded-[24px] p-6 border border-foreground/5">
             <div className="flex items-baseline gap-2 mb-4">
               <span className="text-xl md:text-2xl font-bold text-zinc-800 dark:text-zinc-200">
-                Donald Trump
+                {redName}
               </span>
               <span className="text-2xl md:text-3xl font-black text-red-500 tabular-nums">
                 {redScore}
@@ -108,7 +112,7 @@ export default function MatchResultOverlay({
           <div className="flex-1 flex flex-col items-center dark:bg-zinc-800/50 bg-zinc-100 rounded-[24px] p-6 border border-foreground/5">
             <div className="flex items-baseline gap-2 mb-4">
               <span className="text-xl md:text-2xl font-bold text-zinc-800 dark:text-zinc-200">
-                Joe Biden
+                {blueName}
               </span>
               <span className="text-2xl md:text-3xl font-black text-blue-500 tabular-nums">
                 {blueScore}
@@ -155,7 +159,7 @@ export default function MatchResultOverlay({
             >
               <div className="flex items-center gap-2">
                 <span className="text-white font-semibold text-sm md:text-base tracking-wide">
-                  Next Match
+                  {"Next Match"}
                 </span>
 
                 {/* SVG Progress Ring */}

@@ -10,6 +10,10 @@ import { adaptServerStateToEngine, getDamageValue } from "../../lib/cards";
 import MatchResultOverlay from "./MatchResultOverlay";
 import { useGameStore } from "@/store/gameStore";
 import HowToPlayModal from "./HowToPlayModal";
+import { useUserStore } from "@/store/userStore";
+import { useRouter } from "next/navigation";
+import useSocket from "@/hooks/useSocket";
+import Footer from "./Footer";
 
 export default function GameUI() {
   const engine = useGameEngine();
@@ -17,6 +21,9 @@ export default function GameUI() {
   const gameState = useGameStore((state) => state.gameState);
   const { round, redHP, blueHP, redCards, blueCards } =
     adaptServerStateToEngine(gameState || {});
+  const user = useUserStore((state) => state.user);
+  const router = useRouter();
+  const { sendPing } = useSocket();
 
   const isDark = resolvedTheme === "dark";
 
@@ -99,6 +106,7 @@ export default function GameUI() {
               <div className="w-[49%] xl:w-2/5 flex justify-end xl:order-1">
                 <AgentSide
                   agentName={gameState?.red?.name}
+                  imageUrl={gameState?.red?.celebrity?.image}
                   side="red"
                   hp={redHP}
                   cards={redCards}
@@ -122,6 +130,7 @@ export default function GameUI() {
               <div className="w-[49%] xl:w-2/5 flex justify-start xl:order-3">
                 <AgentSide
                   agentName={gameState?.blue?.name}
+                  imageUrl={gameState?.blue?.celebrity?.image}
                   side="blue"
                   hp={blueHP}
                   cards={blueCards}
@@ -146,6 +155,7 @@ export default function GameUI() {
 
           <PredictionMarkets />
           <LiveComments />
+          <Footer />
 
           {gameState?.phase === "Ended" && (
             <MatchResultOverlay
@@ -158,8 +168,14 @@ export default function GameUI() {
               blueCards={blueCards}
               redScore={gameState?.red?.score}
               blueScore={gameState?.blue?.score}
-              onNextMatch={() => console.log("Routing to MatchMaking...")}
-              onProfile={() => console.log("Routing to Profile...")}
+              onNextMatch={sendPing}
+              onProfile={() => {
+                if (user) {
+                  router.push("/profile");
+                } else {
+                  router.push("/login");
+                }
+              }}
             />
           )}
         </main>

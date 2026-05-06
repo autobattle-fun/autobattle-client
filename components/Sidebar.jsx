@@ -21,14 +21,16 @@ function DesktopSidebar({ isAuthenticated, pathname }) {
 
   return (
     <aside className="hidden md:flex w-20 h-screen bg-background flex-col border-r border-border items-center justify-center py-6 shrink-0 z-20">
-      <Image
-        src="/logo/Autobattle-logo.svg"
-        width={30}
-        height={30}
-        alt="Autobattle.fun"
-        className="mb-10"
-        loading="eager"
-      />
+      <Link href="/">
+        <Image
+          src="/logo/Autobattle-logo.svg"
+          width={30}
+          height={30}
+          alt="Autobattle.fun"
+          className="mb-10"
+          loading="eager"
+        />
+      </Link>
 
       {/* Navigation Links */}
       <nav className="flex flex-1 justify-center flex-col gap-4 w-full">

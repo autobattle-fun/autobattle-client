@@ -5,9 +5,11 @@ import { useState } from "react";
 import { io } from "socket.io-client";
 import { useGameStore } from "@/store/gameStore";
 import { useMarketStore } from "@/store/marketStore";
+import { useSocketStore } from "@/store/socketStore";
 
 export default function useSocket() {
-  const [socket, setSocket] = useState(null);
+  const socket = useSocketStore((state) => state.socket);
+  const setSocket = useSocketStore((state) => state.setSocket);
   const setGameState = useGameStore((state) => state.setGameState);
   const setLatency = useGameStore((state) => state.setLatency);
   const setCountdown = useGameStore((state) => state.setCountdown);

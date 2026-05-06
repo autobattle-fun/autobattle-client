@@ -1,9 +1,19 @@
 "use client";
 
+import useSocket from "@/hooks/useSocket";
 import { RefreshCcw } from "lucide-react";
 import Image from "next/image";
+import { useGameStore } from "@/store/gameStore";
 
 export default function PauseScreen() {
+  const setIsLoading = useGameStore((state) => state.setIsLoading);
+  const { sendPing } = useSocket();
+
+  const handleRefresh = async () => {
+    setIsLoading(true);
+    await sendPing();
+  };
+
   return (
     <div className="w-full h-full flex flex-col relative overflow-hidden">
       <div className="flex-1 flex flex-col items-center justify-center z-10 w-full px-4">
@@ -20,7 +30,10 @@ export default function PauseScreen() {
             Game is Paused
           </span>
 
-          <div className="flex-1 bg-zinc-300 dark:bg-zinc-800 rounded-xl md:rounded-2xl pb-[4px] md:pb-[7px] cursor-pointer group mt-5">
+          <div
+            onClick={handleRefresh}
+            className="flex-1 bg-zinc-300 dark:bg-zinc-800 rounded-xl md:rounded-2xl pb-[4px] md:pb-[7px] cursor-pointer group mt-5"
+          >
             <div className="h-full bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-700 py-3 md:py-4 px-6 rounded-xl md:rounded-2xl flex justify-center items-center transition-transform duration-150 ease-out group-hover:-translate-y-1 group-active:translate-y-[4px] md:group-active:translate-y-[7px]">
               <div className="font-bold flex items-center gap-2 text-sm md:text-base tracking-wide text-zinc-900 dark:text-zinc-100">
                 <RefreshCcw size={20} /> Refresh
