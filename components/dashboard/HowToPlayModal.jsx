@@ -25,7 +25,7 @@ import {
 
 import { cn } from "@/lib/utils";
 
-export default function HowToPlayModal() {
+export default function HowToPlayModal({ render }) {
   const [isOpen, setIsOpen] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
 
@@ -95,10 +95,14 @@ export default function HowToPlayModal() {
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger
         render={
-          <button className="w-full py-2 bg-primary/10 border cursor-pointer border-primary text-primary rounded-lg text-sm md:text-base font-bold tracking-wide transition-all flex justify-center items-center gap-2">
-            How to Play
-            <ArrowRight className="w-4 h-4 md:w-5 md:h-5 -mr-1" />
-          </button>
+          render ? (
+            render
+          ) : (
+            <button className="w-full py-2 bg-primary/10 border cursor-pointer border-primary text-primary rounded-lg text-sm md:text-base font-bold tracking-wide transition-all flex justify-center items-center gap-2">
+              How to Play
+              <ArrowRight className="w-4 h-4 md:w-5 md:h-5 -mr-1" />
+            </button>
+          )
         }
       />
 

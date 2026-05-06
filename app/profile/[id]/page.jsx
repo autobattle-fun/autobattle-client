@@ -43,8 +43,6 @@ export default function ProfilePage() {
 
         const payload = await response.json();
 
-        console.log(payload);
-
         if (isMounted) {
           // Adjust based on your API response structure (e.g., payload.data)
           setUser(payload?.data);

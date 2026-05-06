@@ -79,6 +79,9 @@ export function RootShell({ children, initialLoggedIn = false }) {
 
     if (user?.id) {
       fetchUserFromDB(cancelled);
+    } else {
+      reset();
+      setIsLoggedIn(false);
     }
 
     return () => {

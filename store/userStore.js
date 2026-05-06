@@ -3,7 +3,7 @@ import { create } from "zustand";
 export const useUserStore = create((set) => ({
   user: null,
   metadata: null,
-  isLoadingUser: false,
+  isLoadingUser: true,
   isLoadingMetadata: false,
   setIsLoadingUser: (v) => set({ isLoadingUser: v }),
   setIsLoadingMetadata: (v) => set({ isLoadingMetadata: v }),

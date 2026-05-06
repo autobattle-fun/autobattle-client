@@ -8,6 +8,7 @@ import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import { useOpenfort } from "@openfort/react";
 import { useUserStore } from "@/store/userStore";
+import HowToPlayModal from "@/components/dashboard/HowToPlayModal";
 
 export default function SettingsPage() {
   const { resolvedTheme, setTheme } = useTheme();
@@ -81,6 +82,23 @@ export default function SettingsPage() {
             </Card>
           </Link>
         </div>
+
+        <HowToPlayModal
+          render={
+            <button className="flex flex-col gap-2">
+              <Card className="w-full bg-element rounded-2xl p-5 flex items-center justify-between border border-border hover:bg-element-hover transition-colors cursor-pointer shadow-none">
+                <div className="flex items-center gap-2">
+                  <div className="font-semibold text-normal mb-0.5">
+                    Learn the game
+                  </div>
+                </div>
+                <div className="text-right space-y-2">
+                  <ChevronRight className="w-5 h-5 text-text-main" />
+                </div>
+              </Card>
+            </button>
+          }
+        />
 
         {user ? (
           <div className="flex flex-col gap-2">

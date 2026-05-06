@@ -157,7 +157,10 @@ export default function ReadyToEarnDialog({
           the default footer background/borders. 
           A grid is used to place the buttons side-by-side.
         */}
-        <DialogFooter variant="bare" className="gap-4 sm:space-x-0 -mt-3">
+        <DialogFooter
+          variant="bare"
+          className="gap-4 sm:space-x-0 -mt-3 flex flex-col!"
+        >
           <button
             className={cn(
               "flex-1 rounded-xl md:rounded-2xl pb-[4px] group bg-primary/70 cursor-pointer",
@@ -183,6 +186,18 @@ export default function ReadyToEarnDialog({
               </div>
             </div>
           </button>
+
+          <div className="flex items-center gap-1 justify-center font-semibold text-xs opacity-50 -mb-5 -mt-1">
+            <p>Powered by</p>
+            <Image
+              src="/footer/bags.png"
+              width={15}
+              height={15}
+              alt="bags"
+              className="brightness-0 dark:invert"
+            />
+            <p>Bags.fm</p>
+          </div>
         </DialogFooter>
       </DialogPopup>
     </Dialog>

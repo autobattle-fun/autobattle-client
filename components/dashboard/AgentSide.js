@@ -31,29 +31,44 @@ export default function AgentSide({
   const [scrollLeft, setScrollLeft] = useState(0);
 
   const [actionPopup, setActionPopup] = useState(null);
+
+  // Track previous states to detect action deltas
   const prevStatus = useRef(status);
   const prevCardsLength = useRef(cards.length);
 
+  // --- Animation Trigger Logic ---
   useEffect(() => {
-    const justFinalized =
-      (status === "FINALIZED" || status === "DONE") &&
-      prevStatus.current !== "FINALIZED" &&
-      prevStatus.current !== "DONE";
+    let timer;
 
-    if (justFinalized) {
-      if (cards.length > prevCardsLength.current) {
+    const cardAdded = cards.length > prevCardsLength.current;
+    const gameIsActive = prevCardsLength.current > 0; // Ignore initial deal
+    const wasThinking =
+      prevStatus.current === "THINKING" || prevStatus.current === "TXPENDING";
+    const stoppedThinking =
+      wasThinking && (status === "WAITING" || status === "FINALIZED");
+
+    if (gameIsActive) {
+      // 1. Detect HIT: A card was added while the agent was active
+      if (cardAdded && wasThinking) {
         setActionPopup("HIT!");
-      } else {
-        setActionPopup("STAY");
+        timer = setTimeout(() => setActionPopup(null), 1200);
       }
-
-      const timer = setTimeout(() => setActionPopup(null), 2000);
-      return () => clearTimeout(timer);
+      // 2. Detect STAY: The agent's turn ended, but no card was added
+      else if (!cardAdded && stoppedThinking) {
+        setActionPopup("STAY");
+        timer = setTimeout(() => setActionPopup(null), 1200);
+      }
     }
+
     prevStatus.current = status;
     prevCardsLength.current = cards.length;
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
   }, [status, cards.length]);
 
+  // --- Scroll Logic ---
   useEffect(() => {
     if (cards.length <= 1 && scrollRef.current) {
       scrollRef.current.scrollTo({
@@ -83,6 +98,7 @@ export default function AgentSide({
     <div
       className={`flex flex-col ${isLeft ? "items-end" : "items-start"} flex-1 w-full relative z-0`}
     >
+      {/* Header Info */}
       <div
         className={`flex items-center gap-1.5 sm:gap-2 md:gap-4 mb-2 md:mb-4 ${isLeft ? "flex-row" : "flex-row-reverse"}`}
       >
@@ -134,6 +150,8 @@ export default function AgentSide({
             )}
           </div>
         </div>
+
+        {/* Avatar */}
         {imageUrl ? (
           <div
             className={`w-6 h-6 sm:w-10 sm:h-10 md:w-14 md:h-14 rounded-full overflow-hidden relative border md:border-2 flex items-center justify-center shadow-sm ${avatarRing} dark:bg-transparent bg-white`}
@@ -149,6 +167,7 @@ export default function AgentSide({
         )}
       </div>
 
+      {/* HP Bar */}
       <div
         className={`w-full max-w-[240px] mb-3 md:mb-6 flex flex-col ${isLeft ? "items-end" : "items-start"}`}
       >
@@ -170,6 +189,7 @@ export default function AgentSide({
         </div>
       </div>
 
+      {/* Play Area */}
       <div
         className={`p-2.5 sm:p-5 md:p-6 h-full rounded-[16px] md:rounded-[24px] bg-white dark:bg-zinc-900 border border-foreground/20 w-full md:max-w-[340px] flex flex-col ${isLeft ? "items-end text-right" : "items-start text-left"}`}
       >
@@ -261,11 +281,11 @@ export default function AgentSide({
                 animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
                 exit={{ opacity: 0, scale: 1.5 }}
                 transition={{ type: "spring", bounce: 0.6 }}
-                className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none drop-shadow-2xl"
+                className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none" // Removed drop-shadow-2xl
               >
                 <div
                   className={`text-5xl md:text-7xl font-black rounded-xl px-5 py-2 tracking-tighter text-white ${
-                    actionPopup === "HIT!" ? "bg-red-500" : "bg-blue-500"
+                    actionPopup === "HIT!" ? "bg-blue-500" : "bg-red-500"
                   }`}
                 >
                   {actionPopup}

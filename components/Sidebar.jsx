@@ -58,25 +58,23 @@ function DesktopSidebar({ isAuthenticated, pathname }) {
         })}
       </nav>
 
-      {isAuthenticated ? (
-        <div className="mt-auto w-full">
-          <Link
-            href="/settings"
-            className={`flex flex-col items-center justify-center relative gap-1 p-2 px-0 w-full rounded-xl transition-colors ${
-              pathname === "/settings"
-                ? "text-primary"
-                : "text-text-muted hover:text-text-main"
-            }`}
-          >
-            <Settings className="w-5 h-5" />
-            <span className="text-[10px] font-semibold">Settings</span>
+      <div className="mt-auto w-full">
+        <Link
+          href="/settings"
+          className={`flex flex-col items-center justify-center relative gap-1 p-2 px-0 w-full rounded-xl transition-colors ${
+            pathname === "/settings"
+              ? "text-primary"
+              : "text-text-muted hover:text-text-main"
+          }`}
+        >
+          <Settings className="w-5 h-5" />
+          <span className="text-[10px] font-semibold">Settings</span>
 
-            <div
-              className={`absolute top-1 right-0 w-2 h-[80%] bg-primary rounded-full rounded-r-none ${pathname === "/settings" ? "block" : "hidden"}`}
-            ></div>
-          </Link>
-        </div>
-      ) : null}
+          <div
+            className={`absolute top-1 right-0 w-2 h-[80%] bg-primary rounded-full rounded-r-none ${pathname === "/settings" ? "block" : "hidden"}`}
+          ></div>
+        </Link>
+      </div>
     </aside>
   );
 }
@@ -87,13 +85,11 @@ function MobileSidebar({ isAuthenticated, pathname }) {
     { href: "/", icon: Radio, label: "Live" },
     { href: "/games", icon: Gamepad2, label: "Games" },
     { href: "/history", icon: Clock, label: "History" },
+    { href: "/settings", icon: Settings, label: "Settings" },
   ];
 
   // For mobile, we append Settings directly into the array so it flexes inline
-  const privateLinks = [
-    { href: "/profile", icon: User, label: "Profile" },
-    { href: "/settings", icon: Settings, label: "Settings" },
-  ];
+  const privateLinks = [{ href: "/profile", icon: User, label: "Profile" }];
 
   const links = isAuthenticated
     ? [...publicLinks, ...privateLinks]

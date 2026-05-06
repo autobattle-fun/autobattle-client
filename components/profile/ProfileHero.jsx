@@ -17,7 +17,7 @@ export function ProfileHero({ user, metadata }) {
   const [currentShow, setCurrentShow] = useState("AUTO");
 
   return (
-    <div className="mb-3 h-72 min-h-72 w-full rounded-4xl border border-border/50 bg-primary p-10 shadow-none">
+    <div className="mb-3 h-72 min-h-72 w-full rounded-4xl border border-border/50 bg-primary p-5 md:p-10 shadow-none">
       <div className="flex h-full flex-col justify-between">
         <div className="flex flex-col gap-1">
           <p className="text-xl font-semibold text-white opacity-50">Balance</p>

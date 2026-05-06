@@ -63,7 +63,13 @@ export function LoginScreen() {
       id: "X",
       label: "X/Twitter",
       icon: (
-        <Image src="/provider/x.png" width={24} height={24} alt="X/Twitter" />
+        <Image
+          src="/provider/x.png"
+          width={24}
+          height={24}
+          alt="X/Twitter"
+          className="dark:invert"
+        />
       ),
       action: () => {
         handleXLogin();
@@ -107,7 +113,7 @@ export function LoginScreen() {
             width={20}
             height={20}
             alt="Openfort"
-            className="-mx-1"
+            className="-mx-1 dark:invert"
           />{" "}
           Openfort
         </div>

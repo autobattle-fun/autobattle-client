@@ -60,7 +60,7 @@ export function Header() {
   }
 
   return (
-    <header className="h-16 md:h-20 flex items-center justify-between px-3 md:px-8 w-full shrink-0 bg-background/80 backdrop-blur-md z-10 border-b border-border md:border-none gap-2 md:gap-4">
+    <header className="h-16 md:h-20 flex items-center justify-between px-3 md:px-8 w-full shrink-0 bg-background/80 backdrop-blur-md z-[50] border-b border-border md:border-none gap-2 md:gap-4">
       {/* 1. LEFT: Mobile Logo / Desktop Spacer */}
       {/* On mobile: Shrink to fit logo. On desktop: flex-1 to push search to exact center */}
       <div className="flex shrink-0 md:flex-1 items-center justify-start min-w-0">
@@ -125,7 +125,7 @@ export function Header() {
             </button>
 
             {isMenuOpen ? (
-              <div className="absolute right-0 top-12 z-50 w-48 md:min-w-44 rounded-2xl border border-border bg-surface p-1.5 shadow-lg">
+              <div className="absolute right-0 top-12 z-99 w-48 md:min-w-44 rounded-2xl border border-border bg-surface p-1.5 shadow-lg">
                 <div className="flex flex-col xl:hidden px-3 py-2 border-b border-border/50 mb-1 gap-1">
                   <div className="text-xs text-text-muted">Balances</div>
                   <div className="text-sm font-bold text-text-main">

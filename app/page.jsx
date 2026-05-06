@@ -12,7 +12,7 @@ export default function LivePage() {
   const gameState = useGameStore((state) => state.gameState);
   const isLoading = useGameStore((state) => state.isLoading);
 
-  if (gameState?.serverStatus === "PAUSED") {
+  if (!isLoading && gameState?.serverStatus === "PAUSED") {
     return <PauseScreen />;
   }
 
