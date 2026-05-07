@@ -406,7 +406,7 @@ export default function LiveComments() {
       ) : (
         <div className="flex flex-col gap-4 md:gap-6 overflow-y-auto min-h-[400px] pb-10 max-h-[400px] pr-2 scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-800 scrollbar-track-transparent">
           {logs.length === 0 ? (
-            <div className="text-zinc-500 p-4 text-center text-sm">
+            <div className="text-zinc-500 p-4 text-center text-sm font-semibold">
               No logs recorded yet.
             </div>
           ) : (

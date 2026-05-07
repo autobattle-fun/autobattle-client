@@ -21,9 +21,16 @@ export const useGameStore = create((set) => ({
   setIsSocketWorking: (v) => set({ isSocketWorking: v }),
 
   addLog: (log) =>
-    set((state) => ({
-      logs: [log, ...state.logs],
-    })),
+    set((state) => {
+      const logTime = log.timestamp || log.timeStamp;
+      const isDuplicate = state.logs.some(
+        (l) => (l.timestamp || l.timeStamp) === logTime && l.log === log.log,
+      );
+      if (isDuplicate) return state;
+      return {
+        logs: [...state.logs, log],
+      };
+    }),
 
   // 🔹 ACTIONS
   updateGameState: (newState) =>
