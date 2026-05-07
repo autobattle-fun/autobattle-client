@@ -315,7 +315,7 @@ export function GlobalSearch() {
                 <span className="text-[11px]">↵</span> to select
               </div>
             </div>
-            <div className="text-[10px] font-medium text-text-muted italic">
+            <div className="text-[10px] font-medium text-text-muted">
               {allResultsCount} results found
             </div>
           </div>

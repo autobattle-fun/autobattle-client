@@ -331,7 +331,7 @@ export default function LiveComments() {
                 <Loader2 className="w-8 h-8 animate-spin text-zinc-400" />
               </div>
             ) : comments.length === 0 ? (
-              <div className="text-zinc-500 italic p-4 text-center text-sm">
+              <div className="text-zinc-500 p-4 text-center text-sm">
                 No comments yet. Be the first to say something!
               </div>
             ) : (
@@ -406,7 +406,7 @@ export default function LiveComments() {
       ) : (
         <div className="flex flex-col gap-4 md:gap-6 overflow-y-auto min-h-[400px] pb-10 max-h-[400px] pr-2 scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-800 scrollbar-track-transparent">
           {logs.length === 0 ? (
-            <div className="text-zinc-500 italic p-4 text-center text-sm">
+            <div className="text-zinc-500 p-4 text-center text-sm">
               No logs recorded yet.
             </div>
           ) : (

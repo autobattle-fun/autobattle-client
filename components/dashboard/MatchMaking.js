@@ -77,12 +77,12 @@ export default function MatchMaking() {
 
         {/* Timer Section */}
         <div className="mb-12 flex flex-col items-center transition-all duration-500">
-          <span className="text-sm md:text-lg text-black/50 font-bold uppercase tracking-widest mb-2">
+          <span className="text-sm md:text-lg text-foreground font-bold uppercase tracking-widest mb-2">
             {isMatched ? "Match Finalized" : "Matchmaking in progress"}
           </span>
           <span
             className={`text-6xl md:text-8xl font-black tabular-nums transition-transform duration-500 ${
-              isMatched ? "scale-110 text-green-600" : "text-black"
+              isMatched ? "scale-110 text-green-600" : "text-foreground"
             }`}
           >
             {formatTime(timeLeft)}
@@ -115,7 +115,7 @@ export default function MatchMaking() {
                   {SCROLL_NAMES.map((name, i) => (
                     <span
                       key={i}
-                      className="text-3xl md:text-5xl font-black italic uppercase tracking-tighter text-black/50 blur-[1px] h-[120px] md:h-[160px] flex items-center justify-center shrink-0 w-full"
+                      className="text-3xl md:text-5xl font-black uppercase tracking-tighter text-foreground/50 blur-[1px] h-[120px] md:h-[160px] flex items-center justify-center shrink-0 w-full"
                     >
                       {name}
                     </span>
@@ -127,7 +127,7 @@ export default function MatchMaking() {
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1.1, opacity: 1 }}
                 transition={{ type: "spring", stiffness: 200, damping: 10 }}
-                className="text-3xl font-black italic uppercase tracking-tighter text-center text-black h-full flex items-center"
+                className="text-3xl font-black uppercase tracking-tighter text-center text-foreground h-full flex items-center"
               >
                 {finalPlayer1}
               </motion.span>
@@ -136,7 +136,7 @@ export default function MatchMaking() {
 
           {/* VS Badge */}
           <div className="shrink-0 rounded-full w-16 h-16 md:w-20 md:h-20 flex items-center justify-center z-20">
-            <span className="text-xl md:text-4xl font-black text-black">
+            <span className="text-xl md:text-4xl font-black text-foreground">
               VS
             </span>
           </div>
@@ -165,7 +165,7 @@ export default function MatchMaking() {
                   {SCROLL_NAMES.map((name, i) => (
                     <span
                       key={i}
-                      className="text-3xl md:text-5xl font-black italic uppercase tracking-tighter text-black/50 blur-[1px] h-[120px] md:h-[160px] flex items-center justify-center shrink-0 w-full"
+                      className="text-3xl md:text-5xl font-black uppercase tracking-tighter text-foreground/50 blur-[1px] h-[120px] md:h-[160px] flex items-center justify-center shrink-0 w-full"
                     >
                       {name}
                     </span>
@@ -177,7 +177,7 @@ export default function MatchMaking() {
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1.1, opacity: 1 }}
                 transition={{ type: "spring", stiffness: 200, damping: 10 }}
-                className="text-3xl font-black italic uppercase tracking-tighter text-center text-black h-full flex items-center"
+                className="text-3xl font-black uppercase tracking-tighter text-center text-foreground h-full flex items-center"
               >
                 {finalPlayer2}
               </motion.span>

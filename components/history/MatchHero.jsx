@@ -83,9 +83,7 @@ export function MatchHero({ match }) {
             </span>
           </div>
 
-          <div className="text-white/20 font-black text-2xl italic px-4 mt-2">
-            VS
-          </div>
+          <div className="text-white/20 font-black text-2xl px-4 mt-2">VS</div>
 
           <div className="flex flex-col items-end flex-1 text-right">
             <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">

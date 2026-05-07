@@ -7,7 +7,6 @@ import GameProvider from "@/providers/GameProvider";
 import LoadingScreen from "@/components/dashboard/LoadingScreen";
 import PauseScreen from "@/components/dashboard/PauseScreen";
 import NotFoundScreen from "@/components/dashboard/NotFoundScreen";
-import EasterEgg from "@/components/dashboard/EasterEgg";
 
 export default function LivePage() {
   const gameState = useGameStore((state) => state.gameState);
