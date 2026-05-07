@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
-
-export const runtime = "edge";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 
 export async function GET(request, { params }) {
   try {
@@ -8,7 +8,7 @@ export async function GET(request, { params }) {
     let backendUrl =
       process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8080";
 
-    // Ensure we use 127.0.0.1 instead of localhost for more reliable local fetching in edge runtime
+    // Ensure we use 127.0.0.1 instead of localhost for more reliable local fetching
     if (backendUrl.includes("localhost")) {
       backendUrl = backendUrl.replace("localhost", "127.0.0.1");
     }
@@ -41,6 +41,15 @@ export async function GET(request, { params }) {
     const isResolved =
       match.status === "COMPLETED" || match.status === "RESOLVED";
 
+    // Load fonts using fs for Node.js runtime
+    const semiboldFont = await readFile(
+      join(process.cwd(), "app/fonts/OpenRunde-Semibold.woff"),
+    );
+
+    const boldFont = await readFile(
+      join(process.cwd(), "app/fonts/OpenRunde-Bold.woff"),
+    );
+
     return new ImageResponse(
       <div
         style={{
@@ -49,7 +58,7 @@ export async function GET(request, { params }) {
           display: "flex",
           backgroundColor: "#f3f4f6",
           padding: "40px",
-          fontFamily: 'Inter, "sans-serif"',
+          fontFamily: "OpenRunde",
         }}
       >
         {/* Inner Purple Card */}
@@ -95,12 +104,12 @@ export async function GET(request, { params }) {
               <div
                 style={{
                   fontSize: "36px",
-                  fontWeight: 900,
+                  fontWeight: 700,
                   color: "white",
                   letterSpacing: "-1px",
                 }}
               >
-                AutoBattle.fun
+                Autobattle.fun
               </div>
             </div>
             {isResolved && (
@@ -111,7 +120,7 @@ export async function GET(request, { params }) {
                   padding: "12px 24px",
                   borderRadius: "30px",
                   fontSize: "18px",
-                  fontWeight: 800,
+                  fontWeight: 700,
                   textTransform: "uppercase",
                   letterSpacing: "0.5px",
                 }}
@@ -165,7 +174,7 @@ export async function GET(request, { params }) {
               style={{
                 display: "flex",
                 fontSize: "72px",
-                fontWeight: 800,
+                fontWeight: 700,
                 marginBottom: "24px",
                 lineHeight: 1,
                 letterSpacing: "-1px",
@@ -177,12 +186,8 @@ export async function GET(request, { params }) {
               style={{
                 display: "flex",
                 alignItems: "center",
-                backgroundColor: "rgba(255, 255, 255, 0.1)",
-                padding: "10px 20px",
-                borderRadius: "12px",
                 fontSize: "20px",
                 fontWeight: 600,
-                width: "fit-content",
               }}
             >
               <svg
@@ -229,7 +234,7 @@ export async function GET(request, { params }) {
                 style={{
                   color: "rgba(255, 255, 255, 0.5)",
                   fontSize: "16px",
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: "1px",
                   textTransform: "uppercase",
                   marginBottom: "8px",
@@ -240,7 +245,7 @@ export async function GET(request, { params }) {
               <div
                 style={{
                   fontSize: "48px",
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: "-0.5px",
                 }}
               >
@@ -256,7 +261,7 @@ export async function GET(request, { params }) {
                 bottom: "10px",
                 transform: "translateX(-50%)",
                 fontSize: "36px",
-                fontWeight: 900,
+                fontWeight: 700,
                 color: "rgba(255, 255, 255, 0.2)",
                 letterSpacing: "2px",
               }}
@@ -275,7 +280,7 @@ export async function GET(request, { params }) {
                 style={{
                   color: "rgba(255, 255, 255, 0.5)",
                   fontSize: "16px",
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: "1px",
                   textTransform: "uppercase",
                   marginBottom: "8px",
@@ -286,7 +291,7 @@ export async function GET(request, { params }) {
               <div
                 style={{
                   fontSize: "48px",
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: "-0.5px",
                 }}
               >
@@ -299,6 +304,20 @@ export async function GET(request, { params }) {
       {
         width: 1200,
         height: 630,
+        fonts: [
+          {
+            name: "OpenRunde",
+            data: await semiboldFont,
+            weight: 600,
+            style: "normal",
+          },
+          {
+            name: "OpenRunde",
+            data: await boldFont,
+            weight: 700,
+            style: "normal",
+          },
+        ],
       },
     );
   } catch (e) {

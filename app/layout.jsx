@@ -1,38 +1,39 @@
+import { Toaster } from "sonner";
 import { cookies } from "next/headers";
 import localFont from "next/font/local";
+import { Inter } from "next/font/google";
 
 import "./globals.css";
+
+import { cn } from "@/lib/utils";
 
 import { RootShell } from "@/components/layout/RootShell";
 
 import { ClientProviders } from "@/providers/ClientProviders";
-import { Toaster } from "sonner";
-import { Inter } from "next/font/google";
-import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const openRunde = localFont({
   src: [
     {
-      path: "./fonts/OpenRunde-Regular.woff2",
+      path: "./fonts/OpenRunde-Regular.woff",
       weight: "400",
       style: "normal",
     },
     {
-      path: "./fonts/OpenRunde-Medium.woff2",
+      path: "./fonts/OpenRunde-Medium.woff",
       weight: "500",
       style: "normal",
     },
     {
-      path: "./fonts/OpenRunde-Semibold.woff2",
+      path: "./fonts/OpenRunde-Semibold.woff",
       weight: "600",
       style: "normal",
     },
     {
-      path: "./fonts/OpenRunde-Bold.woff2",
+      path: "./fonts/OpenRunde-Bold.woff",
       weight: "700",
-      style: "italic",
+      style: "normal",
     },
   ],
   variable: "--font-open-runde",

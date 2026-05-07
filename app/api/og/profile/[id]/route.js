@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
-
-export const runtime = "edge";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 
 export async function GET(request, { params }) {
   try {
@@ -31,9 +31,18 @@ export async function GET(request, { params }) {
     }
 
     const winRate =
-      user.totalGames > 0
-        ? ((user.wins / user.totalGames) * 100).toFixed(1)
+      user.totalPredictions > 0
+        ? ((user.totalWins / user.totalPredictions) * 100).toFixed(1)
         : "0";
+
+    // Load fonts using fs for Node.js runtime
+    const semiboldFont = await readFile(
+      join(process.cwd(), "app/fonts/OpenRunde-Semibold.woff"),
+    );
+
+    const boldFont = await readFile(
+      join(process.cwd(), "app/fonts/OpenRunde-Bold.woff"),
+    );
 
     return new ImageResponse(
       <div
@@ -43,7 +52,7 @@ export async function GET(request, { params }) {
           display: "flex",
           backgroundColor: "#f3f4f6",
           padding: "40px",
-          fontFamily: 'Inter, "sans-serif"',
+          fontFamily: "OpenRunde",
         }}
       >
         <div
@@ -84,12 +93,12 @@ export async function GET(request, { params }) {
                 style={{
                   display: "flex",
                   fontSize: "36px",
-                  fontWeight: 900,
+                  fontWeight: 700,
                   color: "white",
                   letterSpacing: "-1px",
                 }}
               >
-                AutoBattle.fun
+                Autobattle.fun
               </div>
             </div>
             <div
@@ -99,7 +108,7 @@ export async function GET(request, { params }) {
                 padding: "12px 24px",
                 borderRadius: "30px",
                 fontSize: "18px",
-                fontWeight: 800,
+                fontWeight: 700,
                 textTransform: "uppercase",
                 letterSpacing: "0.5px",
               }}
@@ -122,27 +131,6 @@ export async function GET(request, { params }) {
                 marginBottom: "20px",
               }}
             >
-              <div
-                style={{
-                  width: "180px",
-                  height: "180px",
-                  borderRadius: "90px",
-                  background:
-                    "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "90px",
-                  color: "white",
-                  fontWeight: 800,
-                  marginRight: "40px",
-                  boxShadow: "0 15px 30px rgba(0,0,0,0.2)",
-                  border: "4px solid rgba(255, 255, 255, 0.2)",
-                }}
-              >
-                {user.username?.[0]?.toUpperCase() || "A"}
-              </div>
-
               <div style={{ display: "flex", flexDirection: "column" }}>
                 <div
                   style={{
@@ -176,7 +164,7 @@ export async function GET(request, { params }) {
                   style={{
                     display: "flex",
                     fontSize: "84px",
-                    fontWeight: 900,
+                    fontWeight: 700,
                     lineHeight: 1,
                     letterSpacing: "-2px",
                   }}
@@ -209,9 +197,42 @@ export async function GET(request, { params }) {
               <div
                 style={{
                   display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    color: "rgba(255, 255, 255, 0.5)",
+                    fontSize: "18px",
+                    fontWeight: 700,
+                    letterSpacing: "1px",
+                    textTransform: "uppercase",
+                    marginBottom: "8px",
+                  }}
+                >
+                  Total Predictions
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    fontSize: "64px",
+                    fontWeight: 700,
+                    color: "#FFF",
+                    lineHeight: 1,
+                  }}
+                >
+                  {user.totalPredictions || 0}
+                </div>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
                   color: "rgba(255, 255, 255, 0.5)",
                   fontSize: "18px",
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: "1px",
                   textTransform: "uppercase",
                   marginBottom: "8px",
@@ -223,45 +244,12 @@ export async function GET(request, { params }) {
                 style={{
                   display: "flex",
                   fontSize: "64px",
-                  fontWeight: 900,
+                  fontWeight: 700,
                   color: "#10D960",
                   lineHeight: 1,
                 }}
               >
-                {user.wins || 0}
-              </div>
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  color: "rgba(255, 255, 255, 0.5)",
-                  fontSize: "18px",
-                  fontWeight: 800,
-                  letterSpacing: "1px",
-                  textTransform: "uppercase",
-                  marginBottom: "8px",
-                }}
-              >
-                Defeats
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  fontSize: "64px",
-                  fontWeight: 900,
-                  color: "#FF4B4B",
-                  lineHeight: 1,
-                }}
-              >
-                {user.losses || 0}
+                {user.totalWins || 0}
               </div>
             </div>
 
@@ -277,7 +265,7 @@ export async function GET(request, { params }) {
                   display: "flex",
                   color: "rgba(255, 255, 255, 0.5)",
                   fontSize: "18px",
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: "1px",
                   textTransform: "uppercase",
                   marginBottom: "8px",
@@ -289,7 +277,7 @@ export async function GET(request, { params }) {
                 style={{
                   display: "flex",
                   fontSize: "64px",
-                  fontWeight: 900,
+                  fontWeight: 700,
                   color: "#F59E0B",
                   lineHeight: 1,
                 }}
@@ -303,6 +291,20 @@ export async function GET(request, { params }) {
       {
         width: 1200,
         height: 630,
+        fonts: [
+          {
+            name: "OpenRunde",
+            data: await semiboldFont,
+            weight: 600,
+            style: "normal",
+          },
+          {
+            name: "OpenRunde",
+            data: await boldFont,
+            weight: 700,
+            style: "normal",
+          },
+        ],
       },
     );
   } catch (e) {
