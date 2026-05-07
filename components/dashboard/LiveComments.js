@@ -331,7 +331,7 @@ export default function LiveComments() {
                 <Loader2 className="w-8 h-8 animate-spin text-zinc-400" />
               </div>
             ) : comments.length === 0 ? (
-              <div className="text-zinc-500 p-4 text-center text-sm">
+              <div className="text-zinc-500 p-4 text-center text-sm font-semibold">
                 No comments yet. Be the first to say something!
               </div>
             ) : (
@@ -415,7 +415,7 @@ export default function LiveComments() {
                 <div className="w-7 h-7 md:w-10 md:h-10 rounded-full shrink-0 bg-primary relative overflow-hidden flex items-center justify-center text-white">
                   {log.role === "system" ? (
                     <Image
-                      src="/logo/AutoBattle-logo.svg"
+                      src="/logo/Autobattle-logo.svg"
                       alt="Logo"
                       width={15}
                       height={15}

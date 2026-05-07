@@ -42,7 +42,7 @@ export default function MatchMaking() {
         const newTime = prev - 1;
 
         // Finalize match at exactly 3 minutes remaining (180 seconds)
-        if (gameState?.gameStatus === "PREPARING") {
+        if (gameState?.gameStatus === "MATCHMAKING" && gameState?.phase === "PREPARING") {
           setIsMatched(true);
           setFinalPlayer1(gameState?.red?.name);
           setFinalPlayer2(gameState?.blue?.name);
