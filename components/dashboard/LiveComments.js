@@ -288,7 +288,7 @@ export default function LiveComments() {
                     console.log("Toggle emoji picker", !showEmojiPicker);
                     setShowEmojiPicker(!showEmojiPicker);
                   }}
-                  className={`p-1 rounded-md transition-colors ${showEmojiPicker ? "text-primary bg-primary/10" : "hover:text-zinc-600 dark:hover:text-zinc-300"}`}
+                  className={`p-1 rounded-md transition-colors -mr-3 ${showEmojiPicker ? "text-primary bg-primary/10" : "hover:text-zinc-600 dark:hover:text-zinc-300"}`}
                 >
                   <Smile className="w-4 h-4 md:w-5 md:h-5 cursor-pointer" />
                 </button>

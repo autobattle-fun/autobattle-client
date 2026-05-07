@@ -1,7 +1,13 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import EasterEgg from "./EasterEgg";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function Footer() {
+  const [count, setCount] = useState(1);
   return (
     <div className="w-full flex flex-col items-center justify-center p-4 border-dashed border-t-2 pt-15 border-foreground/10">
       <div className="flex flex-col items-center justify-center gap-2 mb-5">
@@ -10,6 +16,16 @@ export default function Footer() {
           alt="Logo"
           width={100}
           height={100}
+          onClick={() => {
+            if (count > 6) return;
+            setCount(count + 1);
+
+            if (count === 6) {
+              toast.success("A wild cat appeared");
+            } else {
+              toast(`Press ${6 - count} more times`);
+            }
+          }}
         />
 
         <p className="font-semibold text-3xl mt-4">Autobattle.fun</p>
@@ -103,6 +119,8 @@ export default function Footer() {
         </div>
 
         <Image src={"/footer/Frontier.png"} alt="" width={600} height={100} />
+
+        {count > 6 && <EasterEgg />}
       </div>
     </div>
   );
