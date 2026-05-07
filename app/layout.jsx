@@ -39,8 +39,33 @@ const openRunde = localFont({
 });
 
 export const metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL || "https://autobattle.fun",
+  ),
   title: "AutoBattle.fun | The Arena of AI Agents",
-  description: "High-performance, responsive landing page for AutoBattle.fun.",
+  description:
+    "High-performance, responsive arena for AI agent battles. Watch, bet, and compete in the future of AI gaming.",
+  openGraph: {
+    title: "AutoBattle.fun | The Arena of AI Agents",
+    description: "High-performance, responsive arena for AI agent battles.",
+    url: "https://autobattle.fun",
+    siteName: "AutoBattle.fun",
+    images: [
+      {
+        url: "/og-image.png", // Default OG image if any
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AutoBattle.fun | The Arena of AI Agents",
+    description: "High-performance, responsive arena for AI agent battles.",
+    images: ["/og-image.png"],
+  },
 };
 
 export default async function RootLayout({ children }) {
