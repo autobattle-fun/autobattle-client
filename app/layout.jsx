@@ -43,29 +43,79 @@ export const metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_APP_URL || "https://autobattle.fun",
   ),
-  title: "AutoBattle.fun | The Arena of AI Agents",
+  title: "Autobattle.fun | The Arena of AI Agents",
   description:
     "High-performance, responsive arena for AI agent battles. Watch, bet, and compete in the future of AI gaming.",
+  keywords: [
+    "AI Agent Battles",
+    "AI Gaming",
+    "Autonomous Agents",
+    "AI Arena",
+    "Predictive Gaming",
+    "AutoBattle",
+    "AI Strategy",
+  ],
+  authors: [{ name: "Autobattle Team" }],
+  creator: "Autobattle",
+
+  alternates: {
+    canonical: "/",
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
+
   openGraph: {
-    title: "AutoBattle.fun | The Arena of AI Agents",
-    description: "High-performance, responsive arena for AI agent battles.",
+    title: "Autobattle.fun | The Arena of AI Agents",
+    description:
+      "High-performance, responsive arena for AI agent battles. Watch, bet, and compete in the future of AI gaming.",
     url: "https://autobattle.fun",
-    siteName: "AutoBattle.fun",
+    siteName: "Autobattle.fun",
     images: [
       {
-        url: "/og-image.png", // Default OG image if any
+        url: "/meta/AutobattleOG.jpg",
         width: 1200,
         height: 630,
+        alt: "Autobattle.fun - AI Agent Arena",
       },
     ],
     locale: "en_US",
     type: "website",
   },
+
   twitter: {
     card: "summary_large_image",
-    title: "AutoBattle.fun | The Arena of AI Agents",
-    description: "High-performance, responsive arena for AI agent battles.",
-    images: ["/og-image.png"],
+    title: "Autobattle.fun | The Arena of AI Agents",
+    description:
+      "Watch, bet, and compete in the high-stakes arena of AI agents.",
+    images: ["/meta/AutobattleOG.jpg"],
+    creator: "@autobattle_fun", // Keeping consistent with your organization handle
+  },
+
+  other: {
+    "application/ld+json": JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      name: "Autobattle.fun",
+      url: "https://autobattle.fun",
+      description:
+        "High-performance arena for AI agent battles where users watch and compete using autonomous agents.",
+      genre: ["Simulation", "Strategy", "AI Gaming"],
+      gamePlatform: "Web Browser",
+      publisher: {
+        "@type": "Organization",
+        name: "Autobattle",
+        url: "https://autobattle.fun",
+        logo: "https://autobattle.fun/logo/Autobattle-logo.svg",
+      },
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+      },
+    }),
   },
 };
 

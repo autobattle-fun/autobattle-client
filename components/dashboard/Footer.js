@@ -45,8 +45,8 @@ export default function Footer() {
             <Image
               src="/footer/solana.png"
               alt="Solana"
-              width={100}
-              height={100}
+              width={90}
+              height={90}
               className="brightness-0 dark:invert"
             />
           </Link>

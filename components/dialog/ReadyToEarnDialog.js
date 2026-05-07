@@ -36,10 +36,12 @@ export default function ReadyToEarnDialog({
               type="button"
               size="icon"
               aria-label="Buy $AUTO"
-              className="cursor-pointer h-8 w-8 md:h-9 md:w-9"
+              className="cursor-pointer h-8 w-8 md:h-9 md:w-9 relative"
             >
-              {" "}
-              <Plus className="w-4 h-4" />
+              {(solBalance === 0 || autoBalance === 0) && (
+                <div className="w-6 h-6 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full animate-ping bg-primary" />
+              )}
+              <Plus className="w-4 h-4 relative" />
             </Button>
           )
         }

@@ -16,6 +16,7 @@ export default function HistoryPage() {
     matches: [],
     pagination: { totalPages: 1, total: 0 },
   });
+  console.log(data);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -169,7 +170,7 @@ export default function HistoryPage() {
 
                           {/* Updated to show Market Count instead of Prediction Count */}
                           <span className="text-[10px] font-medium text-text-muted mt-1">
-                            {match._count?.markets || 0} Markets
+                            {match._count?.rounds || 0} Rounds
                           </span>
                         </div>
                         <ArrowRight className="w-4 h-4 text-text-muted/50 group-hover:text-text-main transition-colors hidden sm:block flex-shrink-0" />
