@@ -25,7 +25,7 @@ export default function LivePage() {
     <GameProvider>
       {isLoading ? (
         <LoadingScreen />
-      ) : gameState && !countdown?.isBreak ? (
+      ) : gameState?.gameStatus === "ACTIVE" ? (
         <GameUI />
       ) : (
         <MatchMaking />

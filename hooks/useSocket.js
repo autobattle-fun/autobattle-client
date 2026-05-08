@@ -82,12 +82,12 @@ export default function useSocket() {
 
     websocket.on("round:started", (envelope) => {
       console.log("Round started", envelope);
-      updateGameState(envelope.data);
+      updateGameState(envelope.data.gameState);
     });
 
     websocket.on("cards:dealt", (envelope) => {
       console.log("Cards dealt", envelope);
-      updateGameState(envelope.data.game);
+      updateGameState(envelope.data.gameState);
       if (envelope.data.market) {
         setMarket(envelope.data.market);
       }
@@ -95,37 +95,37 @@ export default function useSocket() {
 
     websocket.on("agent:decision", (envelope) => {
       console.log("Agent decision", envelope);
-      updateGameState(envelope.data);
+      updateGameState(envelope.data.gameState);
     });
 
     websocket.on("river:flowing", (envelope) => {
       console.log("River flowing", envelope);
-      updateGameState(envelope.data);
+      updateGameState(envelope.data.gameState);
     });
 
     websocket.on("round:resolved", (envelope) => {
       console.log("Round resolved", envelope);
-      updateGameState(envelope.data);
+      updateGameState(envelope.data.gameState);
     });
 
     websocket.on("tiebreaker:started", (envelope) => {
       console.log("Tiebreaker started", envelope);
-      updateGameState(envelope.data);
+      updateGameState(envelope.data.gameState);
     });
 
     websocket.on("tiebreaker:resolved", (envelope) => {
       console.log("Tiebreaker resolved", envelope);
-      updateGameState(envelope.data);
+      updateGameState(envelope.data.gameState);
     });
 
     websocket.on("match:ended", (envelope) => {
       console.log("Match ended", envelope);
-      updateGameState(envelope.data);
+      updateGameState(envelope.data.gameState);
     });
 
     websocket.on("game:paused", (envelope) => {
       console.log("Game paused", envelope);
-      updateGameState(envelope.data);
+      updateGameState(envelope.data.gameState);
     });
 
     websocket.on("game:resumed", (envelope) => {
