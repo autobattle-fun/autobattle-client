@@ -11,12 +11,13 @@ import NotFoundScreen from "@/components/dashboard/NotFoundScreen";
 export default function LivePage() {
   const gameState = useGameStore((state) => state.gameState);
   const isLoading = useGameStore((state) => state.isLoading);
+  const countdown = useGameStore((state) => state.countdown);
 
   if (!isLoading && gameState?.serverStatus === "PAUSED") {
     return <PauseScreen />;
   }
 
-  if (!isLoading && !gameState) {
+  if (!isLoading && !gameState && !countdown?.isBreak) {
     return <NotFoundScreen />;
   }
 
@@ -24,7 +25,7 @@ export default function LivePage() {
     <GameProvider>
       {isLoading ? (
         <LoadingScreen />
-      ) : gameState?.gameStatus === "ACTIVE" ? (
+      ) : gameState && !countdown?.isBreak ? (
         <GameUI />
       ) : (
         <MatchMaking />

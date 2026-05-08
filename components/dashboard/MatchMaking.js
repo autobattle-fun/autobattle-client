@@ -24,41 +24,72 @@ const AGENT_NAMES = [
 
 // Exactly 2 sets for a perfect 50% loop with Framer Motion
 const SCROLL_NAMES = [...AGENT_NAMES, ...AGENT_NAMES];
+const DEFAULT_MATCHMAKING_SECONDS = 300;
+
+const resolveCountdownSeconds = (countdown) => {
+  if (typeof countdown === "number" && Number.isFinite(countdown)) {
+    return Math.max(0, countdown);
+  }
+
+  if (!countdown) return DEFAULT_MATCHMAKING_SECONDS;
+
+  if (
+    countdown.isBreak &&
+    Number.isFinite(countdown.remainingSeconds)
+  ) {
+    return Math.max(0, countdown.remainingSeconds);
+  }
+
+  if (
+    Number.isFinite(countdown.remainingSeconds) &&
+    countdown.remainingSeconds > 0
+  ) {
+    return countdown.remainingSeconds;
+  }
+
+  return DEFAULT_MATCHMAKING_SECONDS;
+};
 
 export default function MatchMaking() {
   const gameState = useGameStore((state) => state.gameState);
   const countdown = useGameStore((state) => state.countdown);
-  // 300 seconds = 5 minutes
-  const [timeLeft, setTimeLeft] = useState(countdown || 300);
+  const [timeLeft, setTimeLeft] = useState(() =>
+    resolveCountdownSeconds(countdown),
+  );
   const [isMatched, setIsMatched] = useState(false);
   const [finalPlayer1, setFinalPlayer1] = useState("");
   const [finalPlayer2, setFinalPlayer2] = useState("");
 
   useEffect(() => {
-    if (timeLeft <= 0) return;
+    setTimeLeft(resolveCountdownSeconds(countdown));
+  }, [countdown]);
+
+  useEffect(() => {
+    if (!countdown?.isBreak) return;
 
     const countdownInterval = setInterval(() => {
-      setTimeLeft((prev) => {
-        const newTime = prev - 1;
-
-        // Finalize match at exactly 3 minutes remaining (180 seconds)
-        if (gameState?.gameStatus === "MATCHMAKING" && gameState?.phase === "PREPARING") {
-          setIsMatched(true);
-          setFinalPlayer1(gameState?.red?.name);
-          setFinalPlayer2(gameState?.blue?.name);
-        }
-        return newTime;
-      });
+      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
 
     return () => clearInterval(countdownInterval);
-  }, [isMatched, gameState, timeLeft]);
+  }, [countdown?.isBreak]);
+
+  useEffect(() => {
+    if (gameState && countdown?.isBreak) {
+      setIsMatched(true);
+      setFinalPlayer1(gameState?.red?.name);
+      setFinalPlayer2(gameState?.blue?.name);
+    } else if (!gameState && countdown?.isBreak) {
+      setIsMatched(false);
+    }
+  }, [gameState, countdown?.isBreak]);
 
   const formatTime = (seconds) => {
-    const m = Math.floor(seconds / 60)
+    const safeSeconds = Number.isFinite(seconds) ? Math.max(0, seconds) : 0;
+    const m = Math.floor(safeSeconds / 60)
       .toString()
       .padStart(2, "0");
-    const s = (seconds % 60).toString().padStart(2, "0");
+    const s = (safeSeconds % 60).toString().padStart(2, "0");
     return `${m}:${s}`;
   };
 
