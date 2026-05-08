@@ -8,10 +8,10 @@ export const metadata = {
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="h-[100dvh] w-full bg-background text-text-main p-6 sm:p-12 overflow-y-auto relative selection:bg-primary/20 scroll-smooth">
+    <div className="h-dvh w-full bg-background text-text-main p-6 sm:p-12 overflow-y-auto relative selection:bg-primary/20 scroll-smooth">
       <div className="max-w-3xl mx-auto space-y-8 pb-24">
-        <Link 
-          href="/login" 
+        <Link
+          href="/login"
           className="inline-flex items-center gap-2 text-sm font-bold text-text-muted hover:text-text-main transition-colors mb-4"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -103,7 +103,12 @@ export default function PrivacyPolicyPage() {
               3. Cookie Policy
             </h2>
             <p className="leading-relaxed opacity-80 font-medium">
-              We do not use tracking cookies for marketing purposes. However, we may use essential cookies and similar technologies (like local storage) to provide necessary site functionality, such as remembering your login state or theme preferences. By using the Platform, you consent to the use of these technical session identifiers.
+              We do not use tracking cookies for marketing purposes. However, we
+              may use essential cookies and similar technologies (like local
+              storage) to provide necessary site functionality, such as
+              remembering your login state or theme preferences. By using the
+              Platform, you consent to the use of these technical session
+              identifiers.
             </p>
           </div>
 
@@ -192,7 +197,8 @@ export default function PrivacyPolicyPage() {
               8. Contact Us
             </h2>
             <p className="leading-relaxed opacity-80 font-medium">
-              For any privacy-related inquiries, please reach out via our community channels:
+              For any privacy-related inquiries, please reach out via our
+              community channels:
             </p>
             <div className="flex flex-wrap gap-4 pt-2">
               <div className="bg-surface/50 border border-border px-4 py-2 rounded-xl text-sm font-bold">

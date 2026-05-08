@@ -129,11 +129,11 @@ export default function Footer() {
             X/Twitter
           </Link>
 
-          <Link href={""} target="_blank" className="hover:underline">
+          <Link href={"/terms-of-service"} className="hover:underline">
             Terms of Service
           </Link>
 
-          <Link href={""} target="_blank" className="hover:underline">
+          <Link href={"/privacy-policy"} className="hover:underline">
             Privacy Policy
           </Link>
         </div>
