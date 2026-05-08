@@ -121,6 +121,7 @@ export default function useSocket() {
     websocket.on("match:ended", (envelope) => {
       console.log("Match ended", envelope);
       updateGameState(envelope.data.gameState);
+      sendPing();
     });
 
     websocket.on("game:paused", (envelope) => {
@@ -145,6 +146,7 @@ export default function useSocket() {
 
     websocket.on("log:broadcast", (envelope) => {
       addLog(envelope.data);
+      updateGameState(envelope.data.gameState);
     });
 
     return websocket;
