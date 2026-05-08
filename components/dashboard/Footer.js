@@ -107,18 +107,36 @@ export default function Footer() {
             className="not-dark:invert"
           />
 
-          <div className="relative overflow-hidden h-5 flex-1">
+          <div className="relative overflow-hidden h-5 flex-1 hidden sm:flex">
             <Image
               src={"/footer/title.png"}
               alt=""
               width={160}
               height={160}
-              className="absolute -top-9 right-0"
+              className="absolute scale-x-130 -top-9 right-4"
             />
           </div>
         </div>
 
         <Image src={"/footer/Frontier.png"} alt="" width={600} height={100} />
+
+        <div className="flex sm:flex-row flex-col gap-2 flex-wrap mt-6 text-xs font-semibold opacity-50 text-center">
+          <Link
+            href={"https://x.com/autobattle_fun"}
+            target="_blank"
+            className="hover:underline"
+          >
+            X/Twitter
+          </Link>
+
+          <Link href={""} target="_blank" className="hover:underline">
+            Terms of Service
+          </Link>
+
+          <Link href={""} target="_blank" className="hover:underline">
+            Privacy Policy
+          </Link>
+        </div>
 
         {count > 6 && <EasterEgg />}
       </div>

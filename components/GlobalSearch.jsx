@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { API_BASE_URL } from "@/lib/config";
 import { toast } from "sonner";
+import Avatar from "boring-avatars";
 
 export function GlobalSearch() {
   const [query, setQuery] = useState("");
@@ -143,9 +144,9 @@ export function GlobalSearch() {
   return (
     <div
       ref={searchRef}
-      className="relative flex-1 md:w-full md:max-w-md shrink flex justify-center min-w-0 z-50"
+      className="relative w-full max-w-[400px] shrink z-50 mx-2 md:mx-0"
     >
-      <div className="relative flex items-center w-full border border-border shadow-inner h-9 md:h-10 rounded-full bg-element px-3 md:px-4 transition-all focus-within:bg-surface focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/40 min-w-0">
+      <div className="relative flex items-center w-full border border-border shadow-inner h-9 md:h-10 rounded-full bg-element px-3 md:px-4 transition-all focus-within:bg-surface focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/40">
         {isLoading ? (
           <Loader2 className="w-4 h-4 text-primary mr-2 shrink-0 animate-spin" />
         ) : (
@@ -177,7 +178,7 @@ export function GlobalSearch() {
 
       {/* Results Dropdown */}
       {showResults && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-surface backdrop-blur-xl border border-border rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden z-100 max-h-[450px] flex flex-col animate-in fade-in slide-in-from-top-2 duration-300">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-surface w-full backdrop-blur-xl border border-border rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden z-[100] max-h-[450px] flex flex-col animate-in fade-in slide-in-from-top-2 duration-300">
           <div className="overflow-y-auto p-2 scrollbar-hide">
             {!hasResults && !isLoading ? (
               <div className="p-8 text-center flex flex-col items-center gap-2">
@@ -212,13 +213,13 @@ export function GlobalSearch() {
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           <div
-                            className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                            className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
                               match.status === "RESOLVED"
-                                ? "bg-green-500/10 text-green-500"
-                                : "bg-blue-500/10 text-blue-500"
+                                ? "bg-green-500/10"
+                                : "bg-blue-500/10"
                             }`}
                           >
-                            <History className="w-4 h-4" />
+                            <Swords className="w-4 h-4 text-primary" />
                           </div>
                           <div className="flex flex-col min-w-0">
                             <span className="text-sm font-bold text-text-main truncate">
@@ -229,24 +230,24 @@ export function GlobalSearch() {
                               {match.blueName}
                             </span>
                             <span className="text-[10px] text-text-muted font-medium flex items-center gap-1.5 mt-0.5">
-                              <span className="px-1.5 py-0.5 bg-element rounded text-primary">
+                              <span className="px-1.5 py-0.5 bg-primary text-white rounded-sm font-semibold">
                                 #{match.gameId}
                               </span>
                               <span>•</span>
                               <span
                                 className={
                                   match.status === "RESOLVED"
-                                    ? "text-green-500/80"
-                                    : "text-blue-500/80"
+                                    ? "bg-green-500/80 capitalize font-semibold text-white rounded-sm px-1.5 py-0.5"
+                                    : "bg-blue-500/80 capitalize font-semibold text-white rounded-sm px-1.5 py-0.5"
                                 }
                               >
-                                {match.status}
+                                {match.status.toLowerCase()}
                               </span>
                             </span>
                           </div>
                         </div>
                         <Search
-                          className={`w-3.5 h-3.5 text-primary transition-all duration-300 ${
+                          className={`w-3.5 h-3.5 text-primary transition-all duration-300 mr-1 hidden sm:block ${
                             selectedIndex === idx
                               ? "opacity-100 translate-x-0"
                               : "opacity-0 -translate-x-2"
@@ -259,7 +260,7 @@ export function GlobalSearch() {
 
                 {results.users.length > 0 && (
                   <div>
-                    <div className="px-3 py-2 text-[10px] font-bold text-text-muted uppercase tracking-widest flex items-center opacity-70 border-t border-border/40 mt-1 pt-3">
+                    <div className="px-3 py-2 text-[10px] font-bold text-text-muted uppercase tracking-widest flex items-center opacity-70">
                       <User className="w-3 h-3 mr-2" />
                       Users
                     </div>
@@ -277,8 +278,8 @@ export function GlobalSearch() {
                           } border`}
                         >
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20">
-                              <User className="w-4 h-4 text-primary" />
+                            <div className="w-8 h-8 rounded-full border-2 border-primary bg-primary/10 flex items-center justify-center shrink-0">
+                              <Avatar name={user.username} />
                             </div>
                             <div className="flex flex-col min-w-0">
                               <span className="text-sm font-bold text-text-main truncate">
@@ -291,7 +292,7 @@ export function GlobalSearch() {
                             </div>
                           </div>
                           <Search
-                            className={`w-3.5 h-3.5 text-primary transition-all duration-300 ${
+                            className={`w-3.5 h-3.5 text-primary transition-all mr-1 duration-300 hidden sm:block ${
                               selectedIndex === absoluteIdx
                                 ? "opacity-100 translate-x-0"
                                 : "opacity-0 -translate-x-2"
@@ -306,16 +307,8 @@ export function GlobalSearch() {
             )}
           </div>
 
-          <div className="p-3 bg-element/50 border-t border-border flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-surface border border-border text-[9px] font-bold text-text-muted">
-                <span className="text-[11px]">↑↓</span> to navigate
-              </div>
-              <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-surface border border-border text-[9px] font-bold text-text-muted">
-                <span className="text-[11px]">↵</span> to select
-              </div>
-            </div>
-            <div className="text-[10px] font-medium text-text-muted">
+          <div className="p-3 bg-element/50 border-t border-border flex items-center justify-center">
+            <div className="text-xs font-semibold text-text-muted">
               {allResultsCount} results found
             </div>
           </div>
