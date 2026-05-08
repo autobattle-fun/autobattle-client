@@ -23,7 +23,11 @@ export function RootShell({ children, initialLoggedIn = false }) {
   const { loadShares } = useUserUtil();
   const market = useMarketStore((state) => state.market);
 
-  const isLoginRoute = pathname === "/login" || pathname === "/verify-login";
+  const isLoginRoute =
+    pathname === "/login" ||
+    pathname === "/verify-login" ||
+    pathname === "/terms-of-service" ||
+    pathname === "/privacy-policy";
   const showShell = !isLoginRoute;
 
   const { setActive } = useSolanaEmbeddedWallet();

@@ -3,6 +3,8 @@
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
 
+import Link from "next/link";
+
 export function LoginShell({ title, description, children }) {
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center flex-col gap-10 justify-center px-4 py-8 sm:px-6 lg:px-8">
@@ -28,9 +30,22 @@ export function LoginShell({ title, description, children }) {
         </div>
       </Card>
 
-      <div className="flex items-center max-w-sm text-center opacity-35 -mt-6 gap-2 text-sm font-semibold text-text-main">
-        By Continuing, you agree to our Terms of Service and Privacy Policy of
-        Autobattle.fun
+      <div className="max-w-sm text-center -mt-6 text-[13px] font-semibold text-text-main">
+        <span className="opacity-50">By Continuing, you agree to our</span>{" "}
+        <Link
+          href="/terms-of-service"
+          className="underline opacity-50 hover:opacity-70 transition-opacity whitespace-nowrap"
+        >
+          Terms of Service
+        </Link>{" "}
+        <span className="opacity-50">and</span>{" "}
+        <Link
+          href="/privacy-policy"
+          className="underline opacity-50 hover:opacity-70 transition-opacity whitespace-nowrap"
+        >
+          Privacy Policy
+        </Link>{" "}
+        <span className="opacity-50">of Autobattle.fun</span>
       </div>
     </div>
   );
