@@ -1,7 +1,13 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import EasterEgg from "./EasterEgg";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function Footer() {
+  const [count, setCount] = useState(1);
   return (
     <div className="w-full flex flex-col items-center justify-center p-4 border-dashed border-t-2 pt-15 border-foreground/10">
       <div className="flex flex-col items-center justify-center gap-2 mb-5">
@@ -10,6 +16,16 @@ export default function Footer() {
           alt="Logo"
           width={100}
           height={100}
+          onClick={() => {
+            if (count > 6) return;
+            setCount(count + 1);
+
+            if (count === 6) {
+              toast.success("A wild cat appeared");
+            } else {
+              toast(`Press ${6 - count} more times`);
+            }
+          }}
         />
 
         <p className="font-semibold text-3xl mt-4">Autobattle.fun</p>
@@ -29,8 +45,8 @@ export default function Footer() {
             <Image
               src="/footer/solana.png"
               alt="Solana"
-              width={100}
-              height={100}
+              width={90}
+              height={90}
               className="brightness-0 dark:invert"
             />
           </Link>
@@ -91,18 +107,38 @@ export default function Footer() {
             className="not-dark:invert"
           />
 
-          <div className="relative overflow-hidden h-5 flex-1">
+          <div className="relative overflow-hidden h-5 flex-1 hidden sm:flex">
             <Image
               src={"/footer/title.png"}
               alt=""
               width={160}
               height={160}
-              className="absolute -top-9 right-0"
+              className="absolute scale-x-130 -top-9 right-4"
             />
           </div>
         </div>
 
         <Image src={"/footer/Frontier.png"} alt="" width={600} height={100} />
+
+        <div className="flex sm:flex-row flex-col gap-2 flex-wrap mt-6 text-xs font-semibold opacity-50 text-center">
+          <Link
+            href={"https://x.com/autobattle_fun"}
+            target="_blank"
+            className="hover:underline"
+          >
+            X/Twitter
+          </Link>
+
+          <Link href={""} target="_blank" className="hover:underline">
+            Terms of Service
+          </Link>
+
+          <Link href={""} target="_blank" className="hover:underline">
+            Privacy Policy
+          </Link>
+        </div>
+
+        {count > 6 && <EasterEgg />}
       </div>
     </div>
   );

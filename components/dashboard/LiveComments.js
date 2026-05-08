@@ -288,7 +288,7 @@ export default function LiveComments() {
                     console.log("Toggle emoji picker", !showEmojiPicker);
                     setShowEmojiPicker(!showEmojiPicker);
                   }}
-                  className={`p-1 rounded-md transition-colors ${showEmojiPicker ? "text-primary bg-primary/10" : "hover:text-zinc-600 dark:hover:text-zinc-300"}`}
+                  className={`p-1 rounded-md transition-colors -mr-3 ${showEmojiPicker ? "text-primary bg-primary/10" : "hover:text-zinc-600 dark:hover:text-zinc-300"}`}
                 >
                   <Smile className="w-4 h-4 md:w-5 md:h-5 cursor-pointer" />
                 </button>
@@ -331,7 +331,7 @@ export default function LiveComments() {
                 <Loader2 className="w-8 h-8 animate-spin text-zinc-400" />
               </div>
             ) : comments.length === 0 ? (
-              <div className="text-zinc-500 italic p-4 text-center text-sm">
+              <div className="text-zinc-500 p-4 text-center text-sm font-semibold">
                 No comments yet. Be the first to say something!
               </div>
             ) : (
@@ -406,7 +406,7 @@ export default function LiveComments() {
       ) : (
         <div className="flex flex-col gap-4 md:gap-6 overflow-y-auto min-h-[400px] pb-10 max-h-[400px] pr-2 scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-800 scrollbar-track-transparent">
           {logs.length === 0 ? (
-            <div className="text-zinc-500 italic p-4 text-center text-sm">
+            <div className="text-zinc-500 p-4 text-center text-sm font-semibold">
               No logs recorded yet.
             </div>
           ) : (
@@ -415,7 +415,7 @@ export default function LiveComments() {
                 <div className="w-7 h-7 md:w-10 md:h-10 rounded-full shrink-0 bg-primary relative overflow-hidden flex items-center justify-center text-white">
                   {log.role === "system" ? (
                     <Image
-                      src="/logo/AutoBattle-logo.svg"
+                      src="/logo/Autobattle-logo.svg"
                       alt="Logo"
                       width={15}
                       height={15}

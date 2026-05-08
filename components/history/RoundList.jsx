@@ -16,6 +16,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 export function RoundList({ rounds, redName, blueName }) {
+  console.log(rounds);
   const [expandedRound, setExpandedRound] = useState(null);
 
   const toggleRound = (roundId) => {
@@ -150,7 +151,7 @@ export function RoundList({ rounds, redName, blueName }) {
                                   </span>
                                 </div>
                                 {move.reason && (
-                                  <p className="text-[11px] text-text-muted/80 italic mt-1 line-clamp-2 hover:line-clamp-none transition-all">
+                                  <p className="text-[11px] text-text-muted/80 mt-1 line-clamp-2 hover:line-clamp-none transition-all">
                                     "{move.reason}"
                                   </p>
                                 )}
@@ -191,7 +192,7 @@ export function RoundList({ rounds, redName, blueName }) {
                 </div>
 
                 {/* 2. RIVER CARDS */}
-                {(round.riverRed || round.riverBlue) && (
+                {(round.riverRedCard || round.riverBlueCard) && (
                   <div className="flex flex-col border-t border-border/30 p-4 bg-element-hover/30">
                     <div className="flex items-center gap-2 mb-3">
                       <Layers className="w-4 h-4 text-text-muted" />
@@ -200,23 +201,24 @@ export function RoundList({ rounds, redName, blueName }) {
                       </span>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
-                      {round.riverRed && (
+                      {round.riverRedCard && (
                         <div className="flex items-center gap-2 rounded-lg bg-element border border-border/50 px-3 py-2 flex-1">
                           <span className="text-xs font-bold text-red-500 flex-1 truncate">
                             {redName}
                           </span>
                           <div className="rounded border border-border/50 bg-element-hover px-2 py-0.5 text-xs font-bold text-text-main">
-                            {round.riverRed.label || round.riverRed.value}
+                            {round.riverRedCard.label ||
+                              round.riverRedCard.value}
                           </div>
                         </div>
                       )}
-                      {round.riverBlue && (
+                      {round.riverBlueCard && (
                         <div className="flex items-center gap-2 rounded-lg bg-element border border-border/50 px-3 py-2 flex-1">
                           <span className="text-xs font-bold text-blue-500 flex-1 truncate">
                             {blueName}
                           </span>
                           <div className="rounded border border-border/50 bg-element-hover px-2 py-0.5 text-xs font-bold text-text-main">
-                            {round.riverBlue.label || round.riverBlue.value}
+                            {round.riverBlueCard.label || round.riverBlue.value}
                           </div>
                         </div>
                       )}

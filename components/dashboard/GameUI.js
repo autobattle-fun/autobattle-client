@@ -27,6 +27,19 @@ export default function GameUI() {
 
   const isDark = resolvedTheme === "dark";
 
+  const PHASE_DISPLAY_MAP = {
+    PENDING: "Pending",
+    MATCHMAKING: "Matchmaking",
+    PREPARING: "Preparing",
+    AWAITING_INITIAL_DEAL: "Awaiting Initial Deal",
+    P1_TURN: "Red Turn",
+    P2_TURN: "Blue Turn",
+    AWAITING_FINAL_REVEAL_VRF: "Awaiting Final Reveal",
+    AWAITING_TIEBREAKER_VRF: "Awaiting Tiebreaker",
+    ENDED: "Ended",
+    AWAITING_ACTION: "Awaiting Action",
+  };
+
   return (
     <div
       className={`flex h-screen overflow-hidden selection:bg-amber-500/30 transition-colors duration-500`}
@@ -58,7 +71,7 @@ export default function GameUI() {
                 <div
                   className={`text-[10px] md:text-xs font-bold tracking-tight mb-3 md:mb-6 bg-primary/10 border border-primary text-primary rounded-lg px-2 py-1`}
                 >
-                  {gameState?.phase?.replace(/([A-Z])/g, " $1").trim()}
+                  {PHASE_DISPLAY_MAP[gameState?.phase] || gameState?.phase}
                 </div>
 
                 <div className="flex-1 mb-4 flex flex-col items-center justify-center relative w-full gap-2 md:gap-4 p-4 rounded-xl overflow-hidden mt-1 md:mt-2 dark:bg-zinc-900 bg-white border border-amber-500/50 transition-colors duration-500 h-24 md:h-32">
@@ -118,10 +131,10 @@ export default function GameUI() {
                   }
                   showRiverPlaceholder={
                     [
-                      "RedTurn",
-                      "BlueTurn",
-                      "AwaitingFinalReveal",
-                      "AwaitingTiebreaker",
+                      "P1_TURN",
+                      "P2_TURN",
+                      "AWAITING_FINAL_REVEAL_VRF",
+                      "AWAITING_TIEBREAKER_VRF",
                     ].includes(gameState?.phase) && redCards.length > 0
                   }
                 />
@@ -142,10 +155,10 @@ export default function GameUI() {
                   }
                   showRiverPlaceholder={
                     [
-                      "RedTurn",
-                      "BlueTurn",
-                      "AwaitingFinalReveal",
-                      "AwaitingTiebreaker",
+                      "P1_TURN",
+                      "P2_TURN",
+                      "AWAITING_FINAL_REVEAL_VRF",
+                      "AWAITING_TIEBREAKER_VRF",
                     ].includes(gameState?.phase) && blueCards.length > 0
                   }
                 />
