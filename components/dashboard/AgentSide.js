@@ -2,7 +2,7 @@
 
 import { CheckCircle, Cpu, ShieldAlert } from "lucide-react";
 import PlayingCard from "./PlayingCard";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
 
@@ -15,6 +15,7 @@ export default function AgentSide({
   score,
   imageUrl,
   align,
+  reason,
   atRisk = 0,
   showRiverPlaceholder = false,
 }) {
@@ -32,9 +33,65 @@ export default function AgentSide({
 
   const [actionPopup, setActionPopup] = useState(null);
 
+  // --- Thinking Bubble State ---
+  const [bubbleContent, setBubbleContent] = useState(null); // null | { type: 'thinking' | 'reason' | 'finalized', text?: string }
+  const reasonTimerRef = useRef(null);
+  const reasonShownAtRef = useRef(null);
+
   // Track previous states to detect action deltas
   const prevStatus = useRef(status);
   const prevCardsLength = useRef(cards.length);
+
+  // --- Thinking Bubble Logic ---
+  useEffect(() => {
+    // Clean up reason timer on unmount
+    return () => {
+      if (reasonTimerRef.current) clearTimeout(reasonTimerRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (status === "THINKING") {
+      setBubbleContent({ type: "thinking" });
+      reasonShownAtRef.current = null;
+      if (reasonTimerRef.current) {
+        clearTimeout(reasonTimerRef.current);
+        reasonTimerRef.current = null;
+      }
+    } else if (status === "TXPENDING") {
+      if (reason) {
+        setBubbleContent({ type: "reason", text: reason });
+        reasonShownAtRef.current = Date.now();
+      } else {
+        setBubbleContent({ type: "reason", text: "Executing..." });
+        reasonShownAtRef.current = Date.now();
+      }
+    } else if (status === "FINALIZED" || status === "DONE") {
+      const now = Date.now();
+      const elapsed = reasonShownAtRef.current
+        ? now - reasonShownAtRef.current
+        : Infinity;
+      const minDisplayMs = 10000; // 10 seconds minimum
+
+      if (elapsed < minDisplayMs) {
+        // Keep showing reason, then switch to finalized after remaining time
+        reasonTimerRef.current = setTimeout(() => {
+          setBubbleContent({ type: "finalized" });
+          reasonTimerRef.current = null;
+        }, minDisplayMs - elapsed);
+      } else {
+        setBubbleContent({ type: "finalized" });
+      }
+    } else if (status === "WAITING") {
+      // Close the bubble
+      if (reasonTimerRef.current) {
+        clearTimeout(reasonTimerRef.current);
+        reasonTimerRef.current = null;
+      }
+      setBubbleContent(null);
+      reasonShownAtRef.current = null;
+    }
+  }, [status, reason]);
 
   // --- Animation Trigger Logic ---
   useEffect(() => {
@@ -96,75 +153,131 @@ export default function AgentSide({
 
   return (
     <div
-      className={`flex flex-col ${isLeft ? "items-end" : "items-start"} flex-1 w-full relative z-0`}
+      className={`flex flex-col ${isLeft ? "items-end" : "items-start"} flex-1 w-full relative z-20`}
     >
-      {/* Header Info */}
+      {/* Header Info + Bubble */}
       <div
-        className={`flex items-center gap-1.5 sm:gap-2 md:gap-4 mb-2 md:mb-4 ${isLeft ? "flex-row" : "flex-row-reverse"}`}
+        className={`relative mb-2 md:mb-4 ${isLeft ? "self-end" : "self-start"}`}
       >
+        {/* Thinking Bubble - floats above the header */}
+        <AnimatePresence>
+          {bubbleContent && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.6, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.6, y: 10 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              className={`absolute z-50 bottom-full mb-1.5 sm:mb-2 ${
+                isLeft ? "right-10" : "left-10"
+              }`}
+            >
+              <div
+                className={`group relative rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 border backdrop-blur-sm ${
+                  isRed
+                    ? "bg-red-50 dark:bg-red-950/80 border-red-200 dark:border-red-800/50 rounded-br-none"
+                    : "bg-blue-50 dark:bg-blue-950/80 border-blue-200 dark:border-blue-800/50 rounded-bl-none"
+                } ${bubbleContent.type === "reason" ? "min-w-[140px]" : ""} sm:max-w-[180px] md:max-w-[220px] hover:max-w-[200px] sm:hover:max-w-[260px] md:hover:max-w-[320px] transition-all duration-200`}
+              >
+                {/* Bubble Content */}
+                {bubbleContent.type === "thinking" && (
+                  <div className="flex items-center justify-center py-0.5">
+                    <div className="flex gap-[4px] items-end">
+                      <span
+                        className={`block w-[6px] h-[6px] sm:w-2 sm:h-2 rounded-full animate-bounce ${
+                          isRed
+                            ? "bg-red-400 dark:bg-red-500"
+                            : "bg-blue-400 dark:bg-blue-500"
+                        }`}
+                        style={{ animationDelay: "0ms" }}
+                      />
+                      <span
+                        className={`block w-[6px] h-[6px] sm:w-2 sm:h-2 rounded-full animate-bounce ${
+                          isRed
+                            ? "bg-red-400 dark:bg-red-500"
+                            : "bg-blue-400 dark:bg-blue-500"
+                        }`}
+                        style={{ animationDelay: "150ms" }}
+                      />
+                      <span
+                        className={`block w-[6px] h-[6px] sm:w-2 sm:h-2 rounded-full animate-bounce ${
+                          isRed
+                            ? "bg-red-400 dark:bg-red-500"
+                            : "bg-blue-400 dark:bg-blue-500"
+                        }`}
+                        style={{ animationDelay: "300ms" }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {bubbleContent.type === "reason" && (
+                  <p
+                    className={`text-[8px] sm:text-[10px] md:text-xs leading-tight font-medium line-clamp-2 group-hover:line-clamp-none transition-all duration-200 cursor-default ${
+                      isRed
+                        ? "text-red-700 dark:text-red-300"
+                        : "text-blue-700 dark:text-blue-300"
+                    }`}
+                  >
+                    {bubbleContent.text}
+                  </p>
+                )}
+
+                {bubbleContent.type === "finalized" && (
+                  <div className="flex items-center gap-0.5 py-0.5">
+                    <div className="flex items-center gap-1">
+                      <span
+                        className={`text-[9px] sm:text-[11px] md:text-xs font-bold tracking-tight ${
+                          isRed
+                            ? "text-red-700 dark:text-red-300"
+                            : "text-blue-700 dark:text-blue-300"
+                        }`}
+                      >
+                        Finalized
+                      </span>
+                    </div>
+                    <CheckCircle
+                      className={`w-3 h-3 text-green-600 dark:text-green-400 ml-0.5`}
+                    />
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Header Row: Name + Avatar */}
         <div
-          className={`flex flex-col ${isLeft ? "items-end" : "items-start"}`}
+          className={`flex items-center gap-1.5 sm:gap-2 md:gap-4 ${isLeft ? "flex-row" : "flex-row-reverse"}`}
         >
-          <h3 className="font-semibold text-[11px] sm:text-sm md:text-lg tracking-tight whitespace-nowrap">
-            {agentName}
-          </h3>
-          <div className="flex items-center gap-1 opacity-60 dark:text-zinc-400 text-zinc-600">
-            {status === "WAITING" && (
-              <>
-                <ShieldAlert className="w-2.5 h-2.5 md:w-4 md:h-4" />
-                <span className="text-[9px] md:text-sm font-bold font-mono tracking-tighter tabular-nums">
-                  {Math.max(0, hp)} / 10
-                </span>
-              </>
-            )}
-
-            {status === "THINKING" && (
-              <>
-                <div className="rounded-full w-2 h-2 bg-amber-500 relative">
-                  <div className="rounded-full w-2 h-2 bg-amber-500 animate-ping absolute"></div>
-                </div>
-                <span className="text-[9px] md:text-sm font-bold font-mono tracking-tighter tabular-nums">
-                  THINKING...
-                </span>
-              </>
-            )}
-
-            {status === "TXPENDING" && (
-              <>
-                <div className="rounded-full w-2 h-2 bg-green-500 relative">
-                  <div className="rounded-full w-2 h-2 bg-green-500 animate-ping absolute"></div>
-                </div>
-                <span className="text-[9px] md:text-sm font-bold font-mono tracking-tighter tabular-nums">
-                  EXECUTING...
-                </span>
-              </>
-            )}
-
-            {(status === "FINALIZED" || status === "DONE") && (
-              <>
-                <CheckCircle className="w-2.5 h-2.5 md:w-4 md:h-4 text-green-700" />
-                <span className="text-[9px] md:text-sm font-bold font-mono tracking-tighter tabular-nums">
-                  FINALIZED
-                </span>
-              </>
-            )}
+          <div
+            className={`flex flex-col ${isLeft ? "items-end" : "items-start"}`}
+          >
+            <h3 className="font-semibold text-[11px] sm:text-sm md:text-lg tracking-tight whitespace-nowrap">
+              {agentName}
+            </h3>
+            <div className="flex items-center gap-1 opacity-60 dark:text-zinc-400 text-zinc-600">
+              <ShieldAlert className="w-2.5 h-2.5 md:w-4 md:h-4" />
+              <span className="text-[9px] md:text-sm font-bold font-mono tracking-tighter tabular-nums">
+                {Math.max(0, hp)} / 10
+              </span>
+            </div>
           </div>
+
+          {/* Avatar */}
+          {imageUrl ? (
+            <div
+              className={`w-6 h-6 sm:w-10 sm:h-10 md:w-14 md:h-14 rounded-full overflow-hidden relative border md:border-2 flex items-center justify-center shadow-sm ${avatarRing} dark:bg-transparent bg-white`}
+            >
+              <Image src={imageUrl} width={70} height={70} alt="" />
+            </div>
+          ) : (
+            <div
+              className={`w-6 h-6 sm:w-10 sm:h-10 md:w-14 md:h-14 rounded-full border md:border-2 flex items-center justify-center shadow-sm ${avatarRing} dark:bg-transparent bg-white`}
+            >
+              <Cpu className="w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6" />
+            </div>
+          )}
         </div>
-
-        {/* Avatar */}
-        {imageUrl ? (
-          <div
-            className={`w-6 h-6 sm:w-10 sm:h-10 md:w-14 md:h-14 rounded-full overflow-hidden relative border md:border-2 flex items-center justify-center shadow-sm ${avatarRing} dark:bg-transparent bg-white`}
-          >
-            <Image src={imageUrl} width={70} height={70} alt="" />
-          </div>
-        ) : (
-          <div
-            className={`w-6 h-6 sm:w-10 sm:h-10 md:w-14 md:h-14 rounded-full border md:border-2 flex items-center justify-center shadow-sm ${avatarRing} dark:bg-transparent bg-white`}
-          >
-            <Cpu className="w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6" />
-          </div>
-        )}
       </div>
 
       {/* HP Bar */}
@@ -281,7 +394,7 @@ export default function AgentSide({
                 animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
                 exit={{ opacity: 0, scale: 1.5 }}
                 transition={{ type: "spring", bounce: 0.6 }}
-                className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none" // Removed drop-shadow-2xl
+                className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none"
               >
                 <div
                   className={`text-5xl md:text-7xl font-black rounded-xl px-5 py-2 tracking-tighter text-white ${

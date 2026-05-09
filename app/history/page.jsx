@@ -16,7 +16,6 @@ export default function HistoryPage() {
     matches: [],
     pagination: { totalPages: 1, total: 0 },
   });
-  console.log(data);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

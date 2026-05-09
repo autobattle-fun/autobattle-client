@@ -285,7 +285,6 @@ export default function LiveComments() {
                 <button
                   type="button"
                   onClick={() => {
-                    console.log("Toggle emoji picker", !showEmojiPicker);
                     setShowEmojiPicker(!showEmojiPicker);
                   }}
                   className={`p-1 rounded-md transition-colors -mr-3 ${showEmojiPicker ? "text-primary bg-primary/10" : "hover:text-zinc-600 dark:hover:text-zinc-300"}`}

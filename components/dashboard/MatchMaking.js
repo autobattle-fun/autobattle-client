@@ -33,10 +33,7 @@ const resolveCountdownSeconds = (countdown) => {
 
   if (!countdown) return DEFAULT_MATCHMAKING_SECONDS;
 
-  if (
-    countdown.isBreak &&
-    Number.isFinite(countdown.remainingSeconds)
-  ) {
+  if (countdown.isBreak && Number.isFinite(countdown.remainingSeconds)) {
     return Math.max(0, countdown.remainingSeconds);
   }
 

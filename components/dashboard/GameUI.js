@@ -23,21 +23,19 @@ export default function GameUI() {
     adaptServerStateToEngine(gameState || {});
   const user = useUserStore((state) => state.user);
   const router = useRouter();
-  const { sendPing } = useSocket();
+  const { initializeWebSocket } = useSocket();
 
   const isDark = resolvedTheme === "dark";
 
   const PHASE_DISPLAY_MAP = {
-    PENDING: "Pending",
-    MATCHMAKING: "Matchmaking",
     PREPARING: "Preparing",
+    ROUND_STARTED: "Round Started",
     AWAITING_INITIAL_DEAL: "Awaiting Initial Deal",
-    P1_TURN: "Red Turn",
-    P2_TURN: "Blue Turn",
+    AWAITING_ACTION: "Awaiting Action",
     AWAITING_FINAL_REVEAL_VRF: "Awaiting Final Reveal",
     AWAITING_TIEBREAKER_VRF: "Awaiting Tiebreaker",
+    ROUND_RESOLVED: "Round Resolved",
     ENDED: "Ended",
-    AWAITING_ACTION: "Awaiting Action",
   };
 
   return (
@@ -126,16 +124,14 @@ export default function GameUI() {
                   score={gameState?.red?.score}
                   align="left"
                   status={gameState?.playerStatus?.red}
+                  reason={gameState?.red?.reason}
                   atRisk={
                     gameState?.phase === "Ended" ? 0 : getDamageValue(round)
                   }
                   showRiverPlaceholder={
-                    [
-                      "P1_TURN",
-                      "P2_TURN",
-                      "AWAITING_FINAL_REVEAL_VRF",
-                      "AWAITING_TIEBREAKER_VRF",
-                    ].includes(gameState?.phase) && redCards.length > 0
+                    !["AWAITING_INITIAL_DEAL", "ROUND_RESOLVED"].includes(
+                      gameState?.phase,
+                    ) && redCards.length > 0
                   }
                 />
               </div>
@@ -150,16 +146,14 @@ export default function GameUI() {
                   score={gameState?.blue?.score}
                   align="right"
                   status={gameState?.playerStatus?.blue}
+                  reason={gameState?.blue?.reason}
                   atRisk={
                     gameState?.phase === "Ended" ? 0 : getDamageValue(round)
                   }
                   showRiverPlaceholder={
-                    [
-                      "P1_TURN",
-                      "P2_TURN",
-                      "AWAITING_FINAL_REVEAL_VRF",
-                      "AWAITING_TIEBREAKER_VRF",
-                    ].includes(gameState?.phase) && blueCards.length > 0
+                    !["AWAITING_INITIAL_DEAL", "ROUND_RESOLVED"].includes(
+                      gameState?.phase,
+                    ) && blueCards.length > 0
                   }
                 />
               </div>
@@ -170,7 +164,7 @@ export default function GameUI() {
           <LiveComments />
           <Footer />
 
-          {gameState?.phase === "Ended" && (
+          {gameState?.phase === "ENDED" && (
             <MatchResultOverlay
               redName={gameState?.red?.name}
               blueName={gameState?.blue?.name}
@@ -181,7 +175,7 @@ export default function GameUI() {
               blueCards={blueCards}
               redScore={gameState?.red?.score}
               blueScore={gameState?.blue?.score}
-              onNextMatch={sendPing}
+              onNextMatch={initializeWebSocket}
               onProfile={() => {
                 if (user) {
                   router.push("/profile");

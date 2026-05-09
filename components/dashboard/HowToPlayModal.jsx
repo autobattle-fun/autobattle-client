@@ -98,9 +98,21 @@ export default function HowToPlayModal({ render }) {
           render ? (
             render
           ) : (
-            <button className="w-full py-2 bg-primary/10 border cursor-pointer border-primary text-primary rounded-lg text-sm md:text-base font-bold tracking-wide transition-all flex justify-center items-center gap-2">
-              How to Play
-              <ArrowRight className="w-4 h-4 md:w-5 md:h-5 -mr-1" />
+            <button
+              className={cn(
+                "w-full h-15 rounded-xl md:rounded-2xl pb-[4px] group bg-primary/70 cursor-pointer",
+              )}
+            >
+              <div
+                className={cn(
+                  "h-full rounded-xl md:rounded-2xl p-4 flex flex-col items-center transition-transform duration-150 ease-out bg-primary justify-center",
+                  "group-hover:-translate-y-1 group-active:translate-y-[4px] md:group-active:translate-y-[7px]",
+                )}
+              >
+                <div className="text-2xl text-white font-bold tracking-tighter flex items-center gap-2">
+                  Game rules
+                </div>
+              </div>
             </button>
           )
         }

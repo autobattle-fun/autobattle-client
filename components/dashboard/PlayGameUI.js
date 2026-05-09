@@ -333,10 +333,10 @@ export default function PlayGameUI() {
             </h1>
           </div>
 
-          {/* 3-Column Layout: items-start prevents columns from stretching each other vertically */}
-          <div className="flex flex-row items-start justify-center gap-2 md:gap-6 w-full flex-1 isolate mt-0 xl:mt-4">
+          {/* 3-Column Layout -> Responsive Stack/Wrap */}
+          <div className="flex flex-wrap lg:flex-nowrap items-start justify-center gap-x-2 gap-y-6 lg:gap-5 xl:gap-0 w-full flex-1 isolate mt-0 xl:mt-4">
             {/* Left Agent (Red) */}
-            <div className="w-[30%] sm:w-1/3 flex justify-end">
+            <div className="order-2 lg:order-1 flex-1 lg:flex-none lg:w-[30%] flex justify-end">
               <AgentSide
                 agentName="You"
                 side="red"
@@ -352,93 +352,95 @@ export default function PlayGameUI() {
               />
             </div>
 
-            {/* Center Area (Card + Buttons) */}
-            <div className="flex flex-col justify-start items-center w-[38%] sm:w-1/3 min-w-[140px] max-w-[340px] shrink-0 relative z-20">
-              {/* Added h-auto so it stops stretching into empty space */}
-              <motion.div
-                layout
-                className={`${isDark ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-100 shadow-sm"} w-full h-auto border p-3 md:p-6 rounded-2xl md:rounded-[32px] flex flex-col items-center text-center relative transition-colors duration-500`}
-              >
-                <div className="text-xs md:text-base uppercase font-bold tracking-[0.1em] text-slate-500 mb-1 md:mb-2">
-                  <span>ROUND {gs.round}</span>
-                </div>
-
-                <div
-                  className={`text-[10px] md:text-xs font-semibold tracking-wide mb-3 md:mb-4 border rounded-full px-2 py-0.5 md:px-3 md:py-1 ${
-                    gs.activePlayer === "Blue"
-                      ? "bg-blue-50 text-blue-600 border-blue-200"
-                      : "bg-indigo-50 text-indigo-600 border-indigo-200"
-                  }`}
+            {/* Center Area (Card + Buttons) Wrapper */}
+            <div className="order-1 lg:order-2 w-full lg:w-[38%] flex justify-center shrink-0 relative z-20 mb-8 lg:mb-0">
+              <div className="flex flex-col justify-start items-center w-full min-w-[140px] max-w-[340px]">
+                <motion.div
+                  layout
+                  className={`${isDark ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-100 shadow-sm"} w-full h-auto border p-3 md:p-6 rounded-2xl md:rounded-[32px] flex flex-col items-center text-center relative transition-colors duration-500`}
                 >
-                  {gs.phase === "AwaitingAction"
-                    ? `${gs.activePlayer} Turn`
-                    : "Resolving"}
-                </div>
-
-                {/* Stakes Card */}
-                <div
-                  className={`w-full flex flex-col items-center justify-center relative py-4 px-2 md:py-6 md:px-4 rounded-xl md:rounded-[20px] mb-3 md:mb-4 border ${isDark ? "bg-gradient-to-b from-orange-950/40 to-orange-900/20 border-orange-900/50" : "bg-gradient-to-b from-[#fff7ed] to-[#fffaf5] border-orange-200"}`}
-                >
-                  <span className="text-[8px] md:text-[10px] text-slate-500 font-bold tracking-[0.15em] uppercase mb-1">
-                    Round Stakes
-                  </span>
+                  <div className="text-xs md:text-base uppercase font-bold tracking-[0.1em] text-slate-500 mb-1 md:mb-2">
+                    <span>ROUND {gs.round}</span>
+                  </div>
 
                   <div
-                    className={`text-3xl md:text-6xl font-black tracking-tighter flex items-baseline gap-1 ${dmg >= 4 ? "text-orange-500" : "text-orange-400"}`}
+                    className={`text-[10px] md:text-xs font-semibold tracking-wide mb-3 md:mb-4 border rounded-full px-2 py-0.5 md:px-3 md:py-1 ${
+                      gs.activePlayer === "Blue"
+                        ? "bg-blue-50 text-blue-600 border-blue-200"
+                        : "bg-indigo-50 text-indigo-600 border-indigo-200"
+                    }`}
                   >
-                    {dmg}
-                    <span className="text-xs md:text-base font-bold tracking-widest opacity-60 ml-1">
-                      HP
+                    {gs.phase === "AwaitingAction"
+                      ? `${gs.activePlayer} Turn`
+                      : "Resolving"}
+                  </div>
+
+                  {/* Stakes Card */}
+                  <div
+                    className={`w-full flex flex-col items-center justify-center relative py-4 px-2 md:py-6 md:px-4 rounded-xl md:rounded-[20px] mb-3 md:mb-4 border ${isDark ? "bg-gradient-to-b from-orange-950/40 to-orange-900/20 border-orange-900/50" : "bg-gradient-to-b from-[#fff7ed] to-[#fffaf5] border-orange-200"}`}
+                  >
+                    <span className="text-[8px] md:text-[10px] text-slate-500 font-bold tracking-[0.15em] uppercase mb-1">
+                      Round Stakes
                     </span>
+
+                    <div
+                      className={`text-3xl md:text-6xl font-black tracking-tighter flex items-baseline gap-1 ${dmg >= 4 ? "text-orange-500" : "text-orange-400"}`}
+                    >
+                      {dmg}
+                      <span className="text-xs md:text-base font-bold tracking-widest opacity-60 ml-1">
+                        HP
+                      </span>
+                    </div>
+
+                    <div
+                      className={`text-[8px] md:text-[10px] font-bold px-2 py-1 rounded-full border tracking-[0.15em] uppercase mt-1 md:mt-2 ${dmg >= 4 ? "text-orange-600 bg-orange-100 border-orange-200" : "text-orange-500 bg-orange-100/50 border-orange-200"}`}
+                    >
+                      {dmg >= 4 ? "High Stakes" : "Normal"}
+                    </div>
                   </div>
 
+                  {/* Message / Logs */}
                   <div
-                    className={`text-[8px] md:text-[10px] font-bold px-2 py-1 rounded-full border tracking-[0.15em] uppercase mt-1 md:mt-2 ${dmg >= 4 ? "text-orange-600 bg-orange-100 border-orange-200" : "text-orange-500 bg-orange-100/50 border-orange-200"}`}
+                    className={`w-full text-[10px] md:text-sm font-medium p-2 md:p-3 rounded-lg border ${isDark ? "bg-indigo-950/30 border-indigo-900/50 text-indigo-300" : "bg-blue-50/80 border-blue-100 text-blue-600"}`}
                   >
-                    {dmg >= 4 ? "High Stakes" : "Normal"}
+                    {gs.message}
                   </div>
-                </div>
+                </motion.div>
 
-                {/* Message / Logs */}
-                <div
-                  className={`w-full text-[10px] md:text-sm font-medium p-2 md:p-3 rounded-lg border ${isDark ? "bg-indigo-950/30 border-indigo-900/50 text-indigo-300" : "bg-blue-50/80 border-blue-100 text-blue-600"}`}
-                >
-                  {gs.message}
-                </div>
-              </motion.div>
+                {/* Action Buttons */}
+                <div className="w-full flex justify-center gap-2 mt-2 md:mt-4">
+                  {gs.phase === "AwaitingAction" &&
+                    gs.activePlayer === "Red" && (
+                      <>
+                        <ActionButton
+                          label="HIT"
+                          onClick={playerHit}
+                          baseColor="bg-[#0055c4]"
+                          topColor="bg-[#0070f3]"
+                        />
+                        <ActionButton
+                          label="STAY"
+                          onClick={playerStay}
+                          baseColor="bg-[#cc0032]"
+                          topColor="bg-[#ff003e]"
+                        />
+                      </>
+                    )}
 
-              {/* Action Buttons */}
-              <div className="w-full flex justify-center gap-2 mt-2 md:mt-4">
-                {gs.phase === "AwaitingAction" && gs.activePlayer === "Red" && (
-                  <>
+                  {isGameOver && (
                     <ActionButton
-                      label="HIT"
-                      onClick={playerHit}
-                      baseColor="bg-[#0055c4]"
-                      topColor="bg-[#0070f3]"
+                      label="NEW GAME"
+                      onClick={resetGame}
+                      baseColor="bg-emerald-700"
+                      topColor="bg-emerald-500"
                     />
-                    <ActionButton
-                      label="STAY"
-                      onClick={playerStay}
-                      baseColor="bg-[#cc0032]"
-                      topColor="bg-[#ff003e]"
-                    />
-                  </>
-                )}
-
-                {isGameOver && (
-                  <ActionButton
-                    label="NEW GAME"
-                    onClick={resetGame}
-                    baseColor="bg-emerald-700"
-                    topColor="bg-emerald-500"
-                  />
-                )}
+                  )}
+                </div>
               </div>
             </div>
 
             {/* Right Agent (Blue) */}
-            <div className="w-[30%] sm:w-1/3 flex justify-start">
+            <div className="order-3 lg:order-3 flex-1 lg:flex-none lg:w-[30%] flex justify-start">
               <AgentSide
                 agentName="AI"
                 side="blue"

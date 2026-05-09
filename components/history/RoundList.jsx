@@ -16,7 +16,6 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 export function RoundList({ rounds, redName, blueName }) {
-  console.log(rounds);
   const [expandedRound, setExpandedRound] = useState(null);
 
   const toggleRound = (roundId) => {
