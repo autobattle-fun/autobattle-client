@@ -78,7 +78,7 @@ export default function useSocket() {
 
     websocket.on("break:preparing", (envelope) => {
       console.log("Break preparing", envelope);
-      useGameStore.getState().setCountdown(envelope.data?.nextMatchAt);
+      useGameStore.getState().setCountdown(envelope.data?.countdown);
     });
 
     websocket.on("round:started", (envelope) => {
@@ -150,7 +150,6 @@ export default function useSocket() {
     websocket.on("log:broadcast", (envelope) => {
       if (envelope.data) {
         useGameStore.getState().addLog(envelope.data);
-        useGameStore.getState().updateGameState(envelope.data.gameState);
       }
     });
 

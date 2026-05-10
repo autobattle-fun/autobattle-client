@@ -16,7 +16,7 @@ export default function PredictionMarkets() {
   const [winnerName, setWinnerName] = useState("");
 
   // Refs to track previous values for comparison
-  const prevHp = useRef({ red: 10, blue: 10 });
+  // const prevHp = useRef({ red: 10, blue: 10 });
 
   useEffect(() => {
     if (!gameState) return;
@@ -28,18 +28,12 @@ export default function PredictionMarkets() {
     // 1. DETECT ROUND WINNER (Animate In)
     if (currentPhase === "ROUND_RESOLVED" && !isWinnerShowing) {
       // Check whose HP is lower *than it was previously* (meaning they took damage)
-      const redTookDamage = currentRedHp < prevHp.current.red;
-      const blueTookDamage = currentBlueHp < prevHp.current.blue;
+      const redWon = currentRedHp > currentBlueHp;
 
-      if (redTookDamage || blueTookDamage) {
-        // If Blue took damage, Red won. If Red took damage, Blue won.
-        const redWon = blueTookDamage;
-
-        setWinnerName(redWon ? gameState.red?.name : gameState.blue?.name);
-        setIsBlueWin(!redWon);
-        setIsWinnerShowing(true);
-        setIsAnimatingOut(false);
-      }
+      setWinnerName(redWon ? gameState.red?.name : gameState.blue?.name);
+      setIsBlueWin(!redWon);
+      setIsWinnerShowing(true);
+      setIsAnimatingOut(false);
     }
 
     // 2. DETECT TRANSITION TO NEW ROUND (Animate Out)
@@ -57,7 +51,7 @@ export default function PredictionMarkets() {
     }
 
     // Update refs for next render so we always have the last known HP
-    prevHp.current = { red: currentRedHp, blue: currentBlueHp };
+    // prevHp.current = { red: currentRedHp, blue: currentBlueHp };
   }, [
     gameState?.phase,
     gameState?.red?.hp,
