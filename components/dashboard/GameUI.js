@@ -28,15 +28,26 @@ export default function GameUI() {
   const isDark = resolvedTheme === "dark";
 
   const PHASE_DISPLAY_MAP = {
+    PENDING: "Pending",
     PREPARING: "Preparing",
     ROUND_STARTED: "Round Started",
     AWAITING_INITIAL_DEAL: "Awaiting Initial Deal",
     AWAITING_ACTION: "Awaiting Action",
+    AWAITING_HIT_VRF: "Dealing Hit...",
     AWAITING_FINAL_REVEAL_VRF: "Awaiting Final Reveal",
     AWAITING_TIEBREAKER_VRF: "Awaiting Tiebreaker",
+    RIVER_REVEALED: "River Revealed",
     ROUND_RESOLVED: "Round Resolved",
     ENDED: "Ended",
   };
+
+  // 🔥 FIX: Define exactly which phases are actively playing/waiting for cards
+  const isPlayingPhase = [
+    "AWAITING_ACTION",
+    "AWAITING_HIT_VRF",
+    "AWAITING_FINAL_REVEAL_VRF",
+    "AWAITING_TIEBREAKER_VRF",
+  ].includes(gameState?.phase);
 
   return (
     <div
@@ -126,13 +137,11 @@ export default function GameUI() {
                   status={gameState?.playerStatus?.red}
                   reason={gameState?.red?.reason}
                   atRisk={
-                    gameState?.phase === "Ended" ? 0 : getDamageValue(round)
+                    ["ENDED", "Ended"].includes(gameState?.phase)
+                      ? 0
+                      : getDamageValue(round)
                   }
-                  showRiverPlaceholder={
-                    !["AWAITING_INITIAL_DEAL", "ROUND_RESOLVED"].includes(
-                      gameState?.phase,
-                    ) && redCards.length > 0
-                  }
+                  showRiverPlaceholder={isPlayingPhase && redCards.length > 0}
                 />
               </div>
 
@@ -148,13 +157,11 @@ export default function GameUI() {
                   status={gameState?.playerStatus?.blue}
                   reason={gameState?.blue?.reason}
                   atRisk={
-                    gameState?.phase === "Ended" ? 0 : getDamageValue(round)
+                    ["ENDED", "Ended"].includes(gameState?.phase)
+                      ? 0
+                      : getDamageValue(round)
                   }
-                  showRiverPlaceholder={
-                    !["AWAITING_INITIAL_DEAL", "ROUND_RESOLVED"].includes(
-                      gameState?.phase,
-                    ) && blueCards.length > 0
-                  }
+                  showRiverPlaceholder={isPlayingPhase && blueCards.length > 0}
                 />
               </div>
             </div>
@@ -164,7 +171,7 @@ export default function GameUI() {
           <LiveComments />
           <Footer />
 
-          {gameState?.phase === "ENDED" && (
+          {["ENDED", "Ended"].includes(gameState?.phase) && (
             <MatchResultOverlay
               redName={gameState?.red?.name}
               blueName={gameState?.blue?.name}

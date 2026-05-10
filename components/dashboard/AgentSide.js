@@ -2,7 +2,7 @@
 
 import { CheckCircle, Cpu, ShieldAlert } from "lucide-react";
 import PlayingCard from "./PlayingCard";
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
 
@@ -33,64 +33,83 @@ export default function AgentSide({
 
   const [actionPopup, setActionPopup] = useState(null);
 
-  // --- Thinking Bubble State ---
-  const [bubbleContent, setBubbleContent] = useState(null); // null | { type: 'thinking' | 'reason' | 'finalized', text?: string }
+  // --- Display States ---
+  const [displayStatus, setDisplayStatus] = useState(status);
+  const [bubbleContent, setBubbleContent] = useState(null);
+
+  const displayTimerRef = useRef(null);
   const reasonTimerRef = useRef(null);
   const reasonShownAtRef = useRef(null);
 
-  // Track previous states to detect action deltas
   const prevStatus = useRef(status);
   const prevCardsLength = useRef(cards.length);
 
+  // --- Inline Status Delayer Logic ---
+  useEffect(() => {
+    if (displayTimerRef.current) clearTimeout(displayTimerRef.current);
+
+    if (status === "THINKING" || status === "TXPENDING") {
+      setDisplayStatus(status);
+    } else if (status === "FINALIZED" || status === "DONE") {
+      setDisplayStatus("FINALIZED");
+    } else if (status === "WAITING") {
+      if (
+        prevStatus.current === "TXPENDING" ||
+        prevStatus.current === "DONE" ||
+        prevStatus.current === "FINALIZED"
+      ) {
+        setDisplayStatus("FINALIZED");
+        displayTimerRef.current = setTimeout(() => {
+          setDisplayStatus("WAITING");
+        }, 2500);
+      } else {
+        setDisplayStatus("WAITING");
+      }
+    }
+  }, [status]);
+
   // --- Thinking Bubble Logic ---
   useEffect(() => {
-    // Clean up reason timer on unmount
-    return () => {
-      if (reasonTimerRef.current) clearTimeout(reasonTimerRef.current);
-    };
-  }, []);
+    const now = Date.now();
 
-  useEffect(() => {
     if (status === "THINKING") {
+      if (reasonTimerRef.current) clearTimeout(reasonTimerRef.current);
       setBubbleContent({ type: "thinking" });
       reasonShownAtRef.current = null;
-      if (reasonTimerRef.current) {
-        clearTimeout(reasonTimerRef.current);
-        reasonTimerRef.current = null;
-      }
     } else if (status === "TXPENDING") {
       if (reason) {
         setBubbleContent({ type: "reason", text: reason });
-        reasonShownAtRef.current = Date.now();
-      } else {
-        setBubbleContent({ type: "reason", text: "Executing..." });
-        reasonShownAtRef.current = Date.now();
+        if (!reasonShownAtRef.current) reasonShownAtRef.current = now;
       }
-    } else if (status === "FINALIZED" || status === "DONE") {
-      const now = Date.now();
-      const elapsed = reasonShownAtRef.current
-        ? now - reasonShownAtRef.current
-        : Infinity;
-      const minDisplayMs = 10000; // 10 seconds minimum
+    } else if (
+      status === "FINALIZED" ||
+      status === "DONE" ||
+      status === "WAITING"
+    ) {
+      if (reasonShownAtRef.current && reason) {
+        const elapsed = now - reasonShownAtRef.current;
+        const minDisplayMs = 10000;
 
-      if (elapsed < minDisplayMs) {
-        // Keep showing reason, then switch to finalized after remaining time
-        reasonTimerRef.current = setTimeout(() => {
-          setBubbleContent({ type: "finalized" });
-          reasonTimerRef.current = null;
-        }, minDisplayMs - elapsed);
-      } else {
-        setBubbleContent({ type: "finalized" });
+        if (elapsed < minDisplayMs) {
+          setBubbleContent({ type: "reason", text: reason });
+          if (reasonTimerRef.current) clearTimeout(reasonTimerRef.current);
+
+          reasonTimerRef.current = setTimeout(() => {
+            setBubbleContent(null);
+            reasonShownAtRef.current = null;
+          }, minDisplayMs - elapsed);
+        } else {
+          setBubbleContent(null);
+          reasonShownAtRef.current = null;
+        }
+      } else if (!reasonShownAtRef.current) {
+        setBubbleContent(null);
       }
-    } else if (status === "WAITING") {
-      // Close the bubble
-      if (reasonTimerRef.current) {
-        clearTimeout(reasonTimerRef.current);
-        reasonTimerRef.current = null;
-      }
-      setBubbleContent(null);
-      reasonShownAtRef.current = null;
     }
+
+    return () => {
+      if (reasonTimerRef.current) clearTimeout(reasonTimerRef.current);
+    };
   }, [status, reason]);
 
   // --- Animation Trigger Logic ---
@@ -98,20 +117,18 @@ export default function AgentSide({
     let timer;
 
     const cardAdded = cards.length > prevCardsLength.current;
-    const gameIsActive = prevCardsLength.current > 0; // Ignore initial deal
+    const gameIsActive = prevCardsLength.current > 0;
     const wasThinking =
       prevStatus.current === "THINKING" || prevStatus.current === "TXPENDING";
     const stoppedThinking =
-      wasThinking && (status === "WAITING" || status === "FINALIZED");
+      wasThinking &&
+      (status === "WAITING" || status === "FINALIZED" || status === "DONE");
 
     if (gameIsActive) {
-      // 1. Detect HIT: A card was added while the agent was active
       if (cardAdded && wasThinking) {
         setActionPopup("HIT!");
         timer = setTimeout(() => setActionPopup(null), 1200);
-      }
-      // 2. Detect STAY: The agent's turn ended, but no card was added
-      else if (!cardAdded && stoppedThinking) {
+      } else if (!cardAdded && stoppedThinking) {
         setActionPopup("STAY");
         timer = setTimeout(() => setActionPopup(null), 1200);
       }
@@ -159,7 +176,7 @@ export default function AgentSide({
       <div
         className={`relative mb-2 md:mb-4 ${isLeft ? "self-end" : "self-start"}`}
       >
-        {/* Thinking Bubble - floats above the header */}
+        {/* LLM Reason Bubble - floats above the header */}
         <AnimatePresence>
           {bubbleContent && (
             <motion.div
@@ -221,31 +238,12 @@ export default function AgentSide({
                     {bubbleContent.text}
                   </p>
                 )}
-
-                {bubbleContent.type === "finalized" && (
-                  <div className="flex items-center gap-0.5 py-0.5">
-                    <div className="flex items-center gap-1">
-                      <span
-                        className={`text-[9px] sm:text-[11px] md:text-xs font-bold tracking-tight ${
-                          isRed
-                            ? "text-red-700 dark:text-red-300"
-                            : "text-blue-700 dark:text-blue-300"
-                        }`}
-                      >
-                        Finalized
-                      </span>
-                    </div>
-                    <CheckCircle
-                      className={`w-3 h-3 text-green-600 dark:text-green-400 ml-0.5`}
-                    />
-                  </div>
-                )}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Header Row: Name + Avatar */}
+        {/* Header Row: Name + Inline Status Indicators + Avatar */}
         <div
           className={`flex items-center gap-1.5 sm:gap-2 md:gap-4 ${isLeft ? "flex-row" : "flex-row-reverse"}`}
         >
@@ -255,11 +253,48 @@ export default function AgentSide({
             <h3 className="font-semibold text-[11px] sm:text-sm md:text-lg tracking-tight whitespace-nowrap">
               {agentName}
             </h3>
+
+            {/* Inline Status Indicators */}
             <div className="flex items-center gap-1 opacity-60 dark:text-zinc-400 text-zinc-600">
-              <ShieldAlert className="w-2.5 h-2.5 md:w-4 md:h-4" />
-              <span className="text-[9px] md:text-sm font-bold font-mono tracking-tighter tabular-nums">
-                {Math.max(0, hp)} / 10
-              </span>
+              {displayStatus === "WAITING" && (
+                <>
+                  <ShieldAlert className="w-2.5 h-2.5 md:w-4 md:h-4" />
+                  <span className="text-[9px] md:text-sm font-bold font-mono tracking-tighter tabular-nums">
+                    {Math.max(0, hp)} / 10
+                  </span>
+                </>
+              )}
+
+              {displayStatus === "THINKING" && (
+                <>
+                  <div className="rounded-full w-2 h-2 bg-amber-500 relative">
+                    <div className="rounded-full w-2 h-2 bg-amber-500 animate-ping absolute"></div>
+                  </div>
+                  <span className="text-[9px] md:text-sm font-bold font-mono tracking-tighter tabular-nums">
+                    THINKING...
+                  </span>
+                </>
+              )}
+
+              {displayStatus === "TXPENDING" && (
+                <>
+                  <div className="rounded-full w-2 h-2 bg-green-500 relative">
+                    <div className="rounded-full w-2 h-2 bg-green-500 animate-ping absolute"></div>
+                  </div>
+                  <span className="text-[9px] md:text-sm font-bold font-mono tracking-tighter tabular-nums">
+                    EXECUTING...
+                  </span>
+                </>
+              )}
+
+              {displayStatus === "FINALIZED" && (
+                <>
+                  <CheckCircle className="w-2.5 h-2.5 md:w-4 md:h-4 text-green-700" />
+                  <span className="text-[9px] md:text-sm font-bold font-mono tracking-tighter tabular-nums">
+                    FINALIZED
+                  </span>
+                </>
+              )}
             </div>
           </div>
 
@@ -347,7 +382,7 @@ export default function AgentSide({
                   key="river-placeholder"
                   initial={{ opacity: 0, scale: 0.9, x: isLeft ? -20 : 20 }}
                   animate={{ opacity: 1, scale: 1, x: 0 }}
-                  exit={{ opacity: 0, scale: 0.9, x: isLeft ? 20 : -20 }}
+                  exit={{ opacity: 0, transition: { duration: 0 } }}
                   style={{ zIndex: 0 }}
                   className={`w-[44px] h-[64px] sm:w-[64px] sm:h-[96px] md:w-[88px] md:h-[128px] border-[1.5px] md:border-2 border-dashed ${
                     isRed

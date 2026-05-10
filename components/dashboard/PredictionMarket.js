@@ -15,31 +15,41 @@ export default function PredictionMarkets() {
   const [isBlueWin, setIsBlueWin] = useState(false);
   const [winnerName, setWinnerName] = useState("");
 
-  // Refs to track previous values for comparison
-  // const prevHp = useRef({ red: 10, blue: 10 });
+  // Refs for precise state tracking
+  const prevPhase = useRef(gameState?.phase);
+  const prevRound = useRef(gameState?.roundNumber);
 
   useEffect(() => {
     if (!gameState) return;
 
     const currentPhase = gameState.phase;
-    const currentRedHp = gameState.red?.hp ?? 10;
-    const currentBlueHp = gameState.blue?.hp ?? 10;
+    const currentRound = gameState.roundNumber;
 
-    // 1. DETECT ROUND WINNER (Animate In)
-    if (currentPhase === "ROUND_RESOLVED" && !isWinnerShowing) {
-      // Check whose HP is lower *than it was previously* (meaning they took damage)
-      const redWon = currentRedHp > currentBlueHp;
+    // --- 1. DETECT ROUND END (Animate In) ---
+    if (
+      currentPhase === "ROUND_RESOLVED" &&
+      prevPhase.current !== "ROUND_RESOLVED"
+    ) {
+      const redHp = gameState.red?.hp ?? 10;
+      const blueHp = gameState.blue?.hp ?? 10;
+
+      const redWon = redHp > blueHp;
 
       setWinnerName(redWon ? gameState.red?.name : gameState.blue?.name);
       setIsBlueWin(!redWon);
-      setIsWinnerShowing(true);
+
       setIsAnimatingOut(false);
+      setIsWinnerShowing(true);
     }
 
-    // 2. DETECT TRANSITION TO NEW ROUND (Animate Out)
-    const isGameplayPhase = ["AWAITING_ACTION"].includes(currentPhase);
-
-    if (isGameplayPhase && isWinnerShowing && !isAnimatingOut) {
+    // --- 2. DETECT ACTION PHASE (Animate Out) ---
+    // Trigger out-animation ONLY when the phase becomes AWAITING_ACTION
+    if (
+      prevPhase.current !== "AWAITING_ACTION" &&
+      currentPhase === "AWAITING_ACTION" &&
+      isWinnerShowing &&
+      !isAnimatingOut
+    ) {
       setIsAnimatingOut(true);
 
       const resetTimer = setTimeout(() => {
@@ -50,15 +60,9 @@ export default function PredictionMarkets() {
       return () => clearTimeout(resetTimer);
     }
 
-    // Update refs for next render so we always have the last known HP
-    // prevHp.current = { red: currentRedHp, blue: currentBlueHp };
-  }, [
-    gameState?.phase,
-    gameState?.red?.hp,
-    gameState?.blue?.hp,
-    isWinnerShowing,
-    isAnimatingOut,
-  ]);
+    prevPhase.current = currentPhase;
+    prevRound.current = currentRound;
+  }, [gameState?.phase, gameState?.roundNumber]);
 
   return (
     <div className="w-full mt-6 md:mt-8 grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6 relative z-10 shrink-0">
