@@ -51,6 +51,16 @@ export default function Footer() {
             />
           </Link>
 
+          <Link href={"https://helius.dev"} target="_blank">
+            <Image
+              src="/footer/helius.svg"
+              alt="Helius"
+              width={90}
+              height={90}
+              className="brightness-0 dark:invert"
+            />
+          </Link>
+
           <Link href={"https://switchboard.xyz"} target="_blank">
             <Image
               src="/footer/switchboard.svg"

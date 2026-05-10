@@ -5,6 +5,7 @@ import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
 import AgentSide from "./AgentSide";
 import { getDamageValue, drawRandomCard } from "../../lib/cards";
+import Footer from "./Footer";
 
 // Utility for Tailwind classes merging
 const cn = (...classes) => classes.filter(Boolean).join(" ");
@@ -458,6 +459,7 @@ export default function PlayGameUI() {
           </div>
         </main>
       </div>
+      <Footer />
     </div>
   );
 }

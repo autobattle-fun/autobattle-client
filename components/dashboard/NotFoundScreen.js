@@ -4,13 +4,14 @@ import useSocket from "@/hooks/useSocket";
 import { RefreshCcw } from "lucide-react";
 import Image from "next/image";
 import { useGameStore } from "@/store/gameStore";
+import Footer from "./Footer";
 
 export default function NotFoundScreen() {
   const setIsLoading = useGameStore((state) => state.setIsLoading);
   const { sendPing } = useSocket();
   return (
-    <div className="w-full h-full flex flex-col relative overflow-hidden">
-      <div className="flex-1 flex flex-col items-center justify-center z-10 w-full px-4">
+    <div className="w-full h-full flex flex-col relative">
+      <div className="flex-1 flex flex-col items-center justify-center z-10 w-full px-4 min-h-[95vh]">
         <div className="flex flex-col items-center justify-center gap-2">
           <Image
             src="/logo/Autobattle-logo.svg"
@@ -39,6 +40,7 @@ export default function NotFoundScreen() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

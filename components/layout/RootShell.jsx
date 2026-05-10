@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
 import { API_BASE_URL } from "@/lib/config";
-import { useUser } from "@openfort/react";
+import { useOpenfort, useUser } from "@openfort/react";
 import { useUserStore } from "@/store/userStore";
 import { useMarketStore } from "@/store/marketStore";
 import useUserUtil from "@/hooks/useUserUtil";
@@ -22,6 +22,8 @@ export function RootShell({ children, initialLoggedIn = false }) {
   const setIsLoadingUser = useUserStore((state) => state.setIsLoadingUser);
   const { loadShares } = useUserUtil();
   const market = useMarketStore((state) => state.market);
+  const { embeddedAccounts } = useOpenfort();
+  const dbUser = useUserStore((state) => state.user);
 
   const isLoginRoute =
     pathname === "/login" ||
@@ -30,7 +32,7 @@ export function RootShell({ children, initialLoggedIn = false }) {
     pathname === "/privacy-policy";
   const showShell = !isLoginRoute;
 
-  const { setActive } = useSolanaEmbeddedWallet();
+  const { setActive, activeWallet } = useSolanaEmbeddedWallet();
 
   const fetchUserFromDB = async (isCancelled = false) => {
     try {
@@ -134,6 +136,23 @@ export function RootShell({ children, initialLoggedIn = false }) {
 
     loadShares(market?.roundMarket?.id, true);
   }, [market?.roundMarket?.id, user?.id]);
+
+  useEffect(() => {
+    try {
+      if (
+        dbUser &&
+        !activeWallet &&
+        embeddedAccounts &&
+        embeddedAccounts?.length > 0
+      ) {
+        setActive({
+          address: dbUser?.walletAddress,
+        });
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }, [embeddedAccounts, activeWallet, dbUser]);
 
   if (!showShell) {
     return children;
