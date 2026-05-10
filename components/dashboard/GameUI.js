@@ -8,6 +8,7 @@ import LiveComments from "./LiveComments";
 import useGameEngine from "../../hooks/useGameEngine";
 import { adaptServerStateToEngine, getDamageValue } from "../../lib/cards";
 import MatchResultOverlay from "./MatchResultOverlay";
+import BannerNotification from "./BannerNotification";
 import { useGameStore } from "@/store/gameStore";
 import HowToPlayModal from "./HowToPlayModal";
 import { useUserStore } from "@/store/userStore";
@@ -194,6 +195,7 @@ export default function GameUI() {
           )}
         </main>
       </div>
+      <BannerNotification />
     </div>
   );
 }

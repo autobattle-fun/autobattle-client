@@ -96,7 +96,7 @@ function MobileSidebar({ isAuthenticated, pathname }) {
     : publicLinks;
 
   return (
-    <aside className="flex md:hidden w-full h-[72px] bg-background flex-row border-t border-border items-center justify-between shrink-0 z-20 pb-safe">
+    <aside className="flex md:hidden w-full h-[72px] bg-background flex-row border-t border-border items-center justify-between shrink-0 z-99 pb-safe">
       <nav className="flex flex-row w-full h-full">
         {links.map((link) => {
           const isActive = pathname === link.href;
