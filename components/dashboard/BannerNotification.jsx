@@ -15,19 +15,29 @@ export default function BannerNotification() {
   useEffect(() => {
     if (logs.length > prevLogsLength.current) {
       const newLogs = logs.slice(prevLogsLength.current);
-      const messages = newLogs.map(l => {
-        let msg = l.log || l.message;
-        if (!msg) return null;
-        
-        if (gameState?.red?.name) {
-          msg = msg.replace(/AGENT RED/gi, gameState.red.name);
-        }
-        if (gameState?.blue?.name) {
-          msg = msg.replace(/AGENT BLUE/gi, gameState.blue.name);
-        }
-        return msg;
-      }).filter(Boolean);
-      
+      const messages = newLogs
+        .map((l) => {
+          let role = l.role;
+          let msg = l.log || l.message;
+
+          if (l.role === "blue" || l.role === "red") {
+            if (msg !== "Thinking...") {
+              return null;
+            }
+          }
+
+          if (!msg) return null;
+
+          if (gameState?.red?.name) {
+            msg = msg.replace(/AGENT RED/gi, gameState.red.name);
+          }
+          if (gameState?.blue?.name) {
+            msg = msg.replace(/AGENT BLUE/gi, gameState.blue.name);
+          }
+          return msg;
+        })
+        .filter(Boolean);
+
       setQueue((prev) => [...prev, ...messages]);
       prevLogsLength.current = logs.length;
     } else if (logs.length < prevLogsLength.current) {
@@ -66,10 +76,10 @@ export default function BannerNotification() {
     <motion.div
       initial={{ y: "100%" }}
       animate={{ y: isVisible ? 0 : "100%" }}
-      transition={{ 
-        duration: 0.4, 
+      transition={{
+        duration: 0.4,
         ease: "easeInOut",
-        delay: isVisible ? 0 : 0.8
+        delay: isVisible ? 0 : 0.8,
       }}
       className="fixed bottom-[72px] md:bottom-0 left-0 md:left-20 w-full md:w-[calc(100%-5rem)] h-10 md:h-12 bg-background/95 border-t border-foreground/20 backdrop-blur-md z-[30] flex items-center justify-center overflow-hidden pointer-events-none transition-colors duration-500"
     >

@@ -16,7 +16,7 @@ export default function ProfilePage() {
       <ProfileHero user={user} metadata={metadata} />
       <ProfileActions />
       <ProfilePerformanceCards user={user} />
-      <Predictions username={username} />
+      <Predictions username={username} isProfile={true} />
     </div>
   );
 }

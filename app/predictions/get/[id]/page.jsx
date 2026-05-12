@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   Loader2,
   Lock,
+  InfoIcon,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -25,9 +26,9 @@ import { useUserStore } from "@/store/userStore";
 import useShares from "@/hooks/useShares";
 
 // Helper to format dates
-const formatDate = (dateString) => {
-  if (!dateString) return "N/A";
-  return new Date(dateString).toLocaleDateString("en-US", {
+const formatDate = (dateValue) => {
+  if (!dateValue) return "N/A";
+  return new Date(dateValue).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -99,7 +100,6 @@ export default function PredictionDetailPage() {
     };
   }, [id, router]);
 
-  // 👇 Integrated actual claim logic
   const handleClaim = async () => {
     if (isClaiming || !prediction?.market?.id) return;
 
@@ -155,6 +155,12 @@ export default function PredictionDetailPage() {
 
   // Check ownership
   const isOwner = currentUser?.id === userId;
+
+  // --- Claim Expiration Logic (2 Days from creation) ---
+  const creationDate = match?.createdAt || market?.createdAt || createdAt;
+  const claimExpiresAtMs =
+    new Date(creationDate).getTime() + 2 * 24 * 60 * 60 * 1000;
+  const isClaimExpired = Date.now() > claimExpiresAtMs;
 
   return (
     <div className="mx-auto flex h-full w-full max-w-xl flex-col items-center pb-12 pt-8 px-4">
@@ -287,8 +293,21 @@ export default function PredictionDetailPage() {
             </div>
           </div>
 
-          {/* Claim Status */}
+          {/* Claim Window / Expiration */}
           <div className="flex items-center justify-between border-b border-border/30 p-4">
+            <div className="flex items-center gap-3 text-text-muted">
+              <Clock className="w-4 h-4" />
+              <span className="text-sm font-medium">Claim Expires</span>
+            </div>
+            <span
+              className={`text-sm font-bold ${isClaimExpired && !hasClaimed ? "text-red-500" : "text-text-main"}`}
+            >
+              {formatDate(claimExpiresAtMs)}
+            </span>
+          </div>
+
+          {/* Claim Status */}
+          <div className="flex items-center justify-between border-b border-border/30 p-4 bg-element-hover/20">
             <div className="flex items-center gap-3 text-text-muted">
               <ShieldCheck className="w-4 h-4" />
               <span className="text-sm font-medium">Claim Status</span>
@@ -297,17 +316,19 @@ export default function PredictionDetailPage() {
               <span className="text-sm font-bold text-green-500">Claimed</span>
             ) : (
               <span className="text-sm font-bold text-text-muted">
-                {isWinner
-                  ? "Pending Claim"
-                  : isLoser
-                    ? "Lost Wager"
-                    : "Unclaimed"}
+                {isWinner && isClaimExpired
+                  ? "Expired"
+                  : isWinner
+                    ? "Pending Claim"
+                    : isLoser
+                      ? "Lost Wager"
+                      : "Unclaimed"}
               </span>
             )}
           </div>
 
           {/* Date */}
-          <div className="flex items-center justify-between p-4 bg-element-hover/20">
+          <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3 text-text-muted">
               <Calendar className="w-4 h-4" />
               <span className="text-sm font-medium">Placed On</span>
@@ -322,42 +343,49 @@ export default function PredictionDetailPage() {
       {/* 3. CONDITIONAL ACTION BUTTON */}
       {isOwner && (
         <div className="w-full mt-6 pb-6">
-          {isWinner && !hasClaimed ? (
+          {isWinner && !hasClaimed && !isClaimExpired ? (
             /* PRIMARY BUTTON: Eligible to Claim */
-            <button
-              onClick={handleClaim}
-              disabled={isClaiming}
-              className={cn(
-                "w-full rounded-xl md:rounded-2xl pb-[4px] group bg-primary/70 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed",
-              )}
-            >
-              <div
+            <>
+              <button
+                onClick={handleClaim}
+                disabled={isClaiming}
                 className={cn(
-                  "h-full rounded-xl md:rounded-2xl p-4 flex flex-col items-center transition-transform duration-150 ease-out bg-primary",
-                  !isClaiming &&
-                    "group-hover:-translate-y-1 group-active:translate-y-[4px] md:group-active:translate-y-[7px]",
+                  "w-full rounded-xl md:rounded-2xl pb-[4px] group bg-primary/70 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed",
                 )}
               >
-                <div className="text-xl text-white font-bold tracking-tighter flex items-center gap-2">
-                  {isClaiming ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <>
-                      <Image
-                        src="/logo/Autobattle-logo.svg"
-                        width={20}
-                        height={20}
-                        alt="Autobattle.fun"
-                        className="brightness-0 invert"
-                      />
-                      Claim Winnings
-                    </>
+                <div
+                  className={cn(
+                    "h-full rounded-xl md:rounded-2xl p-4 flex flex-col items-center transition-transform duration-150 ease-out bg-primary",
+                    !isClaiming &&
+                      "group-hover:-translate-y-1 group-active:translate-y-[4px] md:group-active:translate-y-[7px]",
                   )}
+                >
+                  <div className="text-xl text-white font-bold tracking-tighter flex items-center gap-2">
+                    {isClaiming ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <>
+                        <Image
+                          src="/logo/Autobattle-logo.svg"
+                          width={20}
+                          height={20}
+                          alt="Autobattle.fun"
+                          className="brightness-0 invert"
+                        />
+                        Claim Winnings
+                      </>
+                    )}
+                  </div>
                 </div>
+              </button>
+              <div className="flex gap-2 text-xs text-left font-semibold text-text-muted mt-2">
+                <InfoIcon className="w-5 h-5 shrink-0" />
+                Payouts are subject to vault liquidity. In low-liquidity
+                markets, winning shares may pay out less than face value.
               </div>
-            </button>
+            </>
           ) : (
-            /* SECONDARY BUTTON: Pending, Lost, or Already Claimed */
+            /* SECONDARY BUTTON: Pending, Lost, Expired, or Already Claimed */
             <button
               disabled
               className={cn(
@@ -374,6 +402,11 @@ export default function PredictionDetailPage() {
                     <>
                       <CheckCircle2 className="w-5 h-5 text-green-500" />
                       Winnings Claimed
+                    </>
+                  ) : isWinner && isClaimExpired ? (
+                    <>
+                      <Clock className="w-5 h-5 text-red-500" />
+                      Claim Window Expired
                     </>
                   ) : isLoser ? (
                     <>

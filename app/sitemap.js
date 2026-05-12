@@ -6,7 +6,6 @@ export default async function sitemap() {
 
   const staticRoutes = [
     "", // Home page (root page.jsx)
-    "/predictions", // Betting/Prediction market
     "/history", // Past battle logs
     "/games", // Game directory
     "/login", // Auth

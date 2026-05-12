@@ -229,10 +229,10 @@ export default function AgentSide({
 
                 {bubbleContent.type === "reason" && (
                   <p
-                    className={`text-[8px] sm:text-[10px] md:text-xs leading-tight font-medium line-clamp-2 group-hover:line-clamp-none transition-all duration-200 cursor-default ${
+                    className={`text-[8px] sm:text-[10px] md:text-xs leading-tight font-medium line-clamp-2 group-hover:line-clamp-none group-hover:overflow-y-auto group-hover:max-h-[50px] md:group-hover:max-h-[60px] pr-1 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full transition-all duration-200 cursor-default ${
                       isRed
-                        ? "text-red-700 dark:text-red-300"
-                        : "text-blue-700 dark:text-blue-300"
+                        ? "text-red-700 dark:text-red-300 [&::-webkit-scrollbar-thumb]:bg-red-500/30"
+                        : "text-blue-700 dark:text-blue-300 [&::-webkit-scrollbar-thumb]:bg-blue-500/30"
                     }`}
                   >
                     {bubbleContent.text}

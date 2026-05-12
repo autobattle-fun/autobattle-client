@@ -104,7 +104,7 @@ export default function PredictionsPage() {
           />
 
           {data.pagination.total > 10 && (
-            <div className="mt-8 w-full">
+            <div className="w-full pb-8">
               <Pagination
                 currentPage={page}
                 totalPages={data.pagination.totalPages}

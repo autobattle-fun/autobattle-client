@@ -1,9 +1,57 @@
 "use client";
 
 import { motion } from "motion/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import PlayingCard from "./PlayingCard";
 import { useGameStore } from "@/store/gameStore";
+
+// --- New Scrollable Deck Sub-Component ---
+function ScrollableDeck({ cards }) {
+  const scrollRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+
+  const handlePointerDown = (e) => {
+    setIsDragging(true);
+    setStartX(e.pageX - scrollRef.current.offsetLeft);
+    setScrollLeft(scrollRef.current.scrollLeft);
+  };
+
+  const handlePointerMove = (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    scrollRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handlePointerUp = () => setIsDragging(false);
+
+  return (
+    <div className="w-full relative h-[120px] md:h-[150px] mt-2 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)]">
+      <div
+        ref={scrollRef}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerLeave={handlePointerUp}
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        className="flex items-center w-full h-full overflow-x-auto [&::-webkit-scrollbar]:hidden px-4 md:px-8 cursor-grab active:cursor-grabbing flex-row"
+      >
+        {cards.map((card, i) => (
+          <PlayingCard
+            key={card.id + "_" + i}
+            card={{ ...card, isFaceUp: true }}
+            delay={0.1 * i}
+            align="right"
+            zIndex={i}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function MatchResultOverlay({
   winnerSide = "red", // "red" | "blue" | "draw"
@@ -47,8 +95,6 @@ export default function MatchResultOverlay({
     return () => clearInterval(timer);
   }, [timeLeft]);
 
-  // Consolidate the Next Match click action
-
   // Math for the SVG circle (Circumference = 2 * PI * Radius)
   const radius = 10;
   const circumference = 2 * Math.PI * radius;
@@ -86,8 +132,8 @@ export default function MatchResultOverlay({
         {/* Final Decks Container */}
         <div className="flex flex-col md:flex-row gap-4 md:gap-8 w-full w-max-3xl relative z-10">
           {/* Red Player Deck */}
-          <div className="flex-1 flex flex-col items-center dark:bg-zinc-800/50 bg-zinc-100 rounded-[24px] p-6 border border-foreground/5">
-            <div className="flex items-baseline gap-2 mb-4">
+          <div className="flex-1 flex flex-col items-center dark:bg-zinc-800/50 bg-zinc-100 rounded-[24px] p-6 border border-foreground/5 overflow-hidden w-full">
+            <div className="flex items-baseline gap-2 mb-2">
               <span className="text-xl md:text-2xl font-bold text-zinc-800 dark:text-zinc-200">
                 {redName}
               </span>
@@ -95,22 +141,14 @@ export default function MatchResultOverlay({
                 {redScore}
               </span>
             </div>
-            <div className="flex justify-center items-center h-[120px] md:h-[150px]">
-              {redCards.map((card, i) => (
-                <PlayingCard
-                  key={card.id + "_" + i}
-                  card={{ ...card, isFaceUp: true }}
-                  delay={0.1 * i}
-                  align="right"
-                  zIndex={i}
-                />
-              ))}
-            </div>
+
+            {/* Red Scrollable Cards */}
+            <ScrollableDeck cards={redCards} />
           </div>
 
           {/* Blue Player Deck */}
-          <div className="flex-1 flex flex-col items-center dark:bg-zinc-800/50 bg-zinc-100 rounded-[24px] p-6 border border-foreground/5">
-            <div className="flex items-baseline gap-2 mb-4">
+          <div className="flex-1 flex flex-col items-center dark:bg-zinc-800/50 bg-zinc-100 rounded-[24px] p-6 border border-foreground/5 overflow-hidden w-full">
+            <div className="flex items-baseline gap-2 mb-2">
               <span className="text-xl md:text-2xl font-bold text-zinc-800 dark:text-zinc-200">
                 {blueName}
               </span>
@@ -118,17 +156,9 @@ export default function MatchResultOverlay({
                 {blueScore}
               </span>
             </div>
-            <div className="flex justify-center items-center h-[120px] md:h-[150px]">
-              {blueCards.map((card, i) => (
-                <PlayingCard
-                  key={card.id + "_" + i}
-                  card={{ ...card, isFaceUp: true }}
-                  delay={0.1 * i}
-                  align="right"
-                  zIndex={i}
-                />
-              ))}
-            </div>
+
+            {/* Blue Scrollable Cards */}
+            <ScrollableDeck cards={blueCards} />
           </div>
         </div>
 

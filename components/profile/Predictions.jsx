@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { Card } from "../ui/card";
 
-export default function Predictions({ username }) {
+export default function Predictions({ username, isProfile = false }) {
   const [predictions, setPredictions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({
@@ -71,7 +71,7 @@ export default function Predictions({ username }) {
         <ProfileRecentHistory predictions={predictions} />
       )}
 
-      {!loading && pagination?.total > 10 && (
+      {!loading && pagination?.total > 10 && !isProfile && (
         <div className="mt-6">
           <Pagination
             currentPage={1}
@@ -84,7 +84,7 @@ export default function Predictions({ username }) {
       {!loading && predictions?.length > 0 && (
         <Link
           href={`/predictions/${username}`}
-          className="mt-5 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest text-text-muted hover:text-text-main transition-colors group"
+          className="flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest text-text-muted hover:text-text-main transition-colors group"
         >
           View Full History
           <span className="group-hover:translate-x-1 transition-transform">
