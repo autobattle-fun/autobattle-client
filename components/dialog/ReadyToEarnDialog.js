@@ -192,13 +192,13 @@ export default function ReadyToEarnDialog({
           <div className="flex items-center gap-1 justify-center font-semibold text-xs opacity-50 -mb-5 -mt-1">
             <p>Powered by</p>
             <Image
-              src="/footer/bags.png"
+              src="/footer/pump.svg"
               width={15}
               height={15}
-              alt="bags"
-              className="brightness-0 dark:invert"
+              alt="pump.fun"
+              className=""
             />
-            <p>Bags.fm</p>
+            <p>pump.fun</p>
           </div>
         </DialogFooter>
       </DialogPopup>

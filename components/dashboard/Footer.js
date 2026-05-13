@@ -91,17 +91,17 @@ export default function Footer() {
             />
           </Link>
 
-          <Link href="https://bags.fm" target="_blank">
+          <Link href="https://pump.fun" target="_blank">
             <div className="flex items-center gap-1">
               <Image
-                src={"/footer/bags.png"}
+                src={"/footer/pump.svg"}
                 alt="Logo"
                 width={22}
                 height={22}
-                className="brightness-0 dark:invert"
+                className="opacity-80"
               />
 
-              <p className="font-semibold text-sm">Bags.fm</p>
+              <p className="font-semibold text-sm">pump.fun</p>
             </div>
           </Link>
         </div>
