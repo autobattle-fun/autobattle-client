@@ -110,7 +110,7 @@ export default function LeaderboardPage() {
               // Safely grab counts
               const totalPlayed = getCount(celeb.matchesPlayed);
               const totalWins = getCount(celeb.wins);
-              const winRate = Number(celeb.winRate) || 0;
+              const winRate = Number(celeb.winRate) * 100 || 0;
 
               return (
                 <Card
