@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { formatNumber } from "@/lib/format";
+import Link from "next/link";
 
 export default function ReadyToEarnDialog({
   solBalance,
@@ -163,11 +164,12 @@ export default function ReadyToEarnDialog({
           variant="bare"
           className="gap-4 sm:space-x-0 -mt-3 flex flex-col!"
         >
-          <button
+          <Link
+            href="https://pump.fun/coin/AHuCNBJziaMf7LtjvGwDCE7D2XWWSA7K5egxwNGZpump"
+            target="_blank"
             className={cn(
               "flex-1 rounded-xl md:rounded-2xl pb-[4px] group bg-primary/70 cursor-pointer",
             )}
-            onClick={() => {}}
           >
             <div
               className={cn(
@@ -187,7 +189,7 @@ export default function ReadyToEarnDialog({
                 Get $AUTO
               </div>
             </div>
-          </button>
+          </Link>
 
           <div className="flex items-center gap-1 justify-center font-semibold text-xs opacity-50 -mb-5 -mt-1">
             <p>Powered by</p>
