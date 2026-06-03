@@ -15,7 +15,7 @@ export function ClientProviders({ children }) {
         walletConfig={{
           shieldPublishableKey:
             process.env.NEXT_PUBLIC_OPENFORT_SHIELD_PUBLISHABLE_KEY,
-          solana: { cluster: "devnet" },
+          solana: { cluster: "mainnet-beta" },
           createEncryptedSessionEndpoint: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/openfort/create-session`,
         }}
       >
