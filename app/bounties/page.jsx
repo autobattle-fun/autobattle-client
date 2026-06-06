@@ -124,7 +124,7 @@ export default function BountiesPage() {
                         alt="Twitter"
                         width={20}
                         height={20}
-                        className="w-4 h-4 shrink-0 mt-0.5"
+                        className="w-4 h-4 shrink-0 mt-0.5 brightness-0 dark:invert"
                       />
                       <p className="text-xs text-text-main font-medium leading-relaxed whitespace-pre-line">
                         {bounty.tweetContent}
