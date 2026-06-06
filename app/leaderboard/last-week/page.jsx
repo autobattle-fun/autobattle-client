@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Activity, Loader2, Medal, ArrowUpDown, User } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, format } from "date-fns";
 
-export default function CurrentWeekLeaderboard() {
+export default function LastWeekLeaderboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -17,7 +17,7 @@ export default function CurrentWeekLeaderboard() {
       setLoading(true);
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/leaderboard/live`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/leaderboard/last-week`,
           { signal: controller.signal },
         );
 
@@ -73,13 +73,13 @@ export default function CurrentWeekLeaderboard() {
 
   return (
     <div className="flex w-full flex-col gap-3 pb-8">
-      {/* Meta Info */}
-      {data?.updatedAt && (
+      {/* Week Info */}
+      {data?.weekStart && (
         <p className="text-xs text-text-muted mb-1 font-medium">
-          Updated{" "}
-          {formatDistanceToNow(new Date(data.updatedAt), {
-            addSuffix: true,
-          })}
+          Week of {format(new Date(data.weekStart), "MMM d, yyyy")}
+          {data?.updatedAt && (
+            <> · Final results</>
+          )}
         </p>
       )}
 
@@ -87,10 +87,10 @@ export default function CurrentWeekLeaderboard() {
         <Card className="flex w-full flex-col items-center justify-center rounded-3xl border border-dashed border-border/50 bg-element/30 py-16 px-4 shadow-none">
           <Activity className="w-8 h-8 text-text-muted/50 mb-3" />
           <p className="text-sm font-semibold text-text-main">
-            No trades this week yet
+            No data for last week
           </p>
           <p className="text-xs text-text-muted mt-1 text-center">
-            Start trading to appear on the leaderboard!
+            Last week&apos;s leaderboard will appear here once available.
           </p>
         </Card>
       ) : (

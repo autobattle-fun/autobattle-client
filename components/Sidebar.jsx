@@ -10,6 +10,7 @@ import {
   Clock,
   Settings,
   Trophy,
+  Crosshair,
   Ellipsis,
 } from "lucide-react";
 import Image from "next/image";
@@ -18,6 +19,7 @@ import Image from "next/image";
 const moreSubItems = [
   { href: "/games", icon: Gamepad2, label: "Games" },
   { href: "/leaderboard", icon: Trophy, label: "Leaderboard" },
+  { href: "/bounties", icon: Crosshair, label: "Bounties" },
 ];
 
 // 1. Desktop Sidebar Component
@@ -35,7 +37,9 @@ function DesktopSidebar({ isAuthenticated, pathname }) {
     ? [...publicLinks, ...privateLinks]
     : publicLinks;
 
-  const isMoreActive = moreSubItems.some((item) => pathname === item.href);
+  const isMoreActive = moreSubItems.some(
+    (item) => pathname === item.href || pathname.startsWith(item.href + "/"),
+  );
 
   return (
     <aside className="hidden md:flex w-20 h-screen bg-background flex-col border-r border-border items-center justify-center py-6 shrink-0 z-20">
@@ -103,7 +107,7 @@ function DesktopSidebar({ isAuthenticated, pathname }) {
               />
               <div className="absolute left-full top-0 ml-2 bg-background border border-border p-3 rounded-xl z-50 flex flex-col gap-3 shadow-lg w-40">
                 {moreSubItems.map((sub) => {
-                  const isSubActive = pathname === sub.href;
+                  const isSubActive = pathname === sub.href || pathname.startsWith(sub.href + "/");
                   const SubIcon = sub.icon;
                   return (
                     <Link
@@ -164,7 +168,9 @@ function MobileSidebar({ isAuthenticated, pathname }) {
     ? [...publicLinks, ...privateLinks, settingsLink]
     : [...publicLinks, settingsLink];
 
-  const isMoreActive = moreSubItems.some((item) => pathname === item.href);
+  const isMoreActive = moreSubItems.some(
+    (item) => pathname === item.href || pathname.startsWith(item.href + "/"),
+  );
 
   return (
     <aside className="flex md:hidden w-full h-[72px] bg-background flex-row border-t border-border items-center justify-between shrink-0 z-50 pb-safe">
@@ -222,7 +228,7 @@ function MobileSidebar({ isAuthenticated, pathname }) {
               />
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-background border border-border p-3 rounded-xl z-50 flex flex-col gap-3 shadow-lg w-48">
                 {moreSubItems.map((sub) => {
-                  const isSubActive = pathname === sub.href;
+                  const isSubActive = pathname === sub.href || pathname.startsWith(sub.href + "/");
                   const SubIcon = sub.icon;
                   return (
                     <Link

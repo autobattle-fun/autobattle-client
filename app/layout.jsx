@@ -119,6 +119,10 @@ export const metadata = {
   },
 };
 
+export const viewport = {
+  viewportFit: "cover",
+};
+
 export default async function RootLayout({ children }) {
   const cookieStore = await cookies();
 

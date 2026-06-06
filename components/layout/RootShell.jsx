@@ -160,7 +160,7 @@ export function RootShell({ children, initialLoggedIn = false }) {
 
   return (
     // 👇 CHANGED HERE: flex-col-reverse for Mobile, flex-row for Desktop
-    <div className="flex flex-col-reverse md:flex-row h-screen overflow-hidden">
+    <div className="flex flex-col-reverse md:flex-row h-dvh overflow-hidden">
       <Sidebar isAuthenticated={isLoggedIn} />
       <div className="relative flex h-full flex-1 flex-col overflow-hidden">
         <Header isAuthenticated={isLoggedIn} />
